@@ -1,8 +1,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-class DesktopLayout;
-class WindowMakerState;
+#include "ViWm.h"
 
 /**
  * Class associated with a real action.

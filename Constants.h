@@ -12,15 +12,6 @@ enum    Tags
     TAG_5 = 16
 };
 
-enum TillingMode
-{
-    VerticalTilling,
-    HorizontalTilling,
-    GridTilling,
-    FullScreenTilling,
-    LastTillingMode
-};
-
 enum    ConfigurationConstants
 {
     DEFAULT_MODKEY = MOD_CONTROL | MOD_ALT,
@@ -28,9 +19,6 @@ enum    ConfigurationConstants
     MemoryTrimmDelay = 60000,
     MousePollDelay = 500
 };
-
-const char* NAME;
-const char* VERSION;
 
 typedef unsigned short uint16;
 

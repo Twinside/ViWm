@@ -12,6 +12,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -45,6 +48,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				DisableLanguageExtensions="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				DebugInformationFormat="4"
@@ -161,6 +165,154 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				DisableLanguageExtensions="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -175,11 +327,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Layouter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LayoutTree.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cc"
 				>
 			</File>
 			<File
 				RelativePath=".\Screen.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\State.cpp"
 				>
 			</File>
 			<File
@@ -209,11 +373,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Layouter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LayoutTree.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Screen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\State.h"
 				>
 			</File>
 			<File
@@ -230,6 +402,66 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="Layouter"
+			>
+			<File
+				RelativePath=".\Layouter\FullScreenLayout.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\FullScreenLayout.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\GridLayout.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\GridLayout.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\HorizontalLayout.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\HorizontalLayout.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\Layouts.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\ManualVimLayout.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\ManualVimLayout.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\VerticalLayout.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Layouter\VerticalLayout.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Actions"
+			>
+			<File
+				RelativePath=".\Actions\TreeAction.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Actions\TreeAction.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

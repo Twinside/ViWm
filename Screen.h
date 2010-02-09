@@ -18,5 +18,6 @@ struct Screen
     LayoutTree  *layoutRoot;
 };
 
+typedef std::vector< Screen >   DesktopLayout;
 
 #endif /* SCREEN_H */

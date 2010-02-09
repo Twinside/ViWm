@@ -2,32 +2,68 @@
 #define STATE_H
 
 #include <list>
+#include <vector>
 #include "Constants.h"
+#include "Layouter.h"
+
+class TilledWindow;
 
 class WindowMakerState
 {
 public:
+    WindowMakerState();
+    
+    enum Configuration
+    {
+        // max recursion for layout tree
+        // 10 is a reasonable value, MaxRecursion,
+        // is more than enough.
+        MaxRecursion = 128
+    };
+
+    TilledWindow*   FindNode( HWND hwnd );
+    void            RemoveNode( HWND hwnd );
+
+    /*
     bool    disableNext;
     bool    lockMouse;
 
-    uint16 experimental_mouse;
-    uint16 mouse_pos_out;
+    int experimental_mouse;
+    int mouse_pos_out;
     int margin;
+    */
+
+    int alpha;
+    /*
+    int borders;
+    int ignoreCount;
+    int ignoreCountBorders;
+
+    // Xmonad style Master area count
+    uint16 masterarea_count;
+    */
 
     TillingMode tilingMode;
 
-    uint16 alpha;
-    uint16 borders;
-    uint16 ignoreCount;
-    uint16 ignoreCountBorders;
-
-    /* Xmonad style Master area count */
-    uint16 masterarea_count;
-
     /* Should always point to current node */
     TilledWindow *current; 	
+    size_t       currentTag;
 
-    std::list< TilledWindow* >  windowList;
+    size_t       currentScreen;
+    size_t       adressDepth;
+    LayoutTree   *currentAdress[MaxRecursion];
+    
+
+    struct Bucket
+    {
+        int bucketCurrent;
+        std::list< TilledWindow* >  windowList;
+    };
+
+    /**
+     * One window list per tag.
+     */
+    std::vector<Bucket> windowList;
 };
 
 #endif /* STATE_H */

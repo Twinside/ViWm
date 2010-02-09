@@ -16,6 +16,8 @@ TilledWindow::~TilledWindow()
 	ShowWindow(hwnd, SW_RESTORE);
 }
 
+char    TilledWindow::TempClassName[MAX_PATH];
+
 void TilledWindow::SetTransparency(int alpha)
 {
     if ( alpha != applyedAlpha )
@@ -60,7 +62,7 @@ void TilledWindow::SetBorders( bool presentOrNot )
     hasBorder = presentOrNot;
 }
 
-bool TilledWindow::IsTileable()
+bool TilledWindow::IsHandleTileable( HWND hwnd )
 {
     /* Some criteria for windows to be tiled */
     if ( IsWindowVisible(hwnd) 
@@ -73,4 +75,21 @@ bool TilledWindow::IsTileable()
             || ((exstyle & WS_EX_APPWINDOW)       && owner != 0);
     }
     return false;
+}
+
+bool TilledWindow::IsTileable() { return IsHandleTileable( hwnd ); }
+
+void TilledWindow::GiveFocus()
+{
+    SetForegroundWindow(hwnd);
+    SetTransparency( Opaque );
+}
+
+void TilledWindow::SetSize( int x, int y, int width, int height )
+    { ::SetWindowPos( hwnd, HWND_TOP, x, y, width, height, SWP_SHOWWINDOW ); }
+
+void TilledWindow::GetClassName( std::string &name )
+{
+    ::GetClassName( hwnd, TempClassName, MAX_PATH );
+    name = TempClassName;
 }
