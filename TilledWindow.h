@@ -25,6 +25,10 @@ public:
     bool    operator == ( HWND otherWindow ) const
         { return hwnd == otherWindow; }
 
+    bool    operator != ( HWND otherWindow ) const
+        { return hwnd != otherWindow; }
+
+
     struct Finder {
         HWND  toFind;
         Finder( HWND ntoFind ) : toFind( ntoFind ) {}

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ViWm.h"
+#include "Actions/TreeAction.h"
 
 ViWm    *globalManager;
 
@@ -45,8 +46,13 @@ int WINAPI WinMain( HINSTANCE hInstance
                   , int /*nShowCmd*/ )
 {
     MSG msg;
+    HotKeyCollection    defs;
 
-    globalManager = new ViWm( hInstance );
+    defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
+    defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
+    defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
+
+    globalManager = new ViWm( hInstance, defs );
     globalManager->Init();
 
     EnumWindows(EnumWindowsProc, 0);

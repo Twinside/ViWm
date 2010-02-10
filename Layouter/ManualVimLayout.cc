@@ -1,5 +1,6 @@
 #include "ManualVimLayout.h"
 #include "../State.h"
+#include "../Screen.h"
 
 namespace Layout
 {
@@ -14,15 +15,7 @@ namespace Layout
                                               , const WindowMakerState &st
                                               , DesktopLayout &l )
     {
-        // no top level.
-        if ( st.adressDepth <= 0 )
-        {
-            l[ st.currentScreen ].layoutRoot =
-                new LayoutLeaf( &newWindow );
-        }
-        else
-        {
-
-        }
+        LayoutTree::addCreate( l[ st.currentScreen ].layoutRoot
+                             , *new LayoutLeaf( newWindow ) );
     }
 }

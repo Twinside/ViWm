@@ -48,11 +48,7 @@ public:
     /* Should always point to current node */
     TilledWindow *current; 	
     size_t       currentTag;
-
     size_t       currentScreen;
-    size_t       adressDepth;
-    LayoutTree   *currentAdress[MaxRecursion];
-    
 
     struct Bucket
     {

@@ -11,8 +11,8 @@ class Action;
 class Layouter;
 
 typedef int VirtualKey;
-typedef std::vector< std::pair< VirtualKey, Action* > >
-        HotKeyCollection;
+typedef std::pair<VirtualKey, Action*> HotKey;
+typedef std::vector<HotKey> HotKeyCollection;
 
 class ViWm
 {

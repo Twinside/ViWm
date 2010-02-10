@@ -20,8 +20,9 @@ namespace Actions
     class NodeRotate : public Action
     {
     public:
-        NodeRotate( int directionAmount ) : amount( directionAmount ) {};
-        virtual ReturnInfo   operator() ( DesktopLayout &l, WindowMakerState &state );
+        NodeRotate( int directionAmount );
+        virtual ReturnInfo   operator() ( DesktopLayout &l
+                                        , WindowMakerState &state );
 
     private:
         int amount;

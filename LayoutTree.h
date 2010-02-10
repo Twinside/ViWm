@@ -19,6 +19,22 @@ struct LayoutTree
         SplitVertical
     };
 
+    typedef HWND    WindowKey;
+
+    enum CompStatus
+    {
+        Searching,  /**< Still need to search. */
+        Todo,       /**< The action must be performed. */
+        Done        /**< The action has been performed. */
+    };
+
+    virtual CompStatus addNode( LayoutTree &subTree ) = 0;
+    virtual CompStatus removeNode( WindowKey toRemove ) = 0;
+    virtual CompStatus selectNode( WindowKey toRemove ) = 0;
+
+    static CompStatus addCreate( LayoutTree *&root, LayoutTree &tree );
+    static CompStatus removeClean( LayoutTree *&root, WindowKey key );
+
     /**
      * Force the subnode/contained window to fit
      * the current tree dimension. Refresh the
@@ -29,8 +45,9 @@ struct LayoutTree
                              , int width, int height ) = 0;
 };
 
-struct LayoutNode : LayoutTree
+struct LayoutNode : public LayoutTree
 {
+    LayoutNode();
     virtual ~LayoutNode();
 
     enum Constraint
@@ -40,28 +57,51 @@ struct LayoutNode : LayoutTree
 
     struct SizePair
     {
+        SizePair( LayoutTree *t )
+            : width( 0 )
+            , height( 0 )
+            , subTree( t ) {}
+
         int         width;
         int         height;
         LayoutTree* subTree;
     };
 
+    virtual CompStatus    addNode( LayoutTree &subTree );
+    virtual CompStatus    removeNode( WindowKey toRemove );
+    virtual CompStatus    selectNode( WindowKey toSelect );
+
     virtual void    Establish( SplitSide side
                              , int x, int y
-                             , int width, int height );
+                             , int width, int height
+                             );
+
     typedef std::vector<SizePair> Collection;
 
     Collection  nodes;
+    size_t      selectedRoute;
 };
 
-struct LayoutLeaf : LayoutTree
+class LayoutLeaf : public LayoutTree
 {
+public:
     LayoutLeaf( TilledWindow &w ) : window( w ) {}
+
+    virtual CompStatus    addNode( LayoutTree &window );
+    virtual CompStatus    removeNode( WindowKey toRemove );
+    virtual CompStatus    selectNode( WindowKey toSelect );
 
     virtual void    Establish( SplitSide side
                              , int x, int y
                              , int width, int height );
 
     TilledWindow   &window;
+
+private:
+    void operator = ( const LayoutLeaf& l );
 };
+
+class WindowMakerState;
+
 
 #endif /* LAYOUTTREE_H */

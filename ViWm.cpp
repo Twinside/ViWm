@@ -9,7 +9,7 @@ ViWm::ViWm( HINSTANCE inithInstance
           )
     : modkeys( DEFAULT_MODKEY )
     , hInstance( inithInstance )
-    , shellhookid( -1 )
+    , shellhookid( (UINT)-1 )
     , hotkeysDefinition( originalCollection )
 {
     EnumDisplayMonitors( NULL, NULL, &ViWm::monitorEnumerator
@@ -70,9 +70,17 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         break;
 
     case HSHELL_WINDOWDESTROYED:
-        currentState.RemoveNode((HWND)lParam);
-        ArrangeWindows();
-        FocusCurrent();
+        found = currentState.FindNode((HWND)lParam);
+        if ( found )
+        {
+            for (size_t i = 0; i < currentLayout.size(); ++i)
+                LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
+
+            currentState.RemoveNode((HWND)lParam);
+
+            ArrangeWindows();
+            FocusCurrent();
+        }
         break;
 
     case HSHELL_WINDOWACTIVATED:
@@ -159,6 +167,7 @@ void ViWm::createGlobalListener( HINSTANCE hInstance )
 void ViWm::ArrangeWindows()
 {
     layouter[currentState.tilingMode]->layout( currentState, currentLayout );
+    currentLayout[currentState.currentScreen].replace();
     FocusCurrent();
 }
 
@@ -198,11 +207,16 @@ void ViWm::AddNode( HWND hwnd )
     if ( strcmp( TempClassName, "Notepad") != 0 )
         return;
 
+    TilledWindow    *newWindow = new TilledWindow( hwnd );
     currentState.windowList[ currentState.currentTag ]
                            .windowList
-                           .push_back( new TilledWindow( hwnd ));
+                           .push_back( newWindow );
 
-    layouter[currentState.tilingMode]->layout( currentState, currentLayout );
+    layouter[currentState.tilingMode]->addNewWindowToLayout( *newWindow
+                                                           , currentState
+                                                           , currentLayout );
+    ArrangeWindows();
+
 }
 
 void ViWm::FocusCurrent()

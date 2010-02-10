@@ -6,13 +6,17 @@ WindowMakerState::WindowMakerState()
     : tilingMode( ManualVimTilling )
     , alpha( 255 )
     , currentScreen( 0 )
+    , currentTag( 0 )
+    , current( 0 )
     //, borders( 1 )
     //, ignoreCount( 0 )
     //, ignoreCountBorders( 0 )
     //, experimental_mouse( 0 )
     //, mouse_pos_out( 0 )
     //, margin( 120 ), masterarea_count( 1 )
-{}
+{
+    windowList.resize( LastTag );
+}
 
 TilledWindow* WindowMakerState::FindNode( HWND hwnd )
 {
@@ -40,8 +44,8 @@ TilledWindow* WindowMakerState::FindNode( HWND hwnd )
 void WindowMakerState::RemoveNode( HWND hwnd )
 {
     std::vector<Bucket>::iterator it;
-    std::list<TilledWindow*>::iterator     firstFound;
     std::list<TilledWindow*>::iterator     found;
+    TilledWindow*                          firstFound = 0;
     bool                                   hasFound = false;
     TilledWindow::Finder                   comparer( hwnd );
 
@@ -60,7 +64,7 @@ void WindowMakerState::RemoveNode( HWND hwnd )
         {
             if ( !hasFound )
             {
-                firstFound = found;
+                firstFound = *found;
                 hasFound = true;
             }
 
@@ -68,6 +72,5 @@ void WindowMakerState::RemoveNode( HWND hwnd )
         }
     }
 
-    if ( hasFound )
-        delete *firstFound;
+    if ( hasFound ) delete firstFound;
 }
