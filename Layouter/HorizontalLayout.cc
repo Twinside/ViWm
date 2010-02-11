@@ -23,12 +23,16 @@ namespace Layout
     }
 #endif
 
-    void HorizontalLayout::addNewWindowToLayout( TilledWindow &newWindow , const WindowMakerState &st , DesktopLayout &l )
+    void HorizontalLayout::addNewWindowToLayout( TilledWindow& /* newWindow */
+                                               , const WindowMakerState& /* st */
+                                               , DesktopLayout& /* l */ )
     {
 
     }
 
-    void HorizontalLayout::layout( const WindowMakerState &s , DesktopLayout &l )
+    void HorizontalLayout::layout( const WindowMakerState& /* s */
+                                 , DesktopLayout& /* l */
+                                 )
     {
 
     }

@@ -11,9 +11,12 @@ TilledWindow::TilledWindow(HWND realWindow)
 
 TilledWindow::~TilledWindow()
 {
-    SetTransparency( Opaque );
-    SetBorders( true );
-	ShowWindow(hwnd, SW_RESTORE);
+    if ( hwnd )
+    {
+        SetTransparency( Opaque );
+        SetBorders( true );
+    	ShowWindow(hwnd, SW_RESTORE);
+    }
 }
 
 char    TilledWindow::TempClassName[MAX_PATH];

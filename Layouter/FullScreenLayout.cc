@@ -2,7 +2,8 @@
 
 namespace Layout
 {
-    void FullScreenLayout::layout( const WindowMakerState &s, DesktopLayout &l )
+    void FullScreenLayout::layout( const WindowMakerState& /* s */
+                                 , DesktopLayout& /* l */ )
     {
 #if 0
         std::list< TilledWindow* >::iterator    lst;
@@ -20,7 +21,9 @@ namespace Layout
 #endif
     }
 
-    void FullScreenLayout::addNewWindowToLayout( TilledWindow &newWindow , const WindowMakerState &st , DesktopLayout &l )
+    void FullScreenLayout::addNewWindowToLayout( TilledWindow& /* newWindow */
+                                               , const WindowMakerState& /* st */
+                                               , DesktopLayout& /* l */)
     {
 
     }

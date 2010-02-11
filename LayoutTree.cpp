@@ -1,9 +1,11 @@
+#include <assert.h>
 #include "LayoutTree.h"
 
 LayoutTree::~LayoutTree() {}
 
 LayoutTree::CompStatus LayoutTree::addCreate( LayoutTree *&root, LayoutTree &tree )
 {
+
     if ( root == 0 )
         root = &tree;
     else if (root->addNode( tree ) == Todo)
@@ -30,6 +32,8 @@ LayoutTree::CompStatus LayoutTree::removeClean( LayoutTree *&root, WindowKey key
 
 LayoutNode::~LayoutNode()
 {
+    assert( nodes.size() == 0 );
+
     for ( Collection::iterator it = nodes.begin()
         ; it != nodes.end()
         ; ++it )
@@ -79,7 +83,7 @@ void LayoutNode::Establish( SplitSide   side, int x, int y , int width, int heig
     {
         int unconstrainedSize = unconstrainedHeightCount > 0
                               ? unconstrainedHeight / unconstrainedHeightCount
-                              : height / nodes.size();
+                              : height / static_cast<int>( nodes.size() );
 
         for (it = nodes.begin(); it != nodes.end(); ++it)
         {
@@ -99,7 +103,7 @@ void LayoutNode::Establish( SplitSide   side, int x, int y , int width, int heig
     {
         int unconstrainedSize = unconstrainedWidthCount > 0
                               ? unconstrainedWidth / unconstrainedWidthCount
-                              : width / nodes.size();
+                              : width / static_cast<int>( nodes.size() );
 
         for (it = nodes.begin(); it != nodes.end(); ++it)
         {

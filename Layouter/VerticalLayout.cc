@@ -20,12 +20,15 @@ namespace Layout
     }
 #endif
 
-    void VerticalLayout::addNewWindowToLayout( TilledWindow &newWindow , const WindowMakerState &st , DesktopLayout &l )
+    void VerticalLayout::addNewWindowToLayout( TilledWindow&    /* newWindow */
+                                             , const WindowMakerState& /* st */
+                                             , DesktopLayout& /* l */ )
     {
 
     }
 
-    void VerticalLayout::layout( const WindowMakerState &s , DesktopLayout &l )
+    void VerticalLayout::layout( const WindowMakerState& /*s*/
+                               , DesktopLayout& /* l */ )
     {
 
     }

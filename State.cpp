@@ -4,7 +4,7 @@
 
 WindowMakerState::WindowMakerState()
     : tilingMode( ManualVimTilling )
-    , alpha( 255 )
+    , alpha( 205 )
     , currentScreen( 0 )
     , currentTag( 0 )
     , current( 0 )
@@ -49,6 +49,12 @@ void WindowMakerState::RemoveNode( HWND hwnd )
     bool                                   hasFound = false;
     TilledWindow::Finder                   comparer( hwnd );
 
+    // if the current selected window was selected,
+    // and is destroyed, don't forget to remove it's
+    // reference. (5h bug fix)
+    if ( current && (*current) == hwnd )
+        current = 0;
+
     // foreach it in windowList
     for ( it = windowList.begin()
         ; it != windowList.end()
@@ -72,5 +78,9 @@ void WindowMakerState::RemoveNode( HWND hwnd )
         }
     }
 
-    if ( hasFound ) delete firstFound;
+    if ( hasFound )
+    {
+        firstFound->Discard();
+        delete firstFound;
+    }
 }

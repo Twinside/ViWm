@@ -28,6 +28,12 @@ public:
     bool    operator != ( HWND otherWindow ) const
         { return hwnd != otherWindow; }
 
+    /**
+     * If the window has been destroyed,
+     * ensure no operations will be done
+     * one the window.
+     */
+    void    Discard() { hwnd = NULL; }
 
     struct Finder {
         HWND  toFind;

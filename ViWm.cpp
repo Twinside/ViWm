@@ -63,9 +63,13 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
     case HSHELL_WINDOWCREATED:
         if (TilledWindow::IsHandleTileable((HWND)lParam))
         {
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             AddNode((HWND)lParam);
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             ArrangeWindows();
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
+            _ASSERTE( _CrtCheckMemory() == TRUE );
         }
         break;
 
@@ -73,24 +77,32 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         found = currentState.FindNode((HWND)lParam);
         if ( found )
         {
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             for (size_t i = 0; i < currentLayout.size(); ++i)
                 LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
 
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             currentState.RemoveNode((HWND)lParam);
+            _ASSERTE( _CrtCheckMemory() == TRUE );
 
             ArrangeWindows();
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
+            _ASSERTE( _CrtCheckMemory() == TRUE );
         }
         break;
 
     case HSHELL_WINDOWACTIVATED:
         found = currentState.FindNode((HWND)lParam);
+        _ASSERTE( _CrtCheckMemory() == TRUE );
         if (found) {
             if (currentState.current) {
                 currentState.current->SetTransparency( currentState.alpha );
             }
             currentState.current = found;
+            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
+            _ASSERTE( _CrtCheckMemory() == TRUE );
         }
         break;
     }
@@ -121,9 +133,6 @@ void ViWm::RegisterHotKeys(HWND hwnd)
  */
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-//const char    *className = "HashTWM";
-#define className "HashTWM"
-
 void ViWm::createGlobalListener( HINSTANCE hInstance )
 {
     WNDCLASSEX winClass;
@@ -139,7 +148,7 @@ void ViWm::createGlobalListener( HINSTANCE hInstance )
     winClass.hCursor = NULL;
     winClass.hbrBackground = NULL;
     winClass.lpszMenuName = NULL;
-    winClass.lpszClassName = className;
+    winClass.lpszClassName = "ViWm";
 
     if (!RegisterClassEx(&winClass)) {
         MessageBox(NULL, "Error Registering Window Class", "Error", MB_OK | MB_ICONERROR);
@@ -147,7 +156,7 @@ void ViWm::createGlobalListener( HINSTANCE hInstance )
     }
 
     // create a message only window
-    globalHotkeyListener = CreateWindowEx( 0, className, className
+    globalHotkeyListener = CreateWindowEx( 0, "ViWm", "ViWm"
                                          , 0, 0, 0, 0, 0
                                          , HWND_MESSAGE, NULL
                                          , hInstance, NULL);
@@ -200,6 +209,8 @@ BOOL ViWm::monitorEnumerator( HMONITOR hMonitor
 
 void ViWm::AddNode( HWND hwnd )
 {
+    OutputDebugString( __FUNCTION__ "\n" );
+
     char TempClassName[MAX_PATH];
     GetClassName( hwnd, TempClassName, MAX_PATH );
 

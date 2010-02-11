@@ -1,3 +1,6 @@
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#endif
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,6 +48,13 @@ int WINAPI WinMain( HINSTANCE hInstance
                   , LPSTR /*lpCmdLine*/
                   , int /*nShowCmd*/ )
 {
+#ifdef _DEBUG
+    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF
+                  | _CRTDBG_CHECK_ALWAYS_DF
+                  | _CRTDBG_DELAY_FREE_MEM_DF
+                  );
+#endif
+
     MSG msg;
     HotKeyCollection    defs;
 
@@ -55,7 +65,7 @@ int WINAPI WinMain( HINSTANCE hInstance
     globalManager = new ViWm( hInstance, defs );
     globalManager->Init();
 
-    EnumWindows(EnumWindowsProc, 0);
+    EnumWindows(EnumWindowsProc, (LPARAM)globalManager);
 
     //ArrangeWindows();
 
