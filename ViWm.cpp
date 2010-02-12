@@ -35,13 +35,13 @@ void ViWm::Init()
 
 void ViWm::HandleHotKey( WPARAM wParam )
 {
-    size_t  hotkeyIndex = static_cast<size_t>( wParam ) - 1;
+    size_t  hotkeyIndex = static_cast<size_t>( wParam );
 
     // if we are out of bound, we ignore the message.
     if ( hotkeyIndex >= hotkeysDefinition.size() )
         return;
 
-    switch ((*hotkeysDefinition[hotkeyIndex - 1].second)( currentLayout, currentState ))
+    switch ((*hotkeysDefinition[hotkeyIndex].second)( currentLayout, currentState ))
     {
     case Action::Nothing: break;
 
@@ -111,20 +111,20 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 void ViWm::UnregisterHotKeys(HWND hwnd)
 {
-    for (size_t i = 1; i <= hotkeysDefinition.size(); i++)
+    for (size_t i = 0; i < hotkeysDefinition.size(); i++)
         UnregisterHotKey(hwnd, i);
 }
 
 void ViWm::RegisterHotKeys(HWND hwnd)
 {
     HotKeyCollection::const_iterator    it;
-    int i = 1;
+    int i = 0;
 
     for ( it = hotkeysDefinition.begin()
         ; it != hotkeysDefinition.end()
-        ; ++it, i++ )
+        ; ++it )
     {
-        RegisterHotKey(hwnd, i, modkeys, it->first );
+        RegisterHotKey(hwnd, i++, modkeys, it->first );
     }
 }
 

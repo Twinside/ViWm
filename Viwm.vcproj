@@ -43,6 +43,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="&#x0D;&#x0A;&#x0D;&#x0A;"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
@@ -317,6 +318,11 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<AssemblyReference
+			RelativePath="Microsoft.Build.Conversion.v3.5.dll"
+			AssemblyName="Microsoft.Build.Conversion.v3.5, Version=3.5.0.0, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+			MinFrameworkVersion="196613"
+		/>
 	</References>
 	<Files>
 		<Filter
