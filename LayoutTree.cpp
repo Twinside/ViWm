@@ -96,6 +96,7 @@ LayoutTree::CompStatus LayoutTree::globalPack( LayoutTree *&root, CompStatus st 
         child = static_cast<LayoutNode*>(root);
         root = child->getFirstNode();
         root->parent = 0;
+        child->releaseChildren();
         delete child;
         break;
     }
@@ -104,8 +105,6 @@ LayoutTree::CompStatus LayoutTree::globalPack( LayoutTree *&root, CompStatus st 
 
 LayoutNode::~LayoutNode()
 {
-    assert( nodes.size() == 0 );
-
     for ( Collection::iterator it = nodes.begin()
         ; it != nodes.end()
         ; ++it )
@@ -267,15 +266,17 @@ LayoutTree::CompStatus LayoutLeaf::removeNode( WindowKey toRemove )
 
 LayoutTree::CompStatus LayoutNode::removeNode( WindowKey toRemove )
 {
-    Collection::iterator    it;
     CompStatus              lastOperation;
     assert( nodes.size() > 1 );
 
     for ( size_t i = 0; i < nodes.size(); i++ )
     {
-        lastOperation = pack( it->subTree->removeNode( toRemove ), i );
-        if ( lastOperation != Searching  )
-            return lastOperation;
+        if ( nodes[i].subTree )
+        {
+            lastOperation = pack( nodes[i].subTree->removeNode( toRemove ), i );
+            if ( lastOperation != Searching  )
+                return lastOperation;
+        }
     }
 
     return Searching;

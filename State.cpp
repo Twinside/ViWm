@@ -4,7 +4,7 @@
 
 WindowMakerState::WindowMakerState()
     : tilingMode( ManualVimTilling )
-    , alpha( 205 )
+    , alpha( 245 )
     , currentScreen( 0 )
     , currentTag( 0 )
     , current( 0 )

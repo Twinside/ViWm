@@ -100,6 +100,7 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
                 currentState.current->SetTransparency( currentState.alpha );
             }
             currentState.current = found;
+            found->SetTransparency( 255 );
             _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
             _ASSERTE( _CrtCheckMemory() == TRUE );
@@ -214,9 +215,14 @@ void ViWm::AddNode( HWND hwnd )
     char TempClassName[MAX_PATH];
     GetClassName( hwnd, TempClassName, MAX_PATH );
 
-    // DEBUG!!
+    
+#ifdef _DEBUG
+    // For debug purpose and avoiding to messing up with
+    // the whole desktop, we only handle the notepad program
+    // which the good taste to be lightweight.
     if ( strcmp( TempClassName, "Notepad") != 0 )
         return;
+#endif
 
     TilledWindow    *newWindow = new TilledWindow( hwnd );
     currentState.windowList[ currentState.currentTag ]
@@ -232,4 +238,8 @@ void ViWm::AddNode( HWND hwnd )
 
 void ViWm::FocusCurrent()
 {
+    if ( currentState.current )
+    {
+        currentState.current->GiveFocus();
+    }
 }

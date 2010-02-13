@@ -25,7 +25,7 @@ void TilledWindow::SetTransparency(int alpha)
 {
     if ( alpha != applyedAlpha )
     {
-        if ( alpha >= 255 )
+        if ( alpha < 255 )
         {
             SetWindowLong( hwnd
                          , GWL_EXSTYLE
@@ -33,9 +33,9 @@ void TilledWindow::SetTransparency(int alpha)
                          );
 
             SetLayeredWindowAttributes( hwnd
-                                      , RGB(255, 0, 0)
+                                      , RGB(0, 0, 0)
                                       , static_cast<BYTE>(alpha)
-                                      , LWA_COLORKEY | LWA_ALPHA
+                                      , LWA_ALPHA
                                       );
         }
         else
