@@ -8,9 +8,9 @@ namespace ViWm
     {
         LayoutTree  *node;
         ChildFinder ( LayoutTree *nnode ) : node( nnode ) {}
-        
+
         bool   operator() ( LayoutNode::SizePair &p )
-            { return p.subTree == node; }
+        { return p.subTree == node; }
     };
 
     void LayoutNode::insert( LayoutTree *toSearch, LayoutTree *toAdd, int plusMinus )
@@ -122,85 +122,141 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     ////                    Tree directed layout
     //////////////////////////////////////////////////////////////////////////
-    void LayoutLeaf::Establish( SplitSide /*side*/ , int x, int y , int width, int height )
-        { window.SetSize(x, y, width, height ); }
+    void LayoutLeaf::Establish( const Screen& /*currentScreen*/
+                              , const Rect &dim
+                              , SplitSide /* side */
+                              , ScreenBounded  /* bounds */ )
+        { window.SetSize(dim.x, dim.y, dim.width, dim.height ); }
 
-    void LayoutNode::Establish( SplitSide   side, int x, int y , int width, int height )
-{
-    Collection::const_iterator cit;
-    Collection::iterator       it;
+    void LayoutNode::Establish( const Screen &currentScreen
+                              , const Rect &dim
+                              , SplitSide side
+                              , ScreenBounded  bounds  )
 
-    assert( nodes.size() > 1 );
-
-    lastDirection = side;
-
-    // first we need do collect some size constraints.
-    int unconstrainedWidth = width;
-    int unconstrainedHeight = height;
-    int unconstrainedWidthCount = 0;
-    int unconstrainedHeightCount = 0;
-
-    for (cit = nodes.begin(); cit != nodes.end(); ++cit )
     {
-        if (cit->width > 0)
+        Collection::const_iterator cit;
+        Collection::iterator       it;
+
+        assert( nodes.size() > 1 );
+
+        lastDirection = side;
+
+        // first we need do collect some size constraints.
+        int unconstrainedWidth = dim.width;
+        int unconstrainedHeight = dim.height;
+        int unconstrainedWidthCount = 0;
+        int unconstrainedHeightCount = 0;
+
+        for (cit = nodes.begin(); cit != nodes.end(); ++cit )
         {
-            unconstrainedWidth -= cit->width;
-            unconstrainedWidthCount++;
+            if (cit->width > 0)
+            {
+                unconstrainedWidth -= cit->width;
+                unconstrainedWidthCount++;
+            }
+
+            if (cit->height > 0)
+            {
+                unconstrainedHeight -= cit->height;
+                unconstrainedHeightCount++;
+            }
         }
 
-        if (cit->height > 0)
+        Rect        subSize;
+        subSize = dim;
+
+        // during the second pass, we give real sizes to nodes
+        if ( side == SplitHorizontal )
         {
-            unconstrainedHeight -= cit->height;
-            unconstrainedHeightCount++;
+            int unconstrainedSize = unconstrainedHeightCount > 0
+                ? unconstrainedHeight / unconstrainedHeightCount
+                : dim.height / static_cast<int>( nodes.size() );
+
+            size_t i = 0;
+            for (it = nodes.begin(); it != nodes.end(); ++it, i++)
+            {
+                int subBound = bounds;
+                int sizeSub = 0;
+                int topShift = 0;
+
+                if (i != 0)
+                {
+                    subBound &= ~TopBound;
+                    sizeSub += HalfSplit;
+                    topShift += HalfSplit;
+                }
+
+                if (i != nodes.size() - 1)
+                {
+                    subBound &= ~BottomBound;
+                    sizeSub += HalfSplit;
+                }
+
+                if ( it->height )
+                    subSize.height = it->height - sizeSub;
+                else
+                    subSize.height = unconstrainedSize - sizeSub;
+
+                subSize.y += topShift;
+                if ( it->subTree )
+                {
+                    it->subTree->Establish( currentScreen
+                                          , subSize
+                                          , SplitVertical
+                                          , ScreenBounded(subBound) );
+                }
+                subSize.y += subSize.height - topShift + sizeSub;
+                subSize.height += sizeSub;
+
+                it->lastDim = subSize;
+            }
+        }
+        else // SplitVertical
+        {
+            int unconstrainedSize = unconstrainedWidthCount > 0
+                ? unconstrainedWidth / unconstrainedWidthCount
+                : dim.width / static_cast<int>( nodes.size() );
+
+            size_t i = 0;
+
+            for (it = nodes.begin(); it != nodes.end(); ++it, i++)
+            {
+                int subBound = bounds;
+                int sizeSub = 0;
+                int leftShift = 0;
+
+                if (i != 0)
+                {
+                    subBound &= ~LeftBound;
+                    sizeSub += HalfSplit;
+                    leftShift += HalfSplit;
+                }
+
+                if (i != nodes.size() - 1)
+                {
+                    subBound &= ~RightBound;
+                    sizeSub += HalfSplit;
+                }
+
+                if ( it->width )
+                    subSize.width = it->width - sizeSub;
+                else
+                    subSize.width = unconstrainedSize - sizeSub;
+
+                subSize.x += leftShift;
+                if ( it->subTree )
+                {
+                    it->subTree->Establish( currentScreen
+                                          , subSize
+                                          , SplitVertical
+                                          , ScreenBounded(subBound) );
+                }
+                subSize.x += subSize.width - leftShift + sizeSub;
+                subSize.width += sizeSub;
+                it->lastDim = subSize;
+            }
         }
     }
-
-    // during the second pass, we give real sizes to nodes
-    if ( side == SplitHorizontal )
-    {
-        int unconstrainedSize = unconstrainedHeightCount > 0
-                              ? unconstrainedHeight / unconstrainedHeightCount
-                              : height / static_cast<int>( nodes.size() );
-
-        for (it = nodes.begin(); it != nodes.end(); ++it)
-        {
-            if ( it->height )
-            {
-                if ( it->subTree )
-                    it->subTree->Establish( SplitVertical, x, y, width, it->height );
-                y += it->height;
-            }
-            else
-            {
-                if ( it->subTree )
-                    it->subTree->Establish( SplitVertical, x, y, width, unconstrainedSize );
-                y += unconstrainedSize;
-            }
-        }
-    }
-    else // SplitVertical
-    {
-        int unconstrainedSize = unconstrainedWidthCount > 0
-                              ? unconstrainedWidth / unconstrainedWidthCount
-                              : width / static_cast<int>( nodes.size() );
-
-        for (it = nodes.begin(); it != nodes.end(); ++it)
-        {
-            if ( it->width )
-            {
-                if ( it->subTree )
-                    it->subTree->Establish( SplitHorizontal, x, y, it->width, height );
-                x += it->height;
-            }
-            else
-            {
-                if ( it->subTree )
-                    it->subTree->Establish( SplitHorizontal, x, y, unconstrainedSize, height );
-                x += unconstrainedSize;
-            }
-        }
-    }
-}
 
     //////////////////////////////////////////////////////////////////////////
     ////                    Node adding
@@ -210,20 +266,20 @@ namespace ViWm
     // when we found the selected leaf, we backtrack once and add
     // the node there.
     LayoutTree::CompStatus LayoutNode::addNode( LayoutTree *window )
-{
-    if ( nodes.size() == 0
-      || nodes[selectedRoute].subTree->addNode( window ) == Todo )
-        nodes.push_back( window );
+    {
+        if ( nodes.size() == 0
+            || nodes[selectedRoute].subTree->addNode( window ) == Todo )
+            nodes.push_back( window );
 
-    if ( window )
-        window->parent = this;
+        if ( window )
+            window->parent = this;
 
-    assert( nodes.size() >= 1 );
-    return Done;
-}
+        assert( nodes.size() >= 1 );
+        return Done;
+    }
 
     LayoutTree::CompStatus LayoutLeaf::addNode( LayoutTree* /*window*/ )
-        { return Todo; }
+    { return Todo; }
 
     //////////////////////////////////////////////////////////////////////////
     ////                    Node Removing
@@ -232,57 +288,57 @@ namespace ViWm
     // node removing is done in a BFS way.
     LayoutTree::CompStatus LayoutLeaf::removeNode( LayoutTree* /* toRemove */ ) { return Done; }
     LayoutTree::CompStatus LayoutNode::removeNode( LayoutTree *toRemove )
-{
-    struct SizePairComp
     {
-        LayoutTree  *node;
-        SizePairComp( LayoutTree *nnode ) : node( nnode ) {}
-        
-        bool   operator() ( LayoutNode::SizePair &p )
+        struct SizePairComp
         {
-            if ( p.subTree == node )
+            LayoutTree  *node;
+            SizePairComp( LayoutTree *nnode ) : node( nnode ) {}
+
+            bool   operator() ( LayoutNode::SizePair &p )
             {
-                delete p.subTree;
-                p.subTree = 0;
-                return true;
+                if ( p.subTree == node )
+                {
+                    delete p.subTree;
+                    p.subTree = 0;
+                    return true;
+                }
+                return false;
             }
-            return false;
-        }
-    }   comparer( toRemove );
+        }   comparer( toRemove );
 
-    assert( nodes.size() > 1 );
+        assert( nodes.size() > 1 );
 
-    nodes.erase( std::remove_if( nodes.begin(), nodes.end(), comparer ), nodes.end() );
+        nodes.erase( std::remove_if( nodes.begin(), nodes.end(), comparer ), nodes.end() );
 
-    for ( size_t i = 0; i < nodes.size(); ++i )
-        pack( nodes[i].subTree->removeNode( toRemove ), i );
+        for ( size_t i = 0; i < nodes.size(); ++i )
+            pack( nodes[i].subTree->removeNode( toRemove ), i );
 
-    if ( nodes.size() == 0 ) return Todo;
-    if ( nodes.size() == 1 ) return Compact;
-    return Done;
-}
+        if ( nodes.size() == 0 ) return Todo;
+        if ( nodes.size() == 1 ) return Compact;
+        return Done;
+    }
 
     // Depth First Search + same idea of backtracking as in node adding.
     LayoutTree::CompStatus LayoutLeaf::removeNode( WindowKey toRemove )
-        { return window == toRemove ? Todo : Searching; }
+    { return window == toRemove ? Todo : Searching; }
 
     LayoutTree::CompStatus LayoutNode::removeNode( WindowKey toRemove )
-{
-    CompStatus              lastOperation;
-    assert( nodes.size() > 1 );
-
-    for ( size_t i = 0; i < nodes.size(); i++ )
     {
-        if ( nodes[i].subTree )
-        {
-            lastOperation = pack( nodes[i].subTree->removeNode( toRemove ), i );
-            if ( lastOperation != Searching  )
-                return lastOperation;
-        }
-    }
+        CompStatus              lastOperation;
+        assert( nodes.size() > 1 );
 
-    return Searching;
-}
+        for ( size_t i = 0; i < nodes.size(); i++ )
+        {
+            if ( nodes[i].subTree )
+            {
+                lastOperation = pack( nodes[i].subTree->removeNode( toRemove ), i );
+                if ( lastOperation != Searching  )
+                    return lastOperation;
+            }
+        }
+
+        return Searching;
+    }
 
     LayoutTree::CompStatus LayoutNode::pack( CompStatus what, size_t &i )
     {
@@ -327,14 +383,14 @@ namespace ViWm
     // it's a basic Depth First Search.
     // Set up the selectedRoute to point to the good direction.
     LayoutTree::CompStatus LayoutLeaf::selectNode( WindowKey toSelect )
-        { return window == toSelect ? Todo : Searching; }
+    { return window == toSelect ? Todo : Searching; }
 
     LayoutTree::CompStatus LayoutNode::selectNode( WindowKey toSelect )
     {
         for (size_t i = 0; i < nodes.size(); i++)
         {
             if ( nodes[i].subTree
-              && nodes[i].subTree->selectNode( toSelect ) != Searching )
+                && nodes[i].subTree->selectNode( toSelect ) != Searching )
             {
                 selectedRoute = i;
                 return Done;
@@ -347,7 +403,8 @@ namespace ViWm
 
     // with a bit of luck, it'l even be tail recursive.
     LayoutTree* LayoutLeaf::getSelected()
-        { return this; }
+    { return this; }
+
     LayoutTree* LayoutNode::getSelected()
     { 
         if ( ! nodes[selectedRoute].subTree )
@@ -367,5 +424,33 @@ namespace ViWm
     {
         for (size_t i = 0; i < nodes.size(); ++i)
             nodes[i].subTree = 0;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    ////                        Layout drawing
+    //////////////////////////////////////////////////////////////////////////
+    void LayoutLeaf::displayLayoutStructure( Renderer& /*r*/, Renderer::Brush /* defaultBrush */ ) {}
+    void LayoutNode::displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush )
+    {
+        Collection::iterator it;
+
+        if ( lastDirection == SplitHorizontal )
+        {
+            for (it = nodes.begin(); it != nodes.end(); ++it)
+                r.drawRect( defaultBrush
+                          , it->lastDim.x
+                          , it->lastDim.y
+                          , it->lastDim.width
+                          , SplitWidth );
+        }
+        else
+        {
+            for (it = nodes.begin(); it != nodes.end(); ++it)
+                r.drawRect( defaultBrush
+                          , it->lastDim.x
+                          , it->lastDim.y
+                          , SplitWidth
+                          , it->lastDim.height );
+        }
     }
 }

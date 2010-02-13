@@ -17,23 +17,23 @@ namespace ViWm
 
         // This accessor are a bit ugly, but I don't
         // want some change screen size by mistake.
-        int getX()      { return x; }
-        int getY()      { return y; }
-        int getWidth()  { return width; }
-        int getHeight() { return height; }
+        int getX()      { return size.x; }
+        int getY()      { return size.y; }
+        int getWidth()  { return size.width; }
+        int getHeight() { return size.height; }
 
         void    replace()
         { 
             if (layoutRoot)
-                layoutRoot->Establish( initialSplit, x, y, width, height );
+                layoutRoot->Establish( *this, size, initialSplit
+                                     , LayoutTree::FullBound );
         }
 
         LayoutTree::SplitSide   initialSplit;
         LayoutTree              *layoutRoot;
 
     private:
-        int x, y;
-        int width, height;
+        Rect    size;
     };
 
     typedef std::vector< Screen >   DesktopLayout;

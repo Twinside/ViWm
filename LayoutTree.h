@@ -4,9 +4,22 @@
 #include <algorithm>
 #include <vector>
 #include "TilledWindow.h"
+#include "Renderer.h"
 
 namespace ViWm
 {
+    struct Screen;
+
+    struct Rect
+    {
+        Rect() : x(0), y(0), width(0), height(0) {}
+        Rect( int xx, int yy, int w, int h )
+            : x( xx ), y( yy ), width( w ), height( h ) {}
+
+        int x, y;
+        int width, height;
+    };
+
     /**
      * This struct only exist to provide a type
      * token. the tree structure is really a sum
@@ -37,11 +50,26 @@ namespace ViWm
             Done        /**< The action has been performed. */
         };
 
+        enum ScreenBounded
+        {
+            LeftBound = 1,
+            TopBound = 2,
+            RightBound = 4,
+            BottomBound = 8,
+            FullBound = LeftBound
+                      | TopBound
+                      | RightBound
+                      | BottomBound
+        };
+
         virtual CompStatus addNode( LayoutTree *subTree ) = 0;
         virtual CompStatus removeNode( WindowKey toRemove ) = 0;
         virtual CompStatus removeNode( LayoutTree *toRemove ) = 0;
         virtual CompStatus selectNode( WindowKey toRemove ) = 0;
         virtual LayoutTree* getSelected() = 0;
+        virtual void        displayLayoutStructure
+                            ( Renderer &r
+                            , Renderer::Brush defaultBrush ) = 0;
 
         static CompStatus addCreate( LayoutTree *&root, LayoutTree &tree );
         static CompStatus removeClean( LayoutTree *&root, WindowKey key );
@@ -52,9 +80,11 @@ namespace ViWm
          * the current tree dimension. Refresh the
          * layout simply put.
          */
-        virtual void    Establish( SplitSide side
-                                 , int x, int y
-                                 , int width, int height ) = 0;
+        virtual void    Establish( const Screen &currentScreen
+                                 , const Rect &dim
+                                 , SplitSide side
+                                 , ScreenBounded  bounds
+                                 ) = 0;
 
         LayoutTree  *parent;
 
@@ -85,8 +115,18 @@ namespace ViWm
                 , height( 0 )
                 , subTree( t ) {}
 
+            /**
+             * Constraining weight. If width == 0,
+             * then the width is free of constraint
+             */
             int         width;
-            int         height;
+            int         height; /**< Same thing as width */
+
+            /**
+             * Store the width atributed to the subtree
+             * during the last establishment
+             */
+            Rect        lastDim;
             LayoutTree* subTree;
         };
 
@@ -108,11 +148,12 @@ namespace ViWm
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual LayoutTree*   getSelected();
+        virtual void        displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush );
 
-        virtual void    Establish( SplitSide side
-                                 , int x, int y
-                                 , int width, int height
-                                 );
+        virtual void    Establish( const Screen &currentScreen
+                                 , const Rect &dim
+                                 , SplitSide side
+                                 , ScreenBounded  bounds );
 
         typedef std::vector<SizePair> Collection;
 
@@ -128,11 +169,18 @@ namespace ViWm
         inline void    rotate( int about )
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
 
+        
     private:
         CompStatus  pack( CompStatus what, size_t &index );
         void        insert( LayoutTree  *toSearch
                           , LayoutTree  *toAdd
                           , int plusMinus );
+
+        enum    Conf
+        {
+            SplitWidth = 8,
+            HalfSplit = SplitWidth / 2
+        };
 
         SplitSide   lastDirection;
         Collection  nodes;
@@ -149,10 +197,12 @@ namespace ViWm
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual LayoutTree*   getSelected();
+        virtual void        displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush );
 
-        virtual void    Establish( SplitSide side
-                                 , int x, int y
-                                 , int width, int height );
+        virtual void    Establish( const Screen &currentScreen
+                                 , const Rect &dim
+                                 , SplitSide side
+                                 , ScreenBounded  bounds );
 
         TilledWindow   &window;
 
