@@ -30,17 +30,17 @@ namespace Actions
 
         // already well splited, so add a new node.
         if (parent->getLastDirection() == goodSide)
-            parent->insertAfter( selected, 0 );
+            parent->insertBefore( selected, 0 );
 
         // not the good split side, so we must
         // subdivide the parent node.
         else
         {
             LayoutNode  *newNode = new LayoutNode();
-            newNode->addNode( new LayoutNode() );
+            newNode->addNode( selected );
             newNode->addNode( 0 );
 
-            parent->insertAfter( selected, newNode );
+            parent->replace( selected, newNode );
         }
     }
 

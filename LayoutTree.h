@@ -114,6 +114,9 @@ struct LayoutNode : public LayoutTree
 
     typedef std::vector<SizePair> Collection;
 
+    // this node only.
+    bool    replace( LayoutTree *toSearch, LayoutTree *replacent );
+
     inline void    insertAfter( LayoutTree *toSearch, LayoutTree *toAdd )
         { insert( toSearch, toAdd, 1 ); }
 

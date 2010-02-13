@@ -2,17 +2,18 @@
 #include <algorithm>
 #include "LayoutTree.h"
 
+struct ChildFinder
+{
+    LayoutTree  *node;
+    ChildFinder ( LayoutTree *nnode ) : node( nnode ) {}
+    
+    bool   operator() ( LayoutNode::SizePair &p )
+        { return p.subTree == node; }
+};
 
 void LayoutNode::insert( LayoutTree *toSearch, LayoutTree *toAdd, int plusMinus )
 {
-    struct SizePairComp
-    {
-        LayoutTree  *node;
-        SizePairComp( LayoutTree *nnode ) : node( nnode ) {}
-        
-        bool   operator() ( LayoutNode::SizePair &p )
-            { return p.subTree == node; }
-    }                       comparer( toSearch );
+    ChildFinder             comparer( toSearch );
     Collection::iterator    it;
 
     it = std::find_if( nodes.begin(), nodes.end(), comparer );
@@ -21,11 +22,28 @@ void LayoutNode::insert( LayoutTree *toSearch, LayoutTree *toAdd, int plusMinus 
         nodes.push_back( toSearch );
     else
     {
+        // our selected route has an index of + 1
+        if ( std::distance( nodes.begin(), it ) <= int(selectedRoute) )
+            selectedRoute += 1 - plusMinus;
+
         nodes.insert( it + plusMinus, toAdd );
 
         if ( toAdd )
             toAdd->parent = this;
     }
+}
+
+bool LayoutNode::replace( LayoutTree *toSearch, LayoutTree *replacent )
+{
+    ChildFinder             finder( toSearch );
+    Collection::iterator    it;
+
+    it = std::find_if( nodes.begin(), nodes.end(), finder );
+
+    if (it == nodes.end()) return false;
+    it->subTree = replacent;
+
+    return true;
 }
 
 LayoutTree::LayoutTree()
@@ -170,13 +188,13 @@ void LayoutNode::Establish( SplitSide   side, int x, int y , int width, int heig
             if ( it->width )
             {
                 if ( it->subTree )
-                    it->subTree->Establish( SplitVertical, x, y, it->width, height );
+                    it->subTree->Establish( SplitHorizontal, x, y, it->width, height );
                 x += it->height;
             }
             else
             {
                 if ( it->subTree )
-                    it->subTree->Establish( SplitVertical, x, y, unconstrainedSize, height );
+                    it->subTree->Establish( SplitHorizontal, x, y, unconstrainedSize, height );
                 x += unconstrainedSize;
             }
         }
