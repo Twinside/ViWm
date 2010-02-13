@@ -69,6 +69,7 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
             ArrangeWindows();
             _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
+            selectWindow( (HWND)lParam );
             _ASSERTE( _CrtCheckMemory() == TRUE );
         }
         break;
@@ -101,6 +102,8 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
             }
             currentState.current = found;
             found->SetTransparency( 255 );
+            selectWindow( (HWND)lParam );
+
             _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
             _ASSERTE( _CrtCheckMemory() == TRUE );
@@ -241,5 +244,24 @@ void ViWm::FocusCurrent()
     if ( currentState.current )
     {
         currentState.current->GiveFocus();
+    }
+}
+
+void ViWm::selectWindow( HWND currentWindow )
+{
+    Screen  *scr = &currentLayout[ currentState.currentScreen ];
+    if ( scr->layoutRoot
+       && scr->layoutRoot->selectNode( currentWindow ) == LayoutTree::Done )
+        return;
+
+    for ( size_t i = 0; i < currentLayout.size(); i++ )
+    {
+        if ( i != currentState.currentScreen ) continue;
+        LayoutTree  *root = currentLayout[i].layoutRoot;
+        if ( root && root->selectNode( currentWindow ) == LayoutTree::Done )
+        {
+            currentState.currentScreen = i;
+            return;
+        }
     }
 }

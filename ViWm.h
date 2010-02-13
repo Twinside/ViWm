@@ -50,6 +50,7 @@ private:
                               , LPARAM   userData );
 
     void    createGlobalListener( HINSTANCE hInstance );
+    void    selectWindow( HWND currentWindow );
 
     typedef std::tr1::shared_ptr<Layouter>
             LayoutPtr;

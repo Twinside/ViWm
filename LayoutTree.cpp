@@ -301,10 +301,15 @@ LayoutTree::CompStatus LayoutNode::pack( CompStatus what, size_t &i )
 
     case Compact:
         child = static_cast<LayoutNode*>(nodes[i].subTree);
+
         nodes[i].subTree = child->getFirstNode();
-        nodes[i].subTree->parent = this;
+
+        if ( nodes[i].subTree )
+            nodes[i].subTree->parent = this;
+
         child->releaseChildren();
         delete child;
+
         return Done;
 
     case Searching: return Searching;
@@ -326,7 +331,8 @@ LayoutTree::CompStatus LayoutNode::selectNode( WindowKey toSelect )
 {
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        if ( nodes[i].subTree->selectNode( toSelect ) != Searching )
+        if ( nodes[i].subTree
+          && nodes[i].subTree->selectNode( toSelect ) != Searching )
         {
             selectedRoute = i;
             return Done;
