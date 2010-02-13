@@ -3,21 +3,24 @@
 
 #include "ViWm.h"
 
-/**
- * Class associated with a real action.
- */
-class Action
+namespace ViWm
 {
-public:
-    enum ReturnInfo
+    /**
+     * Class associated with a real action.
+     */
+    class Action
     {
-        NeedRelayout,
-        Nothing
-    };
+    public:
+        enum ReturnInfo
+        {
+            NeedRelayout,
+            Nothing
+        };
 
-    virtual ReturnInfo operator() ( DesktopLayout       &l
-                                  , WindowMakerState    &state
-                                  ) = 0;
-};
+        virtual ReturnInfo operator() ( DesktopLayout       &l
+                                      , WindowMakerState    &state
+                                      ) = 0;
+    };
+}
 
 #endif /* ACTION_H */

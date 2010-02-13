@@ -2,6 +2,7 @@
 #include "../State.h"
 #include "../Screen.h"
 
+namespace ViWm {
 namespace Layout
 {
     void ManualVimLayout::layout( const WindowMakerState &s, DesktopLayout &l )
@@ -18,4 +19,4 @@ namespace Layout
         LayoutTree::addCreate( l[ st.currentScreen ].layoutRoot
                              , *new LayoutLeaf( newWindow ) );
     }
-}
+}}

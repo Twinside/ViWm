@@ -1,6 +1,6 @@
-
 #include "TreeAction.h"
 
+namespace ViWm {
 namespace Actions
 {
     void    reSplit( LayoutTree::SplitSide goodSide
@@ -76,4 +76,4 @@ namespace Actions
 
         return NeedRelayout;
     }
-}
+}}

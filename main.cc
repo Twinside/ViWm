@@ -7,7 +7,9 @@
 #include "ViWm.h"
 #include "Actions/TreeAction.h"
 
-ViWm    *globalManager;
+using namespace ViWm;
+
+ViWmManager    *globalManager;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -39,7 +41,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
-    reinterpret_cast<ViWm*>( lParam )->AddNode( hwnd );
+    reinterpret_cast<ViWmManager*>( lParam )->AddNode( hwnd );
     return TRUE;
 }
 
@@ -62,7 +64,7 @@ int WINAPI WinMain( HINSTANCE hInstance
     defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
 
-    globalManager = new ViWm( hInstance, defs );
+    globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();
 
     EnumWindows(EnumWindowsProc, (LPARAM)globalManager);

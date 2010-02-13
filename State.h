@@ -6,60 +6,63 @@
 #include "Constants.h"
 #include "Layouter.h"
 
-class TilledWindow;
-
-class WindowMakerState
+namespace ViWm
 {
-public:
-    WindowMakerState();
-    
-    enum Configuration
+    class TilledWindow;
+
+    class WindowMakerState
     {
-        // max recursion for layout tree
-        // 10 is a reasonable value, MaxRecursion,
-        // is more than enough.
-        MaxRecursion = 128
+    public:
+        WindowMakerState();
+        
+        enum Configuration
+        {
+            // max recursion for layout tree
+            // 10 is a reasonable value, MaxRecursion,
+            // is more than enough.
+            MaxRecursion = 128
+        };
+
+        TilledWindow*   FindNode( HWND hwnd );
+        void            RemoveNode( HWND hwnd );
+
+        /*
+        bool    disableNext;
+        bool    lockMouse;
+
+        int experimental_mouse;
+        int mouse_pos_out;
+        int margin;
+        */
+
+        int alpha;
+        /*
+        int borders;
+        int ignoreCount;
+        int ignoreCountBorders;
+
+        // Xmonad style Master area count
+        uint16 masterarea_count;
+        */
+
+        TillingMode tilingMode;
+
+        /* Should always point to current node */
+        TilledWindow *current; 	
+        size_t       currentTag;
+        size_t       currentScreen;
+
+        struct Bucket
+        {
+            int bucketCurrent;
+            std::list< TilledWindow* >  windowList;
+        };
+
+        /**
+         * One window list per tag.
+         */
+        std::vector<Bucket> windowList;
     };
-
-    TilledWindow*   FindNode( HWND hwnd );
-    void            RemoveNode( HWND hwnd );
-
-    /*
-    bool    disableNext;
-    bool    lockMouse;
-
-    int experimental_mouse;
-    int mouse_pos_out;
-    int margin;
-    */
-
-    int alpha;
-    /*
-    int borders;
-    int ignoreCount;
-    int ignoreCountBorders;
-
-    // Xmonad style Master area count
-    uint16 masterarea_count;
-    */
-
-    TillingMode tilingMode;
-
-    /* Should always point to current node */
-    TilledWindow *current; 	
-    size_t       currentTag;
-    size_t       currentScreen;
-
-    struct Bucket
-    {
-        int bucketCurrent;
-        std::list< TilledWindow* >  windowList;
-    };
-
-    /**
-     * One window list per tag.
-     */
-    std::vector<Bucket> windowList;
-};
+}
 
 #endif /* STATE_H */

@@ -1,6 +1,7 @@
 #include "ActionFunctors.h"
 #include "ViWm.h"
 
+namespace ViWm {
 namespace Actions
 {
     Action::ReturnInfo   VoidAction::operator() ( DesktopLayout &, WindowMakerState & )
@@ -185,4 +186,4 @@ namespace Actions
         PostMessage(GetForegroundWindow(), WM_CLOSE, 0, 0);
         return Nothing;
     }
-}
+}}

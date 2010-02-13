@@ -2,85 +2,88 @@
 #include "TilledWindow.h"
 #include "State.h"
 
-WindowMakerState::WindowMakerState()
-    : tilingMode( ManualVimTilling )
-    , alpha( 245 )
-    , currentScreen( 0 )
-    , currentTag( 0 )
-    , current( 0 )
-    //, borders( 1 )
-    //, ignoreCount( 0 )
-    //, ignoreCountBorders( 0 )
-    //, experimental_mouse( 0 )
-    //, mouse_pos_out( 0 )
-    //, margin( 120 ), masterarea_count( 1 )
+namespace ViWm
 {
-    windowList.resize( LastTag );
-}
-
-TilledWindow* WindowMakerState::FindNode( HWND hwnd )
-{
-    std::vector<Bucket>::iterator it;
-    std::list<TilledWindow*>::iterator     found;
-    TilledWindow::Finder                   comparer( hwnd );
-
-    // foreach it in windowList
-    for ( it = windowList.begin()
-        ; it != windowList.end()
-        ; ++it )
+    WindowMakerState::WindowMakerState()
+        : tilingMode( ManualVimTilling )
+        , alpha( 245 )
+        , currentScreen( 0 )
+        , currentTag( 0 )
+        , current( 0 )
+        //, borders( 1 )
+        //, ignoreCount( 0 )
+        //, ignoreCountBorders( 0 )
+        //, experimental_mouse( 0 )
+        //, mouse_pos_out( 0 )
+        //, margin( 120 ), masterarea_count( 1 )
     {
-        found = std::find_if( it->windowList.begin()
-                            , it->windowList.end()
-                            , comparer );
-
-        // we have found something
-        if ( found != it->windowList.end() )
-            return *found;
+        windowList.resize( LastTag );
     }
 
-    return 0;
-}
-
-void WindowMakerState::RemoveNode( HWND hwnd )
-{
-    std::vector<Bucket>::iterator it;
-    std::list<TilledWindow*>::iterator     found;
-    TilledWindow*                          firstFound = 0;
-    bool                                   hasFound = false;
-    TilledWindow::Finder                   comparer( hwnd );
-
-    // if the current selected window was selected,
-    // and is destroyed, don't forget to remove it's
-    // reference. (5h bug fix)
-    if ( current && (*current) == hwnd )
-        current = 0;
-
-    // foreach it in windowList
-    for ( it = windowList.begin()
-        ; it != windowList.end()
-        ; ++it )
+    TilledWindow* WindowMakerState::FindNode( HWND hwnd )
     {
-        // *sigh* I need lambdas.
-        found = std::find_if( it->windowList.begin()
-                            , it->windowList.end()
-                            , comparer );
+        std::vector<Bucket>::iterator it;
+        std::list<TilledWindow*>::iterator     found;
+        TilledWindow::Finder                   comparer( hwnd );
 
-        // we have found something
-        if ( found != it->windowList.end() )
+        // foreach it in windowList
+        for ( it = windowList.begin()
+            ; it != windowList.end()
+            ; ++it )
         {
-            if ( !hasFound )
-            {
-                firstFound = *found;
-                hasFound = true;
-            }
+            found = std::find_if( it->windowList.begin()
+                                , it->windowList.end()
+                                , comparer );
 
-            it->windowList.erase( found );
+            // we have found something
+            if ( found != it->windowList.end() )
+                return *found;
         }
+
+        return 0;
     }
 
-    if ( hasFound )
+    void WindowMakerState::RemoveNode( HWND hwnd )
     {
-        firstFound->Discard();
-        delete firstFound;
+        std::vector<Bucket>::iterator it;
+        std::list<TilledWindow*>::iterator     found;
+        TilledWindow*                          firstFound = 0;
+        bool                                   hasFound = false;
+        TilledWindow::Finder                   comparer( hwnd );
+
+        // if the current selected window was selected,
+        // and is destroyed, don't forget to remove it's
+        // reference. (5h bug fix)
+        if ( current && (*current) == hwnd )
+            current = 0;
+
+        // foreach it in windowList
+        for ( it = windowList.begin()
+            ; it != windowList.end()
+            ; ++it )
+        {
+            // *sigh* I need lambdas.
+            found = std::find_if( it->windowList.begin()
+                                , it->windowList.end()
+                                , comparer );
+
+            // we have found something
+            if ( found != it->windowList.end() )
+            {
+                if ( !hasFound )
+                {
+                    firstFound = *found;
+                    hasFound = true;
+                }
+
+                it->windowList.erase( found );
+            }
+        }
+
+        if ( hasFound )
+        {
+            firstFound->Discard();
+            delete firstFound;
+        }
     }
 }

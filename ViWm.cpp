@@ -4,113 +4,120 @@
 #include "Layouter/Layouts.h"
 #include "LayoutTree.h"
 
-ViWm::ViWm( HINSTANCE inithInstance
-          , const HotKeyCollection &originalCollection
-          )
-    : modkeys( DEFAULT_MODKEY )
-    , hInstance( inithInstance )
-    , shellhookid( (UINT)-1 )
-    , hotkeysDefinition( originalCollection )
+/**
+ * Ugly as hell, but, should work
+ */
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+namespace ViWm
 {
-    EnumDisplayMonitors( NULL, NULL, &ViWm::monitorEnumerator
-                       , reinterpret_cast<LPARAM>(&currentLayout) );
-
-    layouter.reserve( LastTillingMode );
-    layouter.push_back( LayoutPtr( new Layout::VerticalLayout() ) );
-    layouter.push_back( LayoutPtr( new Layout::HorizontalLayout() ) );
-    layouter.push_back( LayoutPtr( new Layout::FullScreenLayout() ) );
-    layouter.push_back( LayoutPtr( new Layout::ManualVimLayout() ) );
-}
-
-ViWm::~ViWm()
-{
-    DeregisterShellHookWindow( globalHotkeyListener );
-    UnregisterHotKeys( globalHotkeyListener );
-}
-
-void ViWm::Init()
-{
-    createGlobalListener( hInstance );
-}
-
-void ViWm::HandleHotKey( WPARAM wParam )
-{
-    size_t  hotkeyIndex = static_cast<size_t>( wParam );
-
-    // if we are out of bound, we ignore the message.
-    if ( hotkeyIndex >= hotkeysDefinition.size() )
-        return;
-
-    switch ((*hotkeysDefinition[hotkeyIndex].second)( currentLayout, currentState ))
+    ViWmManager::ViWmManager( HINSTANCE inithInstance
+              , const HotKeyCollection &originalCollection
+              )
+        : modkeys( DEFAULT_MODKEY )
+        , hInstance( inithInstance )
+        , shellhookid( (UINT)-1 )
+        , hotkeysDefinition( originalCollection )
     {
-    case Action::Nothing: break;
+        EnumDisplayMonitors( NULL, NULL, &ViWmManager::monitorEnumerator
+                           , reinterpret_cast<LPARAM>(&currentLayout) );
 
-    case Action::NeedRelayout:
-        ArrangeWindows();
-        break;
+        layouter.reserve( LastTillingMode );
+        layouter.push_back( LayoutPtr( new Layout::VerticalLayout() ) );
+        layouter.push_back( LayoutPtr( new Layout::HorizontalLayout() ) );
+        layouter.push_back( LayoutPtr( new Layout::FullScreenLayout() ) );
+        layouter.push_back( LayoutPtr( new Layout::ManualVimLayout() ) );
     }
-}
 
-LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
-{
-    if (msg != shellhookid)
-        return DefWindowProc(hwnd, msg, wParam, lParam); 
-
-    TilledWindow    *found;
-
-    switch (wParam)
+    ViWmManager::~ViWmManager()
     {
-    case HSHELL_WINDOWCREATED:
-        if (TilledWindow::IsHandleTileable((HWND)lParam))
+        DeregisterShellHookWindow( globalHotkeyListener );
+        UnregisterHotKeys( globalHotkeyListener );
+    }
+
+    void ViWmManager::Init()
+    {
+        createGlobalListener( hInstance );
+    }
+
+    void ViWmManager::HandleHotKey( WPARAM wParam )
+    {
+        size_t  hotkeyIndex = static_cast<size_t>( wParam );
+
+        // if we are out of bound, we ignore the message.
+        if ( hotkeyIndex >= hotkeysDefinition.size() )
+            return;
+
+        switch ((*hotkeysDefinition[hotkeyIndex].second)( currentLayout, currentState ))
         {
-            AddNode((HWND)lParam);
-            ArrangeWindows();
-            FocusCurrent();
-            selectWindow( (HWND)lParam );
-            _ASSERTE( _CrtCheckMemory() == TRUE );
-        }
-        break;
+        case Action::Nothing: break;
 
-    case HSHELL_WINDOWDESTROYED:
-        found = currentState.FindNode((HWND)lParam);
-        if ( found )
+        case Action::NeedRelayout:
+            ArrangeWindows();
+            break;
+        }
+    }
+
+    LRESULT ViWmManager::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
+    {
+        if (msg != shellhookid)
+            return DefWindowProc(hwnd, msg, wParam, lParam); 
+
+        TilledWindow    *found;
+
+        switch (wParam)
         {
-            for (size_t i = 0; i < currentLayout.size(); ++i)
-                LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
-
-            currentState.RemoveNode((HWND)lParam);
-
-            ArrangeWindows();
-            FocusCurrent();
-            _ASSERTE( _CrtCheckMemory() == TRUE );
-        }
-        break;
-
-    case HSHELL_WINDOWACTIVATED:
-        found = currentState.FindNode((HWND)lParam);
-        if (found) {
-            if (currentState.current) {
-                currentState.current->SetTransparency( currentState.alpha );
+        case HSHELL_WINDOWCREATED:
+            if (TilledWindow::IsHandleTileable((HWND)lParam))
+            {
+                AddNode((HWND)lParam);
+                ArrangeWindows();
+                FocusCurrent();
+                selectWindow( (HWND)lParam );
+                _ASSERTE( _CrtCheckMemory() == TRUE );
             }
-            currentState.current = found;
-            found->SetTransparency( 255 );
-            selectWindow( (HWND)lParam );
+            break;
 
-            FocusCurrent();
+        case HSHELL_WINDOWDESTROYED:
+            found = currentState.FindNode((HWND)lParam);
+            if ( found )
+            {
+                for (size_t i = 0; i < currentLayout.size(); ++i)
+                    LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
+
+                currentState.RemoveNode((HWND)lParam);
+
+                ArrangeWindows();
+                FocusCurrent();
+                _ASSERTE( _CrtCheckMemory() == TRUE );
+            }
+            break;
+
+        case HSHELL_WINDOWACTIVATED:
+            found = currentState.FindNode((HWND)lParam);
+            if (found) {
+                if (currentState.current) {
+                    currentState.current->SetTransparency( currentState.alpha );
+                }
+                currentState.current = found;
+                found->SetTransparency( 255 );
+                selectWindow( (HWND)lParam );
+
+                FocusCurrent();
+            }
+            _ASSERTE( _CrtCheckMemory() == TRUE );
+            break;
         }
-        _ASSERTE( _CrtCheckMemory() == TRUE );
-        break;
+        return 0;
     }
-    return 0;
-}
 
-void ViWm::UnregisterHotKeys(HWND hwnd)
+    void ViWmManager::UnregisterHotKeys(HWND hwnd)
 {
     for (size_t i = 0; i < hotkeysDefinition.size(); i++)
         UnregisterHotKey(hwnd, i);
 }
 
-void ViWm::RegisterHotKeys(HWND hwnd)
+    void ViWmManager::RegisterHotKeys(HWND hwnd)
 {
     HotKeyCollection::const_iterator    it;
     int i = 0;
@@ -123,12 +130,8 @@ void ViWm::RegisterHotKeys(HWND hwnd)
     }
 }
 
-/**
- * Ugly as hell, but, should work
- */
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-void ViWm::createGlobalListener( HINSTANCE hInstance )
+    void ViWmManager::createGlobalListener( HINSTANCE hInstance )
 {
     WNDCLASSEX winClass;
 
@@ -168,7 +171,7 @@ void ViWm::createGlobalListener( HINSTANCE hInstance )
     shellhookid = RegisterWindowMessage("SHELLHOOK");
 }
 
-void ViWm::ArrangeWindows()
+    void ViWmManager::ArrangeWindows()
 {
     layouter[currentState.tilingMode]->layout( currentState, currentLayout );
     currentLayout[currentState.currentScreen].replace();
@@ -176,11 +179,11 @@ void ViWm::ArrangeWindows()
 }
 
 
-BOOL ViWm::monitorEnumerator( HMONITOR hMonitor
-                            , HDC    /* hdcMonitor */
-                            , LPRECT /* intersectionRect */
-                            , LPARAM userData
-                            )
+    BOOL ViWmManager::monitorEnumerator( HMONITOR hMonitor
+                                , HDC    /* hdcMonitor */
+                                , LPRECT /* intersectionRect */
+                                , LPARAM userData
+                                )
 {
     DesktopLayout   &myLayout = *reinterpret_cast<DesktopLayout*>( userData );
     MONITORINFOEX   minfo;
@@ -202,7 +205,7 @@ BOOL ViWm::monitorEnumerator( HMONITOR hMonitor
     return TRUE;
 }
 
-void ViWm::AddNode( HWND hwnd )
+    void ViWmManager::AddNode( HWND hwnd )
 {
     OutputDebugString( __FUNCTION__ "\n" );
 
@@ -230,29 +233,30 @@ void ViWm::AddNode( HWND hwnd )
 
 }
 
-void ViWm::FocusCurrent()
-{
-    if ( currentState.current )
+    void ViWmManager::FocusCurrent()
     {
-        currentState.current->GiveFocus();
-    }
-}
-
-void ViWm::selectWindow( HWND currentWindow )
-{
-    Screen  *scr = &currentLayout[ currentState.currentScreen ];
-    if ( scr->layoutRoot
-       && scr->layoutRoot->selectNode( currentWindow ) == LayoutTree::Done )
-        return;
-
-    for ( size_t i = 0; i < currentLayout.size(); i++ )
-    {
-        if ( i != currentState.currentScreen ) continue;
-        LayoutTree  *root = currentLayout[i].layoutRoot;
-        if ( root && root->selectNode( currentWindow ) == LayoutTree::Done )
+        if ( currentState.current )
         {
-            currentState.currentScreen = i;
+            currentState.current->GiveFocus();
+        }
+    }
+
+    void ViWmManager::selectWindow( HWND currentWindow )
+    {
+        Screen  *scr = &currentLayout[ currentState.currentScreen ];
+        if ( scr->layoutRoot
+           && scr->layoutRoot->selectNode( currentWindow ) == LayoutTree::Done )
             return;
+
+        for ( size_t i = 0; i < currentLayout.size(); i++ )
+        {
+            if ( i != currentState.currentScreen ) continue;
+            LayoutTree  *root = currentLayout[i].layoutRoot;
+            if ( root && root->selectNode( currentWindow ) == LayoutTree::Done )
+            {
+                currentState.currentScreen = i;
+                return;
+            }
         }
     }
 }

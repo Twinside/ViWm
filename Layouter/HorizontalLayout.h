@@ -3,6 +3,7 @@
 
 #include "../Layouter.h"
 
+namespace ViWm {
 namespace Layout
 {
     class HorizontalLayout : public Layouter
@@ -16,6 +17,6 @@ namespace Layout
         virtual void layout( const WindowMakerState &s
                            , DesktopLayout &l );
     };
-}
+}}
 
 #endif /* HORIZONTALLAYOUT_H */

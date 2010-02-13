@@ -1,5 +1,6 @@
 #include "HorizontalLayout.h"
 
+namespace ViWm {
 namespace Layout
 {
 #if 0
@@ -36,4 +37,4 @@ namespace Layout
     {
 
     }
-}
+}}

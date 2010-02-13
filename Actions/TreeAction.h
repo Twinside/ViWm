@@ -3,6 +3,7 @@
 
 #include "../Action.h"
 
+namespace ViWm {
 namespace Actions
 {
     class HorizontalSplit : public Action
@@ -27,7 +28,6 @@ namespace Actions
     private:
         int amount;
     };
-}
+}}
 
 #endif /* TREEACTION_H */
-

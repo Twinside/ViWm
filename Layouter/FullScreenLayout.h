@@ -3,6 +3,7 @@
 
 #include "../Layouter.h"
 
+namespace ViWm {
 namespace Layout
 {
     class FullScreenLayout : public Layouter
@@ -14,6 +15,6 @@ namespace Layout
                                          );
         virtual void layout( const WindowMakerState &s, DesktopLayout &l );
     };
-}
+}}
 
 #endif /* FULLSCREENLAYOUT_H */

@@ -3,6 +3,7 @@
 
 #include "../Layouter.h"
 
+namespace ViWm {
 namespace Layout
 {
     class ManualVimLayout : public Layouter
@@ -14,6 +15,6 @@ namespace Layout
                                          , DesktopLayout          &l
                                          );
     };
-}
+}}
 
 #endif /* MANUALVIMLAYOUT_H */

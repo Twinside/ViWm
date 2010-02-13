@@ -4,6 +4,7 @@
 #include "Action.h"
 #include "Constants.h"
 
+namespace ViWm {
 namespace Actions
 {
     struct VoidAction : public Action
@@ -97,6 +98,6 @@ namespace Actions
 
     struct CloseForeground : public Action
         { ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s); };
-}
+}}
 
 #endif /* ACTIONFUNCTORS_H */

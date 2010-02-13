@@ -1,5 +1,6 @@
 #include "FullScreenLayout.h"
 
+namespace ViWm {
 namespace Layout
 {
     void FullScreenLayout::layout( const WindowMakerState& /* s */
@@ -27,4 +28,4 @@ namespace Layout
     {
 
     }
-}
+}}
