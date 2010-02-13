@@ -63,11 +63,8 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
     case HSHELL_WINDOWCREATED:
         if (TilledWindow::IsHandleTileable((HWND)lParam))
         {
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             AddNode((HWND)lParam);
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             ArrangeWindows();
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
             selectWindow( (HWND)lParam );
             _ASSERTE( _CrtCheckMemory() == TRUE );
@@ -78,16 +75,12 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         found = currentState.FindNode((HWND)lParam);
         if ( found )
         {
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             for (size_t i = 0; i < currentLayout.size(); ++i)
                 LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
 
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             currentState.RemoveNode((HWND)lParam);
-            _ASSERTE( _CrtCheckMemory() == TRUE );
 
             ArrangeWindows();
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
             _ASSERTE( _CrtCheckMemory() == TRUE );
         }
@@ -95,7 +88,6 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
     case HSHELL_WINDOWACTIVATED:
         found = currentState.FindNode((HWND)lParam);
-        _ASSERTE( _CrtCheckMemory() == TRUE );
         if (found) {
             if (currentState.current) {
                 currentState.current->SetTransparency( currentState.alpha );
@@ -104,10 +96,9 @@ LRESULT ViWm::HandleShellHook( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
             found->SetTransparency( 255 );
             selectWindow( (HWND)lParam );
 
-            _ASSERTE( _CrtCheckMemory() == TRUE );
             FocusCurrent();
-            _ASSERTE( _CrtCheckMemory() == TRUE );
         }
+        _ASSERTE( _CrtCheckMemory() == TRUE );
         break;
     }
     return 0;
