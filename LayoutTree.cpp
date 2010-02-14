@@ -179,14 +179,15 @@ namespace ViWm
                 int sizeSub = 0;
                 int topShift = 0;
 
-                if (i != 0)
+                if (i != 0 || (/*i == 0 &&*/ (bounds & TopBound) == 0))
                 {
                     subBound &= ~TopBound;
                     sizeSub += HalfSplit;
                     topShift += HalfSplit;
                 }
 
-                if (i != nodes.size() - 1)
+                if (i != nodes.size() - 1 ||
+                    (/*i == nodes.size() - 1 &&*/ (bounds & BottomBound) == 0))
                 {
                     subBound &= ~BottomBound;
                     sizeSub += HalfSplit;
@@ -225,14 +226,18 @@ namespace ViWm
                 int sizeSub = 0;
                 int leftShift = 0;
 
-                if (i != 0)
+                // if we're not at the left (first index), OR
+                // we're the first, but hey, we're not at the left
+                // of screen :(
+                if (i != 0 || (/*i == 0 && */(bounds & LeftBound) == 0))
                 {
-                    subBound &= ~LeftBound;
-                    sizeSub += HalfSplit;
-                    leftShift += HalfSplit;
+                    subBound &= ~LeftBound; // We're not at left
+                    sizeSub += HalfSplit;   // we're smaller
+                    leftShift += HalfSplit; // we must shift beginning.
                 }
 
-                if (i != nodes.size() - 1)
+                if (i != nodes.size() - 1 ||
+                    (/*i == nodes.size() - 1 && */(bounds & RightBound) == 0))
                 {
                     subBound &= ~RightBound;
                     sizeSub += HalfSplit;
@@ -436,12 +441,21 @@ namespace ViWm
 
         if ( lastDirection == SplitHorizontal )
         {
-            for (it = nodes.begin(); it != nodes.end(); ++it)
+            it = nodes.begin();
+            r.drawRect( defaultBrush
+                      , it->lastDim.x
+                      , it->lastDim.y
+                      , it->lastDim.width - HalfSplit
+                      , SplitWidth );
+
+            for (it = nodes.begin() + 1; it != nodes.end() - 1; ++it)
+            {
                 r.drawRect( defaultBrush
                           , it->lastDim.x
                           , it->lastDim.y
-                          , it->lastDim.width
+                          , it->lastDim.width - SplitWidth
                           , SplitWidth );
+            }
         }
         else
         {

@@ -36,14 +36,33 @@ namespace ViWm
         void    HandleHotKey( WPARAM wParam );
 
     private:
-        // DO NOT WANT!!
+        //////////////////////////////////////////////////////////////////////////
+        ////                    Just to avoid compiler warning
+        //////////////////////////////////////////////////////////////////////////
         void    operator =( const ViWmManager& );
         ViWmManager( const ViWmManager & );
 
-        int modkeys;
 
+        //////////////////////////////////////////////////////////////////////////
+        ////              Function hidden to the rest of the world
+        //////////////////////////////////////////////////////////////////////////
         void    UnregisterHotKeys( HWND hwnd );
         void    RegisterHotKeys( HWND hwnd );
+        void    createGlobalListener( HINSTANCE hInstance );
+        void    selectWindow( HWND currentWindow );
+
+        //////////////////////////////////////////////////////////////////////////
+        ////              Static Win32 Func
+        //////////////////////////////////////////////////////////////////////////
+        // static functions to be used with Win32
+        static LRESULT CALLBACK keyListenerProc( HWND hwnd
+                                               , UINT msg
+                                               , WPARAM wParam
+                                               , LPARAM lParam );
+        static LRESULT CALLBACK windowListenerProc( HWND hwnd
+                                                  , UINT msg
+                                                  , WPARAM wParam
+                                                  , LPARAM lParam );
 
         static BOOL CALLBACK
                  monitorEnumerator( HMONITOR hMonitor
@@ -51,15 +70,19 @@ namespace ViWm
                                   , LPRECT   intersectionRect
                                   , LPARAM   userData );
 
-        void    createGlobalListener( HINSTANCE hInstance );
-        void    selectWindow( HWND currentWindow );
-
         typedef std::tr1::shared_ptr<Layouter>
                 LayoutPtr;
 
+        //////////////////////////////////////////////////////////////////////////
+        ////              Our data!
+        //////////////////////////////////////////////////////////////////////////
         HotKeyCollection        hotkeysDefinition;
         std::vector<LayoutPtr>  layouter;
 
+        /**
+         * Modkey used to define global hotkey.
+         */
+        int modkeys;
         
         HINSTANCE               hInstance;
         DesktopLayout           currentLayout;
@@ -67,8 +90,11 @@ namespace ViWm
         HWND                    globalHotkeyListener;
         UINT                    shellhookid;	/* Window Message id */
 
-        char ignoreClasses[MAX_IGNORE][128];		/* Don't include these classes in tiling */
-        char ignoreClassesBorders[MAX_IGNORE][128]; 	/* Don't remove borders from these classes */
+        /*
+        // Don't include these classes in tiling
+        char ignoreClasses[MAX_IGNORE][128];		
+        // Don't remove borders from these classes
+        char ignoreClassesBorders[MAX_IGNORE][128]; //*/
     };
 
 }

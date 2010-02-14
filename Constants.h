@@ -18,11 +18,6 @@ enum    Tags
 enum    ConfigurationConstants
 {
     DEFAULT_MODKEY = MOD_CONTROL | MOD_ALT,
-    MAX_IGNORE = 16,
-    MemoryTrimmDelay = 60000,
-    MousePollDelay = 500
 };
-
-typedef unsigned short uint16;
 
 #endif /* CONSTANTS_H */

@@ -410,6 +410,10 @@
 				RelativePath=".\ViWm.h"
 				>
 			</File>
+			<File
+				RelativePath=".\ViWm.win32.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Layouter"

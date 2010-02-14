@@ -11,34 +11,6 @@ using namespace ViWm;
 
 ViWmManager    *globalManager;
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-    case WM_CREATE:
-        return 0;
-        break;
-
-    case WM_CLOSE:
-        ClipCursor(0); 	/* Release Cursor Lock */
-        delete globalManager;
-        globalManager = 0;
-        break;
-
-    case WM_DESTROY:
-        PostQuitMessage(WM_QUIT);
-        break;
-
-    case WM_HOTKEY:
-        globalManager->HandleHotKey( wParam );
-        break;
-
-    default:
-        return globalManager->HandleShellHook( hwnd, msg, wParam, lParam );
-    }
-    return 0;
-}
-
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     reinterpret_cast<ViWmManager*>( lParam )->AddNode( hwnd );

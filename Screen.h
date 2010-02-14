@@ -12,8 +12,8 @@ namespace ViWm
      */
     struct Screen 
     {
-        Screen();
-        Screen( int x, int y, int width, int height );
+        Screen( LayoutTree::WindowKey associated
+              , int x, int y, int width, int height );
 
         // This accessor are a bit ugly, but I don't
         // want some change screen size by mistake.
@@ -34,6 +34,7 @@ namespace ViWm
 
     private:
         Rect    size;
+        LayoutTree::WindowKey fullScreenWin;
     };
 
     typedef std::vector< Screen >   DesktopLayout;
