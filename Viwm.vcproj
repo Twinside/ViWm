@@ -371,14 +371,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Renderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Renderer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Screen.cpp"
 				>
 			</File>
@@ -484,6 +476,14 @@
 			</File>
 			<File
 				RelativePath=".\Rendering\LayeredWindowInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Rendering\Renderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Rendering\Renderer.h"
 				>
 			</File>
 			<File

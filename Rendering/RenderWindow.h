@@ -18,7 +18,6 @@ namespace Renderer
         RenderWindow( const RenderWindow &cpy );
         LayeredWindowInfo   m_info;
         ID2D1RenderTarget   *renderTarget;
-        IWICImagingFactory  *factory;
     };
 }}
 

@@ -1,5 +1,3 @@
-#include <wincodec.h>
-#include <D2D1.h>
 #include "RenderWindow.h"
 
 namespace ViWm {
@@ -18,7 +16,6 @@ namespace Renderer
 
     RenderWindow::RenderWindow( HWND window )
     {
-        IWICImagingFactory *factory;
         HRESULT rez;
 
         rez = CoCreateInstance( CLSID_WICImagingFactory, NULL
