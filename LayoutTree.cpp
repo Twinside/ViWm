@@ -101,6 +101,9 @@ namespace ViWm
             child->releaseChildren();
             delete child;
             break;
+
+        case Searching: return Done;
+        case Done: return Done;
         }
         return Done;
     }

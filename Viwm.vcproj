@@ -475,6 +475,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Renderer"
+			>
+			<File
+				RelativePath=".\Rendering\LayeredWindowInfo.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Rendering\LayeredWindowInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Rendering\RenderWindow.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Rendering\RenderWindow.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

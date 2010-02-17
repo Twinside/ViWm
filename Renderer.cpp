@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
-namespace ViWm
+namespace ViWm {
+namespace Renderer
 {
     template<class Interface>
     inline void SafeRelease( Interface **ppInterfaceToRelease )
@@ -24,6 +25,13 @@ namespace ViWm
 
         if (! SUCCEEDED(hr)) throw;
 
+        hr = CoCreateInstance( CLSID_WICImagingFactory, NULL
+                             , CLSCTX_INPROC_SERVER
+                             , IID_IWICImagingFactory
+                             , (void**)&factory );
+
+        if (! SUCCEEDED(hr)) throw;
+
         m_hwnd = GetDesktopWindow();
 
         RECT rc;
@@ -43,7 +51,7 @@ namespace ViWm
     Renderer::~Renderer()
     {
         SafeRelease(&m_pDirect2dFactory);
-        SafeRelease(&m_pRenderTarget);
+        SafeRelease(&factory);
     }
 
     void Renderer::drawRect( Brush color, int x, int y, int width, int height )
@@ -80,4 +88,4 @@ namespace ViWm
 
         return retBrush;
     }
-}
+}}

@@ -3,7 +3,11 @@
 
 #include <d2d1.h>
 
-namespace ViWm
+struct ID2D1Factory;
+struct ID2D1HwndRenderTarget;
+struct ID2D1SolidColorBrush;
+namespace ViWm {
+namespace Renderer
 {
     class Renderer
     {
@@ -16,16 +20,16 @@ namespace ViWm
         Brush   CreateBrush( float r, float g, float b, float a );
         void    DeleteBrush( Brush b );
 
+        RenderWindow
         void    begin();
         void    drawRect( Brush color, int x, int y, int width, int height );
         void    end();
 
         
     private:
-        HWND m_hwnd;
-        ID2D1Factory* m_pDirect2dFactory;
-        ID2D1HwndRenderTarget* m_pRenderTarget;
+        ID2D1Factory            *m_pDirect2dFactory;
+        IWICImagingFactory      *factory;
     };
-}
+}}
 
 #endif /* RENDERER_H */
