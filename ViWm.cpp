@@ -32,7 +32,7 @@ namespace ViWm
         createGlobalListener( hInstance );
 
         EnumDisplayMonitors( NULL, NULL, &ViWmManager::monitorEnumerator
-            , reinterpret_cast<LPARAM>(&currentLayout) );
+                           , reinterpret_cast<LPARAM>(this) );
     }
 
     void ViWmManager::HandleHotKey( WPARAM wParam )
@@ -139,7 +139,9 @@ namespace ViWm
     {
         layouter[currentState.tilingMode]->layout( currentState, currentLayout );
         if ( currentLayout.size() > currentState.currentScreen )
+        {
             currentLayout[currentState.currentScreen].replace();
+        }
         FocusCurrent();
     }
 
@@ -155,7 +157,7 @@ namespace ViWm
 #ifdef _DEBUG
         // For debug purpose and avoiding to messing up with
         // the whole desktop, we only handle the notepad program
-        // which the good taste to be lightweight.
+        // which has the good taste to be lightweight.
         if ( strcmp( TempClassName, "Notepad") != 0 )
             return;
 #endif

@@ -487,6 +487,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Rendering\RenderTargetDC.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Rendering\RenderWindow.cc"
 				>
 			</File>

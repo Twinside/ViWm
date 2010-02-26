@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include "TilledWindow.h"
-#include "Renderer.h"
+#include "Rendering/RenderWindow.h"
 
 namespace ViWm
 {
@@ -62,14 +62,13 @@ namespace ViWm
                       | BottomBound
         };
 
+        void   DisplaySplitTree( Renderer::RenderWindow &r, Renderer::RenderWindow::Brush &defaultBrush ) const;
+
         virtual CompStatus addNode( LayoutTree *subTree ) = 0;
         virtual CompStatus removeNode( WindowKey toRemove ) = 0;
         virtual CompStatus removeNode( LayoutTree *toRemove ) = 0;
         virtual CompStatus selectNode( WindowKey toRemove ) = 0;
         virtual LayoutTree* getSelected() = 0;
-        virtual void        displayLayoutStructure
-                            ( Renderer &r
-                            , Renderer::Brush defaultBrush ) = 0;
 
         static CompStatus addCreate( LayoutTree *&root, LayoutTree &tree );
         static CompStatus removeClean( LayoutTree *&root, WindowKey key );
@@ -88,6 +87,13 @@ namespace ViWm
 
         LayoutTree  *parent;
 
+    protected:
+        virtual void        displayLayoutStructure
+                            ( Renderer::RenderWindow &r
+                            , Renderer::RenderWindow::Brush defaultBrush ) const = 0;
+
+        friend class LayoutNode;
+
     private:
         static CompStatus   globalPack( LayoutTree *&root, CompStatus st );
     };
@@ -98,8 +104,9 @@ namespace ViWm
      * can has empty nodes (for a future opened
      * node).
      */
-    struct LayoutNode : public LayoutTree
+    class LayoutNode : public LayoutTree
     {
+    public:
         LayoutNode();
         virtual ~LayoutNode();
 
@@ -148,7 +155,6 @@ namespace ViWm
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual LayoutTree*   getSelected();
-        virtual void        displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
@@ -169,12 +175,17 @@ namespace ViWm
         inline void    rotate( int about )
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
 
-        
+    protected:
+        virtual void        displayLayoutStructure
+                            ( Renderer::RenderWindow &r
+                            , Renderer::RenderWindow::Brush defaultBrush ) const;
+
     private:
         CompStatus  pack( CompStatus what, size_t &index );
         void        insert( LayoutTree  *toSearch
                           , LayoutTree  *toAdd
                           , int plusMinus );
+
 
         enum    Conf
         {
@@ -197,7 +208,6 @@ namespace ViWm
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual LayoutTree*   getSelected();
-        virtual void        displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
@@ -205,6 +215,11 @@ namespace ViWm
                                  , ScreenBounded  bounds );
 
         TilledWindow   &window;
+
+    protected:
+        virtual void        displayLayoutStructure
+                            ( Renderer::RenderWindow &r
+                            , Renderer::RenderWindow::Brush defaultBrush ) const;
 
     private:
         void operator = ( const LayoutLeaf& l );

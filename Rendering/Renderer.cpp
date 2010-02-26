@@ -1,8 +1,19 @@
 #include "Renderer.h"
+#include "RenderWindow.h"
 
 namespace ViWm {
 namespace Renderer
 {
+    const D2D1_PIXEL_FORMAT format = D2D1::PixelFormat(
+                          DXGI_FORMAT_B8G8R8A8_UNORM,
+                          D2D1_ALPHA_MODE_PREMULTIPLIED);
+
+    const D2D1_RENDER_TARGET_PROPERTIES properties = 
+        D2D1::RenderTargetProperties( D2D1_RENDER_TARGET_TYPE_DEFAULT,
+                                     format,
+                                     0.0f, // default dpi
+                                     0.0f, // default dpi
+                                     D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE);
     template<class Interface>
     inline void SafeRelease( Interface **ppInterfaceToRelease )
     {
@@ -14,10 +25,8 @@ namespace Renderer
     }
 
     Renderer::Renderer()
-        : m_hwnd(NULL)
-        , m_pDirect2dFactory(NULL)
-        , m_pRenderTarget(NULL)
-
+        : m_pDirect2dFactory(NULL)
+        , factory( NULL )
     {
         HRESULT hr;
         hr = D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED
@@ -31,21 +40,6 @@ namespace Renderer
                              , (void**)&factory );
 
         if (! SUCCEEDED(hr)) throw;
-
-        m_hwnd = GetDesktopWindow();
-
-        RECT rc;
-        GetClientRect(m_hwnd, &rc);
-
-        D2D1_SIZE_U size = D2D1::SizeU(
-            rc.right - rc.left,
-            rc.bottom - rc.top
-            );
-
-        hr = m_pDirect2dFactory->CreateHwndRenderTarget
-                ( D2D1::RenderTargetProperties()
-                , D2D1::HwndRenderTargetProperties(m_hwnd, size)
-                , &m_pRenderTarget );
     }
 
     Renderer::~Renderer()
@@ -54,38 +48,31 @@ namespace Renderer
         SafeRelease(&factory);
     }
 
-    void Renderer::drawRect( Brush color, int x, int y, int width, int height )
+    RenderWindow& Renderer::CreateRenderWindow( HWND window )
     {
-        D2D1_RECT_F rectangle2 = D2D1::RectF( float(x)
-                                            , float(y)
-                                            , float(x + width)
-                                            , float(x + height) );
+        RenderTarget    *target;
+        IWICBitmap      *bitmap;
+        //ID2D1GdiInteropRenderTarget    *interopTarget;
+        WINDOWINFO      winInfo;
 
-        m_pRenderTarget->FillRectangle( rectangle2, color );
-    }
+        winInfo.cbSize = sizeof( WINDOWINFO );
+        GetWindowInfo( window, &winInfo );
 
-    void Renderer::begin()
-    {
-        m_pRenderTarget->BeginDraw();
-        m_pRenderTarget->SetTransform( D2D1::Matrix3x2F::Identity() );
-    }
+        int width = winInfo.rcWindow.right - winInfo.rcWindow.left;
+        int height = winInfo.rcWindow.bottom - winInfo.rcWindow.top;
 
-    void Renderer::end()
-    {
-        m_pRenderTarget->EndDraw();
-    }
+        factory->CreateBitmap
+            ( width
+            , height
+            , GUID_WICPixelFormat32bppPBGRA
+            , WICBitmapCacheOnLoad
+            , &bitmap);
 
-    void Renderer::DeleteBrush( Brush b )
-        { SafeRelease( &b ); }
+        m_pDirect2dFactory->CreateWicBitmapRenderTarget(
+            bitmap,
+            properties,
+            &target);
 
-    Renderer::Brush Renderer::CreateBrush( float r, float g, float b, float a )
-    {
-        if ( !m_pRenderTarget ) throw;
-
-        Brush   retBrush;
-        m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF(r,g,b,a)
-                                              , &retBrush);
-
-        return retBrush;
+        return *new RenderWindow( window, width, height, *target );
     }
 }}

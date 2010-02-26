@@ -2,6 +2,7 @@
 #define SCREEN_H
 
 #include "LayoutTree.h"
+#include "Rendering\RenderWindow.h"
 
 namespace ViWm
 {
@@ -12,8 +13,10 @@ namespace ViWm
      */
     struct Screen 
     {
-        Screen( LayoutTree::WindowKey associated
+        Screen( Renderer::RenderWindow &associated
               , int x, int y, int width, int height );
+
+        ~Screen();
 
         // This accessor are a bit ugly, but I don't
         // want some change screen size by mistake.
@@ -22,19 +25,17 @@ namespace ViWm
         int getWidth()  { return size.width; }
         int getHeight() { return size.height; }
 
-        void    replace()
-        { 
-            if (layoutRoot)
-                layoutRoot->Establish( *this, size, initialSplit
-                                     , LayoutTree::FullBound );
-        }
+        void   replace();
 
         LayoutTree::SplitSide   initialSplit;
         LayoutTree              *layoutRoot;
 
     private:
+        void    operator =( const Screen& );
+
         Rect    size;
-        LayoutTree::WindowKey fullScreenWin;
+        Renderer::RenderWindow          &fullScreenWin;
+        Renderer::RenderWindow::Brush   splitBrush;
     };
 
     typedef std::vector< Screen >   DesktopLayout;

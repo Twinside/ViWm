@@ -14,7 +14,8 @@ namespace ViWm
         , LPARAM userData
         )
     {
-        DesktopLayout   &myLayout = *reinterpret_cast<DesktopLayout*>( userData );
+        ViWmManager     &instance = *reinterpret_cast<ViWmManager*>( userData );
+        DesktopLayout   &myLayout = instance.currentLayout;
         MONITORINFOEX   minfo;
 
         minfo.cbSize = sizeof( MONITORINFOEX );
@@ -72,7 +73,7 @@ namespace ViWm
         // displays, we abs the width & height to get correct value to
         // work on.
         Screen          newScreen
-            ( fullScreenWin
+            ( instance.defaultRenderer.CreateRenderWindow( fullScreenWin )
             , minfo.rcWork.left
             , minfo.rcWork.top
             , abs(minfo.rcWork.right - minfo.rcWork.left)

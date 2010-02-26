@@ -30,7 +30,6 @@ namespace ViWm
         void    ArrangeWindows();
         void    FocusCurrent();
 
-
         LRESULT HandleShellHook( HWND hwnd, UINT msg
                                , WPARAM wParam, LPARAM lParam );
         void    HandleHotKey( WPARAM wParam );
@@ -84,6 +83,8 @@ namespace ViWm
          */
         int modkeys;
         
+        Renderer::Renderer      defaultRenderer;
+
         HINSTANCE               hInstance;
         DesktopLayout           currentLayout;
         WindowMakerState        currentState;

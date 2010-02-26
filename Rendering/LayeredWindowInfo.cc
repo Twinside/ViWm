@@ -26,6 +26,12 @@ namespace Renderer
     void LayeredWindowInfo::Update( HWND window, HDC source)
     {
         m_info.hdcSrc = source;
-        UpdateLayeredWindowIndirect(window, &m_info);
+        BOOL rez = UpdateLayeredWindowIndirect(window, &m_info);
+
+        if (rez == 0)
+        {
+            DWORD errorCode = GetLastError();
+            throw;
+        }
     }
 }}

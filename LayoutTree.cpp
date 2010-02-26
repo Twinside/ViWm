@@ -437,37 +437,52 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     ////                        Layout drawing
     //////////////////////////////////////////////////////////////////////////
-    void LayoutLeaf::displayLayoutStructure( Renderer& /*r*/, Renderer::Brush /* defaultBrush */ ) {}
-    void LayoutNode::displayLayoutStructure( Renderer &r, Renderer::Brush defaultBrush )
+    void LayoutLeaf::displayLayoutStructure
+                            ( Renderer::RenderWindow &/*r*/
+                            , Renderer::RenderWindow::Brush /*defaultBrush*/ ) const {}
+    void LayoutNode::displayLayoutStructure
+                            ( Renderer::RenderWindow &r
+                            , Renderer::RenderWindow::Brush defaultBrush ) const
     {
-        Collection::iterator it;
+        Collection::const_iterator it;
+
+        r.drawRect( defaultBrush, 0, 100, 200, 200 );
 
         if ( lastDirection == SplitHorizontal )
         {
-            it = nodes.begin();
-            r.drawRect( defaultBrush
-                      , it->lastDim.x
-                      , it->lastDim.y
-                      , it->lastDim.width - HalfSplit
-                      , SplitWidth );
-
-            for (it = nodes.begin() + 1; it != nodes.end() - 1; ++it)
+            for (it = nodes.begin(); it != nodes.end() - 1; ++it)
             {
+                const Rect    &top = it->lastDim;
+
                 r.drawRect( defaultBrush
-                          , it->lastDim.x
-                          , it->lastDim.y
-                          , it->lastDim.width - SplitWidth
+                          , top.x
+                          , top.y + top.height
+                          , top.width
                           , SplitWidth );
             }
         }
         else
         {
-            for (it = nodes.begin(); it != nodes.end(); ++it)
+            for (it = nodes.begin(); it != nodes.end() - 1; ++it)
+            {
+                const Rect    &left = it->lastDim;
                 r.drawRect( defaultBrush
-                          , it->lastDim.x
-                          , it->lastDim.y
+                          , left.x + left.width
+                          , left.y
                           , SplitWidth
-                          , it->lastDim.height );
+                          , left.height );
+            }
         }
+
+        for (it = nodes.begin(); it != nodes.end(); ++it)
+            it->subTree->displayLayoutStructure( r, defaultBrush );
+    }
+
+    void LayoutTree::DisplaySplitTree( Renderer::RenderWindow &r
+                                     , Renderer::RenderWindow::Brush &defaultBrush ) const
+    {
+        r.begin();
+        displayLayoutStructure(r, defaultBrush);
+        r.end();
     }
 }

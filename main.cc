@@ -32,6 +32,15 @@ int WINAPI WinMain( HINSTANCE hInstance
     MSG msg;
     HotKeyCollection    defs;
 
+    HRESULT hr = CoInitialize( NULL );
+
+    if (!SUCCEEDED(hr))
+    {
+        MessageBox( NULL
+                   , "The programm cannot start because we cannot start the COM interface"
+                   , "ViWm - Launching Error", MB_OK );
+    }
+
     defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
     defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
@@ -48,6 +57,8 @@ int WINAPI WinMain( HINSTANCE hInstance
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    CoUninitialize();
 
     return msg.wParam;
 }
