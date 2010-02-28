@@ -224,7 +224,7 @@ namespace ViWm
                                           , SplitVertical );
                 }
                 it->lastDim = subSize;
-                subSize.y += subSize.height;
+                subSize.y += subSize.height + HalfSplit;
             }
         }
         else // SplitVertical
@@ -263,7 +263,7 @@ namespace ViWm
                                           , SplitVertical );
                 }
                 it->lastDim = subSize;
-                subSize.x += subSize.width;
+                subSize.x += subSize.width + HalfSplit;
             }
         }
     }

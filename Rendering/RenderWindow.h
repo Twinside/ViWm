@@ -13,10 +13,10 @@ namespace Renderer
 
         ~RenderWindow();
 
-        typedef HBRUSH Brush;
+        typedef COLORREF    Brush;
 
         Brush   CreateBrush( int r, int g, int b, int a );
-        void    DeleteBrush( Brush b );
+        void    DeleteBrush( Brush /*b*/ ) {}
 
 
         void    begin();
@@ -32,8 +32,8 @@ namespace Renderer
 
         HWND                    m_window;
         LayeredWindowInfo       m_info;
-        HBRUSH                  transparentColor;
-        void                    *voidBits;
+        Brush                   transparentColor;
+        COLORREF                *voidBits;
     };
 }}
 

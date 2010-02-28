@@ -35,7 +35,6 @@ namespace ViWm
 
         Rect                            size;
         Renderer::RenderWindow          *fullScreenWin;
-        Renderer::RenderWindow::Brush   splitBrush;
     };
 
     typedef std::vector< Screen >   DesktopLayout;

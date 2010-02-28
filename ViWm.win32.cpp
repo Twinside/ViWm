@@ -27,21 +27,10 @@ namespace ViWm
 
         // yeah our nice window...
         HWND fullScreenWin =
-            CreateWindowEx ( WS_EX_OVERLAPPEDWINDOW //WS_EX_LAYERED
-                            /*
-                            | WS_EX_LEFT
-                            | WS_EX_LTRREADING
-
-                            | WS_EX_APPWINDOW
-                            //| WS_EX_TOOLWINDOW
-                            //| WS_EX_NOACTIVATE
-                            | WS_EX_CLIENTEDGE
-                            //*/
-
+            CreateWindowEx ( WS_EX_OVERLAPPEDWINDOW | WS_EX_LAYERED
                            , "ViWmScreenBack"
                            , "ABack"
-                           , WS_POPUP//WS_VISIBLE | WS_OVERLAPPEDWINDOW
-                           //, WS_VISIBLE | WS_POPUP | WS_CLIPSIBLINGS | WS_CAPTION
+                           , WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS 
                             /* style */
 
                            // fake size as it will be changed later
@@ -64,22 +53,20 @@ namespace ViWm
         // ok we need our window to be always on bottom, let's hack to get that
         // we also specify our really wanted size =)
         SetWindowPos( fullScreenWin
-                    , NULL //HWND_BOTTOM
+                    , HWND_BOTTOM
                     , minfo.rcWork.left
                     , minfo.rcWork.top
                     , winWidth
                     , winHeight
-                    , 0/*SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE */
+                    , SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE
                     );
 
-        ShowWindow( fullScreenWin, SW_SHOW);
-        SetWindowLong( fullScreenWin
-                     , GWL_EXSTYLE
-                     , GetWindowLong( fullScreenWin, GWL_EXSTYLE) | WS_EX_LAYERED
-                     );
-
-        // Ask the window and its children to repaint
-        //RedrawWindow(fullScreenWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+        /*
+        SetLayeredWindowAttributes( fullScreenWin
+            , RGB(0, 0, 0)
+            , static_cast<BYTE>(255)
+            , LWA_ALPHA
+            );//*/
 
         // as MSDN state that some value may be negative for non-primary
         // displays, we abs the width & height to get correct value to
@@ -90,6 +77,7 @@ namespace ViWm
                                       , minfo.rcWork.top
                                       , winWidth
                                       , winHeight );
+
         Screen          newScreen
             ( *newWindow
             , minfo.rcWork.left
@@ -99,7 +87,10 @@ namespace ViWm
             );
 
         myLayout.push_back( newScreen );
-        UpdateWindow( fullScreenWin );
+
+        // we make the window transparent here
+        newWindow->begin();
+        newWindow->end();
 
         assert( myLayout.size() >= 1 );
         return TRUE;

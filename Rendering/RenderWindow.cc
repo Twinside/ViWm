@@ -18,10 +18,23 @@ namespace Renderer
 
     void RenderWindow::drawRect( Brush color, int x, int y, int width, int height )
     {
-        RECT    myRect = { x, y, x + width, y + height };
-        int ret = FillRect( memDC, &myRect, color );
+        UINT     winWidth = m_info.GetWidth();
 
-        assert( ret != 0 );
+        assert( x >= 0 );
+        assert( UINT(x) < winWidth );
+        assert( y >= 0 );
+        assert( UINT(y) < m_info.GetHeight() );
+
+        assert( UINT(x + width) <= winWidth );
+        assert( UINT(y + height) <= m_info.GetHeight() );
+
+        for (int yi = 0; yi < height; yi++)
+        {
+            for (int xi = 0; xi < width; xi++)
+            {
+                voidBits[x + xi + (y + yi) * winWidth] = color;
+            }
+        }
     }
 
     void RenderWindow::begin()
@@ -29,7 +42,6 @@ namespace Renderer
         int err;
         int width = m_info.GetWidth();
         int height = m_info.GetHeight();
-        RECT fullRect = { 0, 0, width, height };
 
         screenDC = GetDC( NULL );
         err = GetLastError();
@@ -46,7 +58,7 @@ namespace Renderer
         bitmapInfo.bmiHeader.biBitCount = 32;
         bitmapInfo.bmiHeader.biCompression = BI_RGB;
 
-        bitmap = CreateDIBSection( memDC, &bitmapInfo, DIB_RGB_COLORS, &voidBits,  NULL, 0 );
+        bitmap = CreateDIBSection( memDC, &bitmapInfo, DIB_RGB_COLORS, (void**)&voidBits,  NULL, 0 );
         err = GetLastError();
         if (bitmap == NULL) throw;
 
@@ -54,9 +66,7 @@ namespace Renderer
         err = GetLastError();
 
         assert( oldBitmap != 0 );
-        int ret = FillRect( memDC, &fullRect, transparentColor );
-        err = GetLastError();
-        assert( ret != 0 );
+        drawRect( transparentColor, 0, 0, width, height );
     }
 
     void RenderWindow::end()
@@ -72,17 +82,22 @@ namespace Renderer
         DeleteDC( memDC );
     }
 
-    void RenderWindow::DeleteBrush( Brush b )
-        { DeleteObject( b ); }
-
     RenderWindow::Brush RenderWindow::CreateBrush( int r, int g, int b, int a )
     {
+        assert( a >= 0 && a <= 255 );
+        assert( r >= 0 && r <= 255 );
+        assert( g >= 0 && g <= 255 );
+        assert( b >= 0 && b <= 255 );
+
         int         preR = r * a / 255;
         int         preG = g * a / 255;
         int         preB = b * a / 255;
-        COLORREF    intColor = RGB(preR, preG, preB) | a << 24;
-        HBRUSH created = CreateSolidBrush( intColor );
-        assert( created != NULL );
-        return created;
+
+        COLORREF    intColor = preB
+                             | preG << 8
+                             | preR << 16
+                             | a << 24;
+
+        return intColor;
     }
 }}
