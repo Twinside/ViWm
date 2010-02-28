@@ -1,9 +1,7 @@
 #ifndef __RENDERWINDOW_H__
 #define __RENDERWINDOW_H__
 
-#include <D2D1.h>
 #include "LayeredWindowInfo.h"
-#include "Renderer.h"
 
 namespace ViWm {
 namespace Renderer
@@ -11,15 +9,13 @@ namespace Renderer
     class RenderWindow
     {
     public:
-        RenderWindow( HWND window, int width, int height
-                    , Renderer::RenderTarget &target
-                    );
+        RenderWindow( HWND window, int x, int y, int width, int height );
 
         ~RenderWindow();
 
-        typedef ID2D1SolidColorBrush* Brush;
+        typedef HBRUSH Brush;
 
-        Brush   CreateBrush( float r, float g, float b, float a );
+        Brush   CreateBrush( int r, int g, int b, int a );
         void    DeleteBrush( Brush b );
 
 
@@ -29,10 +25,15 @@ namespace Renderer
         
     private:
         RenderWindow( const RenderWindow &cpy );
+
+        HDC                     screenDC;
+        HDC                     memDC;
+        HBITMAP                 bitmap, oldBitmap;
+
         HWND                    m_window;
         LayeredWindowInfo       m_info;
-        Renderer::RenderTarget  *m_pRenderTarget;
-        RenderTargetDC          m_interopRenderTarget;
+        HBRUSH                  transparentColor;
+        void                    *voidBits;
     };
 }}
 

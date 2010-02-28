@@ -83,8 +83,6 @@ namespace ViWm
          */
         int modkeys;
         
-        Renderer::Renderer      defaultRenderer;
-
         HINSTANCE               hInstance;
         DesktopLayout           currentLayout;
         WindowMakerState        currentState;

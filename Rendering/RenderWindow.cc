@@ -1,56 +1,86 @@
+#include <assert.h>
 #include "RenderWindow.h"
-#include "RenderTargetDC.h"
 
 namespace ViWm {
 namespace Renderer
 {
-
-    RenderWindow::RenderWindow( HWND window
-                              , int width, int height
-                              , Renderer::RenderTarget &target )
-        : m_info( width, height )
+    RenderWindow::RenderWindow( HWND window, int x, int y, int width, int height )
+        : m_info( x, y, width, height )
         , m_window( window )
-        , m_pRenderTarget( &target )
-        , m_interopRenderTarget( &target )
-    {}
+    {
+        transparentColor = CreateBrush(0,128,0,128);
+    }
     
     RenderWindow::~RenderWindow()
     {
+        DeleteBrush( transparentColor );
     }
 
     void RenderWindow::drawRect( Brush color, int x, int y, int width, int height )
     {
-        D2D1_RECT_F rectangle2 = D2D1::RectF( float(x)
-            , float(y)
-            , float(x + width)
-            , float(x + height) );
+        RECT    myRect = { x, y, width, height };
+        int ret = FillRect( memDC, &myRect, color );
 
-        m_pRenderTarget->FillRectangle( rectangle2, color );
+        assert( ret != 0 );
     }
 
     void RenderWindow::begin()
     {
-        m_pRenderTarget->BeginDraw();
-        m_pRenderTarget->SetTransform( D2D1::Matrix3x2F::Identity() );
+        int err;
+        int width = m_info.GetWidth();
+        int height = m_info.GetHeight();
+        RECT fullRect = { 0, 0, width, height };
+
+        screenDC = GetDC( NULL );
+        err = GetLastError();
+        memDC = CreateCompatibleDC( screenDC );
+        err = GetLastError();
+
+        if (memDC == NULL) throw;
+
+        BITMAPINFO bitmapInfo = { };
+        bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
+        bitmapInfo.bmiHeader.biWidth = width;
+        bitmapInfo.bmiHeader.biHeight = height;
+        bitmapInfo.bmiHeader.biPlanes = 1;
+        bitmapInfo.bmiHeader.biBitCount = 32;
+        bitmapInfo.bmiHeader.biCompression = BI_RGB;
+        //*/
+
+        //bitmap = CreateCompatibleBitmap( memDC, width, height );
+        bitmap = CreateDIBSection( memDC, &bitmapInfo, DIB_RGB_COLORS, &voidBits,  NULL, 0 );
+        err = GetLastError();
+        if (bitmap == NULL) throw;
+
+        oldBitmap = (HBITMAP)SelectObject( memDC, bitmap );
+        err = GetLastError();
+
+        assert( oldBitmap != 0 );
+        int ret = FillRect( memDC, &fullRect, transparentColor );
+        err = GetLastError();
+        assert( ret != 0 );
     }
 
     void RenderWindow::end()
     {
-        m_info.Update( m_window, m_interopRenderTarget );
-        m_pRenderTarget->EndDraw();
+        m_info.Update( m_window, memDC );
+        ReleaseDC( NULL, screenDC );
+        if ( bitmap )
+        {
+            SelectObject( memDC, oldBitmap );
+            DeleteObject( bitmap );
+        }
+        DeleteDC( memDC );
     }
 
     void RenderWindow::DeleteBrush( Brush b )
-        { if ( b ) b->Release(); }
+        { DeleteObject( b ); }
 
-    RenderWindow::Brush RenderWindow::CreateBrush( float r, float g, float b, float a )
+    RenderWindow::Brush RenderWindow::CreateBrush( int r, int g, int b, int a )
     {
-        if ( !m_pRenderTarget ) throw;
-
-        Brush   retBrush;
-        m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF(r,g,b,a)
-                                              , &retBrush);
-
-        return retBrush;
+        COLORREF    intColor = RGB(r, g, b) | a << 24;
+        HBRUSH created = CreateSolidBrush( intColor );
+        assert( created != NULL );
+        return created;
     }
 }}

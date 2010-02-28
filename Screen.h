@@ -31,10 +31,10 @@ namespace ViWm
         LayoutTree              *layoutRoot;
 
     private:
-        void    operator =( const Screen& );
+        //void    operator =( const Screen& );
 
-        Rect    size;
-        Renderer::RenderWindow          &fullScreenWin;
+        Rect                            size;
+        Renderer::RenderWindow          *fullScreenWin;
         Renderer::RenderWindow::Brush   splitBrush;
     };
 

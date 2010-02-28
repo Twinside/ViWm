@@ -6,15 +6,15 @@ namespace ViWm
                   , int nx, int ny, int nwidth, int nheight)
         : size( nx, ny, nwidth, nheight)
         , layoutRoot( 0 )
-        , fullScreenWin( associated )
+        , fullScreenWin( &associated )
         , initialSplit( LayoutTree::SplitHorizontal )
        // , initialSplit( LayoutTree::SplitVertical )
-        , splitBrush( associated.CreateBrush( 0.5f, 0.5f, 0.7f, 1.0f ) )
+        , splitBrush( associated.CreateBrush( 128, 128, 200, 255 ) )
     {}
     
     Screen::~Screen()
     {
-        fullScreenWin.DeleteBrush( splitBrush );
+        fullScreenWin->DeleteBrush( splitBrush );
     }
 
     void Screen::replace()
@@ -23,6 +23,6 @@ namespace ViWm
 
         layoutRoot->Establish( *this, size, initialSplit
                              , LayoutTree::FullBound );
-        layoutRoot->DisplaySplitTree( fullScreenWin, splitBrush );
+        layoutRoot->DisplaySplitTree( *fullScreenWin, splitBrush );
     }
 }

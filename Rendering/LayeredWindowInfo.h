@@ -9,7 +9,7 @@ namespace Renderer
     class LayeredWindowInfo
     {
     public:
-        LayeredWindowInfo( UINT width, UINT height);
+        LayeredWindowInfo( int x, int y, UINT width, UINT height);
         void Update( HWND window, HDC source);  
         UINT GetWidth() const { return m_size.cx; }
         UINT GetHeight() const { return m_size.cy; }
@@ -17,7 +17,7 @@ namespace Renderer
     private:
         void    operator= (const LayeredWindowInfo&);
 
-        const POINT             m_sourcePosition;
+        POINT                   m_sourcePosition;
         POINT                   m_windowPosition;
         SIZE                    m_size;
         BLENDFUNCTION           m_blend;

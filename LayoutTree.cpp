@@ -97,7 +97,9 @@ namespace ViWm
         case Compact:
             child = static_cast<LayoutNode*>(root);
             root = child->getFirstNode();
-            root->parent = 0;
+            if ( root )
+                root->parent = 0;
+
             child->releaseChildren();
             delete child;
             break;
@@ -446,8 +448,6 @@ namespace ViWm
     {
         Collection::const_iterator it;
 
-        r.drawRect( defaultBrush, 0, 100, 200, 200 );
-
         if ( lastDirection == SplitHorizontal )
         {
             for (it = nodes.begin(); it != nodes.end() - 1; ++it)
@@ -475,13 +475,16 @@ namespace ViWm
         }
 
         for (it = nodes.begin(); it != nodes.end(); ++it)
-            it->subTree->displayLayoutStructure( r, defaultBrush );
+            if (it->subTree)
+                it->subTree->displayLayoutStructure( r, defaultBrush );
     }
 
     void LayoutTree::DisplaySplitTree( Renderer::RenderWindow &r
                                      , Renderer::RenderWindow::Brush &defaultBrush ) const
     {
         r.begin();
+
+        r.drawRect( defaultBrush, 600, 600, 200, 200 );
         displayLayoutStructure(r, defaultBrush);
         r.end();
     }

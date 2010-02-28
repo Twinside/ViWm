@@ -1,5 +1,6 @@
+#include <assert.h>
 #include "ViWm.h"
-
+#include "Rendering/RenderWindow.h"
 
 /**
 * Ugly as hell, but, should work
@@ -21,26 +22,33 @@ namespace ViWm
         minfo.cbSize = sizeof( MONITORINFOEX );
         GetMonitorInfo( hMonitor, &minfo );
 
+        int winWidth = abs(minfo.rcWork.right - minfo.rcWork.left);
+        int winHeight = abs(minfo.rcWork.bottom - minfo.rcWork.top);
+
         // yeah our nice window...
         HWND fullScreenWin =
-            CreateWindowEx ( WS_EX_LAYERED
+            CreateWindowEx ( WS_EX_OVERLAPPEDWINDOW //WS_EX_LAYERED
+                            /*
                             | WS_EX_LEFT
                             | WS_EX_LTRREADING
 
                             | WS_EX_APPWINDOW
-                            | WS_EX_TOOLWINDOW
-                            | WS_EX_NOACTIVATE
+                            //| WS_EX_TOOLWINDOW
+                            //| WS_EX_NOACTIVATE
+                            | WS_EX_CLIENTEDGE
+                            //*/
 
                            , "ViWmScreenBack"
                            , "ABack"
-                           , WS_VISIBLE | WS_POPUP | WS_CLIPSIBLINGS
+                           , WS_POPUP//WS_VISIBLE | WS_OVERLAPPEDWINDOW
+                           //, WS_VISIBLE | WS_POPUP | WS_CLIPSIBLINGS | WS_CAPTION
                             /* style */
 
                            // fake size as it will be changed later
                            , minfo.rcWork.left
                            , minfo.rcWork.top
-                           , abs(minfo.rcWork.right - minfo.rcWork.left)
-                           , abs(minfo.rcWork.bottom - minfo.rcWork.top)
+                           , winWidth
+                           , winHeight
                            , NULL
                            , NULL /* menu */
                            , GetModuleHandle(0)
@@ -56,32 +64,52 @@ namespace ViWm
         // ok we need our window to be always on bottom, let's hack to get that
         // we also specify our really wanted size =)
         SetWindowPos( fullScreenWin
-                    , HWND_BOTTOM
+                    , NULL //HWND_BOTTOM
                     , minfo.rcWork.left
                     , minfo.rcWork.top
-                    , abs(minfo.rcWork.right - minfo.rcWork.left)
-                    , abs(minfo.rcWork.bottom - minfo.rcWork.top)
+                    , winWidth
+                    , winHeight
                     , 0/*SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE */
                     );
 
         ShowWindow( fullScreenWin, SW_SHOW);
+        SetWindowLong( fullScreenWin
+                     , GWL_EXSTYLE
+                     , GetWindowLong( fullScreenWin, GWL_EXSTYLE) | WS_EX_LAYERED
+                     );
+
         // Ask the window and its children to repaint
-        RedrawWindow(fullScreenWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME |
-            RDW_ALLCHILDREN);
+        //RedrawWindow(fullScreenWin, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 
         // as MSDN state that some value may be negative for non-primary
         // displays, we abs the width & height to get correct value to
         // work on.
+        Renderer::RenderWindow    *newWindow =
+            new Renderer::RenderWindow( fullScreenWin
+                                      , minfo.rcWork.left
+                                      , minfo.rcWork.top
+                                      , winWidth
+                                      , winHeight );
         Screen          newScreen
-            ( instance.defaultRenderer.CreateRenderWindow( fullScreenWin )
+            ( *newWindow
             , minfo.rcWork.left
             , minfo.rcWork.top
-            , abs(minfo.rcWork.right - minfo.rcWork.left)
-            , abs(minfo.rcWork.bottom - minfo.rcWork.top)
+            , winWidth
+            , winHeight
             );
 
-        myLayout.push_back( newScreen );
+        Renderer::RenderWindow::Brush brush = newWindow->CreateBrush( 128, 128, 127, 128 );
+        newWindow->begin();
+        newWindow->drawRect( brush, 200, 200, 200, 200 );
+        newWindow->end();
+        newWindow->DeleteBrush( brush );
 
+        //*/
+
+        myLayout.push_back( newScreen );
+        UpdateWindow( fullScreenWin );
+
+        assert( myLayout.size() >= 1 );
         return TRUE;
     }
 
@@ -173,27 +201,12 @@ namespace ViWm
     LRESULT CALLBACK ViWmManager::windowListenerProc( HWND hwnd , UINT msg 
                                                     , WPARAM wParam , LPARAM lParam )
     {
-        PAINTSTRUCT ps;
-        HDC hdc;
-        RECT rc;
-        POINT aptStar[6] = {50,2, 2,98, 98,33, 2,33, 98,98, 50,2}; 
-
         switch (msg)
         {
         case WM_NCCREATE: return TRUE;
         case WM_CREATE: return 0;
 
         case WM_CLOSE: break;
-
-        case WM_PAINT:
-            hdc = BeginPaint(hwnd, &ps); 
-            GetClientRect(hwnd, &rc); 
-            SetMapMode(hdc, MM_ANISOTROPIC); 
-            SetWindowExtEx(hdc, 100, 100, NULL); 
-            SetViewportExtEx(hdc, rc.right, rc.bottom, NULL); 
-            Polyline(hdc, aptStar, 6); 
-            EndPaint(hwnd, &ps); 
-            break;
 
         default:
             DefWindowProc(hwnd, msg, wParam, lParam); 

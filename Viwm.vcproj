@@ -479,18 +479,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Rendering\Renderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Rendering\Renderer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Rendering\RenderTargetDC.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Rendering\RenderWindow.cc"
 				>
 			</File>
