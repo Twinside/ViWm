@@ -98,16 +98,6 @@ namespace ViWm
             , winHeight
             );
 
-        /*
-        Renderer::RenderWindow::Brush brush =
-            newWindow->CreateBrush( 128, 228, 127, 0 );
-        newWindow->begin();
-        newWindow->drawRect( brush, 200, 200, 200, 200 );
-        newWindow->end();
-        newWindow->DeleteBrush( brush );
-
-        //*/
-
         myLayout.push_back( newScreen );
         UpdateWindow( fullScreenWin );
 

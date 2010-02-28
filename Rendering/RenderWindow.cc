@@ -8,7 +8,7 @@ namespace Renderer
         : m_info( x, y, width, height )
         , m_window( window )
     {
-        transparentColor = CreateBrush(0,0,0,0);
+        transparentColor = CreateBrush(0,0,0, 0);
     }
     
     RenderWindow::~RenderWindow()
@@ -77,7 +77,10 @@ namespace Renderer
 
     RenderWindow::Brush RenderWindow::CreateBrush( int r, int g, int b, int a )
     {
-        COLORREF    intColor = RGB(r, g, b) | a << 24;
+        int         preR = r * a / 255;
+        int         preG = g * a / 255;
+        int         preB = b * a / 255;
+        COLORREF    intColor = RGB(preR, preG, preB) | a << 24;
         HBRUSH created = CreateSolidBrush( intColor );
         assert( created != NULL );
         return created;
