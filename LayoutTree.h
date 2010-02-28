@@ -50,18 +50,6 @@ namespace ViWm
             Done        /**< The action has been performed. */
         };
 
-        enum ScreenBounded
-        {
-            LeftBound = 1,
-            TopBound = 2,
-            RightBound = 4,
-            BottomBound = 8,
-            FullBound = LeftBound
-                      | TopBound
-                      | RightBound
-                      | BottomBound
-        };
-
         void   DisplaySplitTree( Renderer::RenderWindow &r, Renderer::RenderWindow::Brush &defaultBrush ) const;
 
         virtual CompStatus addNode( LayoutTree *subTree ) = 0;
@@ -82,7 +70,6 @@ namespace ViWm
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
                                  , SplitSide side
-                                 , ScreenBounded  bounds
                                  ) = 0;
 
         LayoutTree  *parent;
@@ -158,8 +145,7 @@ namespace ViWm
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
-                                 , SplitSide side
-                                 , ScreenBounded  bounds );
+                                 , SplitSide side );
 
         typedef std::vector<SizePair> Collection;
 
@@ -211,8 +197,7 @@ namespace ViWm
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
-                                 , SplitSide side
-                                 , ScreenBounded  bounds );
+                                 , SplitSide side );
 
         TilledWindow   &window;
 

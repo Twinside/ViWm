@@ -129,14 +129,12 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     void LayoutLeaf::Establish( const Screen& /*currentScreen*/
                               , const Rect &dim
-                              , SplitSide /* side */
-                              , ScreenBounded  /* bounds */ )
+                              , SplitSide /* side */ )
         { window.SetSize(dim.x, dim.y, dim.width, dim.height ); }
 
     void LayoutNode::Establish( const Screen &currentScreen
                               , const Rect &dim
-                              , SplitSide side
-                              , ScreenBounded  bounds  )
+                              , SplitSide side )
 
     {
         Collection::const_iterator cit;
@@ -171,6 +169,26 @@ namespace ViWm
         subSize = dim;
 
         // during the second pass, we give real sizes to nodes
+        //
+        // +-----------------------------+
+        // |   First window              |
+        // |                             |
+        // +-----------------------------+              ^
+        // |    Separator                |-^            |  SplitWidth
+        // +-----------------------------+ |            v
+        // |                             | |  Height
+        // |                             | |
+        // |       Window                | |
+        // |                             | |
+        // +-----------------------------+ |
+        // |    Separator                | x
+        // +-----------------------------+ v    HalfSplit
+        // |                             |
+        // |     OtherWindow             |
+        // |                             |
+        // +-----------------------------+
+        //
+        //
         if ( side == SplitHorizontal )
         {
             int unconstrainedSize = unconstrainedHeightCount > 0
@@ -180,22 +198,17 @@ namespace ViWm
             size_t i = 0;
             for (it = nodes.begin(); it != nodes.end(); ++it, i++)
             {
-                int subBound = bounds;
-                int sizeSub = 0;
-                int topShift = 0;
+                int sizeSub = SplitWidth;
+                int topShift = HalfSplit;
 
-                if (i != 0 || (/*i == 0 &&*/ (bounds & TopBound) == 0))
+                if (i == 0)
                 {
-                    subBound &= ~TopBound;
-                    sizeSub += HalfSplit;
-                    topShift += HalfSplit;
-                }
-
-                if (i != nodes.size() - 1 ||
-                    (/*i == nodes.size() - 1 &&*/ (bounds & BottomBound) == 0))
+                    sizeSub = HalfSplit;
+                    topShift = 0;
+                } 
+                else if (i == nodes.size() - 1)
                 {
-                    subBound &= ~BottomBound;
-                    sizeSub += HalfSplit;
+                    sizeSub = HalfSplit;
                 }
 
                 if ( it->height )
@@ -208,13 +221,10 @@ namespace ViWm
                 {
                     it->subTree->Establish( currentScreen
                                           , subSize
-                                          , SplitVertical
-                                          , ScreenBounded(subBound) );
+                                          , SplitVertical );
                 }
-                subSize.y += subSize.height - topShift + sizeSub;
-                subSize.height += sizeSub;
-
                 it->lastDim = subSize;
+                subSize.y += subSize.height;
             }
         }
         else // SplitVertical
@@ -227,25 +237,17 @@ namespace ViWm
 
             for (it = nodes.begin(); it != nodes.end(); ++it, i++)
             {
-                int subBound = bounds;
-                int sizeSub = 0;
-                int leftShift = 0;
+                int sizeSub = SplitWidth;
+                int leftShift = HalfSplit;
 
-                // if we're not at the left (first index), OR
-                // we're the first, but hey, we're not at the left
-                // of screen :(
-                if (i != 0 || (/*i == 0 && */(bounds & LeftBound) == 0))
+                if (i == 0)
                 {
-                    subBound &= ~LeftBound; // We're not at left
-                    sizeSub += HalfSplit;   // we're smaller
-                    leftShift += HalfSplit; // we must shift beginning.
+                    sizeSub = HalfSplit;
+                    leftShift = 0;
                 }
-
-                if (i != nodes.size() - 1 ||
-                    (/*i == nodes.size() - 1 && */(bounds & RightBound) == 0))
+                else if (i != nodes.size() - 1)
                 {
-                    subBound &= ~RightBound;
-                    sizeSub += HalfSplit;
+                    sizeSub = HalfSplit;
                 }
 
                 if ( it->width )
@@ -258,12 +260,10 @@ namespace ViWm
                 {
                     it->subTree->Establish( currentScreen
                                           , subSize
-                                          , SplitVertical
-                                          , ScreenBounded(subBound) );
+                                          , SplitVertical );
                 }
-                subSize.x += subSize.width - leftShift + sizeSub;
-                subSize.width += sizeSub;
                 it->lastDim = subSize;
+                subSize.x += subSize.width;
             }
         }
     }
@@ -483,8 +483,6 @@ namespace ViWm
                                      , Renderer::RenderWindow::Brush &defaultBrush ) const
     {
         r.begin();
-
-        r.drawRect( defaultBrush, 600, 600, 200, 200 );
         displayLayoutStructure(r, defaultBrush);
         r.end();
     }

@@ -9,7 +9,7 @@ namespace ViWm
         , fullScreenWin( &associated )
         , initialSplit( LayoutTree::SplitHorizontal )
        // , initialSplit( LayoutTree::SplitVertical )
-        , splitBrush( associated.CreateBrush( 128, 128, 200, 255 ) )
+        , splitBrush( associated.CreateBrush( 10, 10, 30, 255 ) )
     {}
     
     Screen::~Screen()
@@ -21,8 +21,7 @@ namespace ViWm
     {
         if (!layoutRoot) return;
 
-        layoutRoot->Establish( *this, size, initialSplit
-                             , LayoutTree::FullBound );
+        layoutRoot->Establish( *this, size, initialSplit );
         layoutRoot->DisplaySplitTree( *fullScreenWin, splitBrush );
     }
 }
