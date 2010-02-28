@@ -8,7 +8,7 @@ namespace Renderer
         : m_info( x, y, width, height )
         , m_window( window )
     {
-        transparentColor = CreateBrush(0,128,0,128);
+        transparentColor = CreateBrush(0,0,0,0);
     }
     
     RenderWindow::~RenderWindow()
@@ -18,7 +18,7 @@ namespace Renderer
 
     void RenderWindow::drawRect( Brush color, int x, int y, int width, int height )
     {
-        RECT    myRect = { x, y, width, height };
+        RECT    myRect = { x, y, x + width, y + height };
         int ret = FillRect( memDC, &myRect, color );
 
         assert( ret != 0 );
@@ -45,9 +45,7 @@ namespace Renderer
         bitmapInfo.bmiHeader.biPlanes = 1;
         bitmapInfo.bmiHeader.biBitCount = 32;
         bitmapInfo.bmiHeader.biCompression = BI_RGB;
-        //*/
 
-        //bitmap = CreateCompatibleBitmap( memDC, width, height );
         bitmap = CreateDIBSection( memDC, &bitmapInfo, DIB_RGB_COLORS, &voidBits,  NULL, 0 );
         err = GetLastError();
         if (bitmap == NULL) throw;
@@ -63,6 +61,7 @@ namespace Renderer
 
     void RenderWindow::end()
     {
+        GdiFlush();
         m_info.Update( m_window, memDC );
         ReleaseDC( NULL, screenDC );
         if ( bitmap )

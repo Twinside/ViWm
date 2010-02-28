@@ -98,7 +98,9 @@ namespace ViWm
             , winHeight
             );
 
-        Renderer::RenderWindow::Brush brush = newWindow->CreateBrush( 128, 128, 127, 128 );
+        /*
+        Renderer::RenderWindow::Brush brush =
+            newWindow->CreateBrush( 128, 228, 127, 0 );
         newWindow->begin();
         newWindow->drawRect( brush, 200, 200, 200, 200 );
         newWindow->end();

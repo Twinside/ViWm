@@ -26,8 +26,7 @@ namespace Renderer
         m_info.cbSize = sizeof(UPDATELAYEREDWINDOWINFO);
         m_info.pptSrc = &m_sourcePosition;
         m_info.pptDst = &m_windowPosition;
-        //m_info.psize = &m_size;
-        m_info.psize = NULL;//&m_size;
+        m_info.psize = &m_size;
         m_info.pblend = &m_blend;
         m_info.dwFlags = ULW_ALPHA;
     }
