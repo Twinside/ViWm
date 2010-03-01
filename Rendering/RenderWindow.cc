@@ -18,15 +18,21 @@ namespace Renderer
 
     void RenderWindow::drawRect( Brush color, int x, int y, int width, int height )
     {
+        UINT     winHeight = m_info.GetHeight();
         UINT     winWidth = m_info.GetWidth();
 
         assert( x >= 0 );
         assert( UINT(x) < winWidth );
         assert( y >= 0 );
-        assert( UINT(y) < m_info.GetHeight() );
+        assert( UINT(y) < winHeight );
 
         assert( UINT(x + width) <= winWidth );
-        assert( UINT(y + height) <= m_info.GetHeight() );
+        assert( UINT(y + height) <= winHeight );
+
+        // because in the bitmap we have the head
+        // flipped compared to the up of the screen
+        // being 0.
+        y = winHeight - (y + height);
 
         for (int yi = 0; yi < height; yi++)
         {
