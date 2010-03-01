@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <functional>
 #include "TilledWindow.h"
 #include "Rendering/RenderWindow.h"
 
@@ -123,6 +124,11 @@ namespace ViWm
             Rect        lastDim;
             LayoutTree* subTree;
         };
+
+        typedef std::tr1::function<bool (SizePair&)>   IteratingPredicate;
+
+        bool FocusTopIteration( IteratingPredicate &p );
+        bool DepthFirstIteration( IteratingPredicate &p );
 
         SplitSide   getLastDirection() { return lastDirection; }
 

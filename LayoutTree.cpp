@@ -164,6 +164,8 @@ namespace ViWm
                 unconstrainedHeightCount++;
             }
         }
+        unconstrainedWidth -= (nodes.size() - 1) * SplitWidth;
+        unconstrainedHeight -= (nodes.size() - 1) * SplitWidth;
 
         Rect        subSize;
         subSize = dim;
@@ -260,7 +262,7 @@ namespace ViWm
                 {
                     it->subTree->Establish( currentScreen
                                           , subSize
-                                          , SplitVertical );
+                                          , SplitHorizontal );
                 }
                 it->lastDim = subSize;
                 subSize.x += subSize.width + HalfSplit;
@@ -278,7 +280,8 @@ namespace ViWm
     LayoutTree::CompStatus LayoutNode::addNode( LayoutTree *window )
     {
         if ( nodes.size() == 0
-            || nodes[selectedRoute].subTree->addNode( window ) == Todo )
+            || (nodes[selectedRoute].subTree &&
+                nodes[selectedRoute].subTree->addNode( window ) == Todo) )
             nodes.push_back( window );
 
         if ( window )
@@ -321,7 +324,8 @@ namespace ViWm
         nodes.erase( std::remove_if( nodes.begin(), nodes.end(), comparer ), nodes.end() );
 
         for ( size_t i = 0; i < nodes.size(); ++i )
-            pack( nodes[i].subTree->removeNode( toRemove ), i );
+            if ( nodes[i].subTree )
+                pack( nodes[i].subTree->removeNode( toRemove ), i );
 
         if ( nodes.size() == 0 ) return Todo;
         if ( nodes.size() == 1 ) return Compact;
@@ -485,5 +489,43 @@ namespace ViWm
         r.begin();
         displayLayoutStructure(r, defaultBrush);
         r.end();
+    }
+
+    bool LayoutNode::FocusTopIteration(IteratingPredicate &p)
+    {
+        LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
+
+        if ( !sub )
+            return false;
+
+        if ( sub->FocusTopIteration( p ))
+            return true;
+
+        for ( Collection::iterator it = nodes.begin()
+            ; it != nodes.end()
+            ; ++it )
+        {
+            bool    status = p( *it );
+            if ( status )
+                return true;
+        }
+
+        return false;
+    }
+
+    bool LayoutNode::DepthFirstIteration(IteratingPredicate &p)
+    {
+        for ( Collection::iterator it = nodes.begin()
+            ; it != nodes.end()
+            ; ++it )
+        {
+            LayoutNode  *sub = dynamic_cast<LayoutNode*>(it->subTree);
+
+            if ( (sub && sub->DepthFirstIteration( p ))
+                || p( *it ) )
+                return true;
+        }
+
+        return false;
     }
 }
