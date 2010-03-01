@@ -459,6 +459,14 @@
 			Name="Actions"
 			>
 			<File
+				RelativePath=".\Actions\MultiScreen.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Actions\MultiScreen.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Actions\TreeAction.cc"
 				>
 			</File>
