@@ -116,7 +116,6 @@ namespace ViWm
         winClass.hIcon = NULL;
         winClass.hIconSm = NULL;
         winClass.hCursor = NULL;
-        //winClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
         winClass.hbrBackground = NULL;
         winClass.lpszMenuName = NULL;
         winClass.lpszClassName = "ViWmScreenBack";

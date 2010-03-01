@@ -27,13 +27,11 @@ namespace ViWm
 
         // yeah our nice window...
         HWND fullScreenWin =
-            CreateWindowEx ( WS_EX_OVERLAPPEDWINDOW | WS_EX_LAYERED
+            CreateWindowEx ( WS_EX_LAYERED
                            , "ViWmScreenBack"
                            , "ABack"
                            , WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS 
                             /* style */
-
-                           // fake size as it will be changed later
                            , minfo.rcWork.left
                            , minfo.rcWork.top
                            , winWidth
@@ -58,15 +56,8 @@ namespace ViWm
                     , minfo.rcWork.top
                     , winWidth
                     , winHeight
-                    , SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE
+                    , /*SWP_NOACTIVATE | */SWP_NOMOVE | SWP_NOSIZE
                     );
-
-        /*
-        SetLayeredWindowAttributes( fullScreenWin
-            , RGB(0, 0, 0)
-            , static_cast<BYTE>(255)
-            , LWA_ALPHA
-            );//*/
 
         // as MSDN state that some value may be negative for non-primary
         // displays, we abs the width & height to get correct value to
@@ -134,6 +125,7 @@ namespace ViWm
             }
             break;
 
+        case HSHELL_RUDEAPPACTIVATED:
         case HSHELL_WINDOWACTIVATED:
             found = currentState.FindNode((HWND)lParam);
             if (found) {
@@ -189,7 +181,19 @@ namespace ViWm
         case WM_NCCREATE: return TRUE;
         case WM_CREATE: return 0;
 
+        // we handle this message to be able
+        // to get back mouse tracking messages.
+        case WM_NCHITTEST: return HTCLIENT;
+
+        case WM_MOUSEACTIVATE:
+            return MA_NOACTIVATE;
+
         case WM_CLOSE: break;
+        case WM_NCLBUTTONDOWN:
+            break;
+
+        case WM_MOUSEMOVE:
+            break;
 
         default:
             DefWindowProc(hwnd, msg, wParam, lParam); 

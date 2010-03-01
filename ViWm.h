@@ -2,6 +2,7 @@
 #define VIWM_H
 
 #include <vector>
+#include <set>
 #include <memory>
 #include "TilledWindow.h"
 #include "Screen.h"

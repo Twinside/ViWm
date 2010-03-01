@@ -21,7 +21,7 @@ namespace ViWm
         layoutRoot->Establish( *this, size, initialSplit );
 
         Renderer::RenderWindow::Brush   splitBrush =
-            fullScreenWin->CreateBrush( 30, 30, 60, 255 );
+            fullScreenWin->CreateBrush( 30, 30, 30, 255 );
         layoutRoot->DisplaySplitTree( *fullScreenWin, splitBrush );
 
         fullScreenWin->DeleteBrush( splitBrush );
