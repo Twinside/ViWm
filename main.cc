@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "ViWm.h"
 #include "Actions/TreeAction.h"
+#include "Actions/MultiScreen.h"
 
 using namespace ViWm;
 
@@ -44,6 +45,8 @@ int WINAPI WinMain( HINSTANCE hInstance
     defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
     defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
+    defs.push_back( HotKey( 'H', new Actions::ScreenMoverBounded( -1 )));
+    defs.push_back( HotKey( 'L', new Actions::ScreenMoverBounded( 1 )));
 
     globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();
