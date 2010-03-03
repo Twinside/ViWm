@@ -188,12 +188,12 @@ namespace ViWm
 
         Screen  *scr = &currentLayout[ currentState.currentScreen ];
         if ( scr->layoutRoot
-            && scr->layoutRoot->selectNode( currentWindow ) == LayoutTree::Done )
+            && scr->layoutRoot->selectNode( currentWindow ) != LayoutTree::Searching)
             return;
 
         for ( size_t i = 0; i < currentLayout.size(); i++ )
         {
-            if ( i != currentState.currentScreen ) continue;
+            if ( i == currentState.currentScreen ) continue;
             LayoutTree  *root = currentLayout[i].layoutRoot;
             if ( root && root->selectNode( currentWindow ) == LayoutTree::Done )
             {

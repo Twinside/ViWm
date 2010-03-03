@@ -20,10 +20,10 @@ namespace ViWm
 
         // This accessor are a bit ugly, but I don't
         // want some change screen size by mistake.
-        int getX()      { return size.x; }
-        int getY()      { return size.y; }
-        int getWidth()  { return size.width; }
-        int getHeight() { return size.height; }
+        int getX() const { return size.x; }
+        int getY() const { return size.y; }
+        int getWidth() const { return size.width; }
+        int getHeight() const { return size.height; }
 
         void   replace();
 

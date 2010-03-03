@@ -18,7 +18,9 @@ namespace ViWm
     {
         if (!layoutRoot) return;
 
-        layoutRoot->Establish( *this, size, initialSplit );
+        Rect    layoutSize( 0, 0, size.width, size.height );
+
+        layoutRoot->Establish( *this, layoutSize, initialSplit );
 
         Renderer::RenderWindow::Brush   splitBrush =
             fullScreenWin->CreateBrush( 30, 30, 30, 255 );

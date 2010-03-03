@@ -7,7 +7,6 @@
 namespace ViWm {
 namespace Actions
 {
-
     ScreenMoverBounded::ScreenMoverBounded(int amount)
         : _moveAmount( amount )
     {}

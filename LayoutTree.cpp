@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm>
 #include "LayoutTree.h"
+#include "Screen.h"
 
 namespace ViWm
 {
@@ -127,10 +128,15 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     ////                    Tree directed layout
     //////////////////////////////////////////////////////////////////////////
-    void LayoutLeaf::Establish( const Screen& /*currentScreen*/
+    void LayoutLeaf::Establish( const Screen& currentScreen
                               , const Rect &dim
                               , SplitSide /* side */ )
-        { window.SetSize(dim.x, dim.y, dim.width, dim.height ); }
+    {
+        window.SetSize( dim.x + currentScreen.getX()
+                      , dim.y + currentScreen.getY()
+                      , dim.width
+                      , dim.height );
+    }
 
     void LayoutNode::Establish( const Screen &currentScreen
                               , const Rect &dim
