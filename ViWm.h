@@ -27,13 +27,42 @@ namespace ViWm
 
         void    Init();
 
+        /**
+         * Add a window to be managed.
+         */
         void    AddNode( HWND hwnd );
+
+        /**
+         * Replace the windows.
+         */
         void    ArrangeWindows();
+
+        /**
+         * Give the focus to the current window.
+         * The window can be on any screens.
+         */
         void    FocusCurrent();
 
+        /**
+         * In charge of listening to hotkey actions.
+         */
         LRESULT HandleShellHook( HWND hwnd, UINT msg
                                , WPARAM wParam, LPARAM lParam );
+
+        /**
+         * Method to call when handling a recognized hotkey.
+         * Will call the corresponding action.
+         */
         void    HandleHotKey( WPARAM wParam );
+
+        /**
+         * Retrieve the window which receive hotkey messages.
+         * You can post messages to this window if you want.
+         */
+        LayoutTree::WindowKey GetReceivingWindow()
+            { return globalHotkeyListener; }
+
+        void                  AddHotkey( HotKey k );
 
     private:
         //////////////////////////////////////////////////////////////////////////

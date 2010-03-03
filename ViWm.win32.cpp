@@ -157,6 +157,7 @@ namespace ViWm
             ClipCursor(0); 	/* Release Cursor Lock */
             delete globalManager;
             globalManager = 0;
+            PostQuitMessage(WM_QUIT);
             break;
 
         case WM_DESTROY:
@@ -189,10 +190,13 @@ namespace ViWm
             return MA_NOACTIVATE;
 
         case WM_CLOSE: break;
+
         case WM_NCLBUTTONDOWN:
+            // get selected band
             break;
 
         case WM_MOUSEMOVE:
+            // move the splits
             break;
 
         default:

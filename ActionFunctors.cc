@@ -39,14 +39,6 @@ namespace Actions
         return NeedRelayout;
     }
 
-    Action::ReturnInfo   ExitAction::operator() ( DesktopLayout &l, WindowMakerState &s )
-    {
-#if 0
-        PostMessage(hwnd, WM_CLOSE, 0, 0);
-#endif
-        return Nothing;
-    }
-
     MarginMove::MarginMove( int namount )
         : amount( namount )
     {}

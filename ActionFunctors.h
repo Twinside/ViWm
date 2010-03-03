@@ -22,9 +22,6 @@ namespace Actions
     struct MoveToMainArea : public Action
         { ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s); };
 
-    struct ExitAction : public Action
-        { ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s); };
-
     struct MarginMove : public Action
     {
     public:

@@ -86,4 +86,23 @@ namespace ViWm
             delete firstFound;
         }
     }
+
+    WindowMakerState::~WindowMakerState()
+    {
+        std::vector<Bucket>::iterator it;
+        std::list<TilledWindow*>::iterator     jt;
+
+        // foreach it in windowList
+        for ( it = windowList.begin()
+            ; it != windowList.end()
+            ; ++it )
+        {
+            for ( jt = it->windowList.begin()
+                ; jt != it->windowList.end()
+                ; ++jt )
+            {
+                delete *jt;
+            }
+        }
+    }
 }

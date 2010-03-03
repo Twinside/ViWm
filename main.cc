@@ -7,6 +7,7 @@
 #include "ViWm.h"
 #include "Actions/TreeAction.h"
 #include "Actions/MultiScreen.h"
+#include "Actions/System.h"
 
 using namespace ViWm;
 
@@ -45,11 +46,14 @@ int WINAPI WinMain( HINSTANCE hInstance
     defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
     defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
-    defs.push_back( HotKey( 'H', new Actions::ScreenMoverBounded( -1 )));
-    defs.push_back( HotKey( 'L', new Actions::ScreenMoverBounded( 1 )));
+    defs.push_back( HotKey(  VK_LEFT, new Actions::ScreenMoverBounded( -1 )));
+    defs.push_back( HotKey( VK_RIGHT, new Actions::ScreenMoverBounded( 1 )));
 
     globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();
+
+    globalManager->AddHotkey(
+        HotKey( 'Q', new Actions::ExitAction(globalManager->GetReceivingWindow()) ));
 
     EnumWindows(EnumWindowsProc, (LPARAM)globalManager);
 

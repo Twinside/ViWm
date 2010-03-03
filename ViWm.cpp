@@ -59,6 +59,16 @@ namespace ViWm
             UnregisterHotKey(hwnd, i);
     }
 
+    void ViWmManager::AddHotkey( HotKey k )
+    {
+        RegisterHotKey( globalHotkeyListener
+                      , hotkeysDefinition.size()
+                      , modkeys
+                      , k.first );
+
+        hotkeysDefinition.push_back( k );
+    }
+
     void ViWmManager::RegisterHotKeys(HWND hwnd)
     {
         HotKeyCollection::const_iterator    it;

@@ -14,6 +14,7 @@ namespace ViWm
     {
     public:
         WindowMakerState();
+        ~WindowMakerState();
         
         enum Configuration
         {
