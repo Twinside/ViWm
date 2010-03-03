@@ -305,7 +305,9 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
 
     // node removing is done in a BFS way.
-    LayoutTree::CompStatus LayoutLeaf::removeNode( LayoutTree* /* toRemove */ ) { return Done; }
+    LayoutTree::CompStatus LayoutLeaf::removeNode( LayoutTree* toRemove )
+        { return toRemove == this ? Todo : Done; }
+
     LayoutTree::CompStatus LayoutNode::removeNode( LayoutTree *toRemove )
     {
         struct SizePairComp
@@ -332,6 +334,11 @@ namespace ViWm
         for ( size_t i = 0; i < nodes.size(); ++i )
             if ( nodes[i].subTree )
                 pack( nodes[i].subTree->removeNode( toRemove ), i );
+
+        // update the selected route into valid range
+        // to avoid problems.
+        if ( selectedRoute >= nodes.size() )
+            selectedRoute = nodes.size() - 1;
 
         if ( nodes.size() == 0 ) return Todo;
         if ( nodes.size() == 1 ) return Compact;

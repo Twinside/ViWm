@@ -18,9 +18,9 @@ namespace Actions
             l[ state.currentScreen ].layoutRoot;
 
         size_t nextScreen =
-            std::max<size_t>( std::min<size_t>( state.currentScreen + _moveAmount
-                                              , l.size() - 1)
-                            , 0 );
+            std::max<int>( std::min<int>( int(state.currentScreen) + _moveAmount
+                                        , int(l.size()) - 1)
+                         , 0 );
 
         if (!currentTree || state.currentScreen == nextScreen)
             return Nothing;

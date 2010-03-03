@@ -195,7 +195,7 @@ namespace ViWm
         {
             if ( i == currentState.currentScreen ) continue;
             LayoutTree  *root = currentLayout[i].layoutRoot;
-            if ( root && root->selectNode( currentWindow ) == LayoutTree::Done )
+            if ( root && root->selectNode( currentWindow ) != LayoutTree::Searching )
             {
                 currentState.currentScreen = i;
                 return;
