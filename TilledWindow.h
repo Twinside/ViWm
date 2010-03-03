@@ -55,6 +55,7 @@ namespace ViWm
         HWND    hwnd;
         int     applyedAlpha;
         bool    hasBorder;
+        RECT    initialSize;
 
         static char TempClassName[MAX_PATH];
     };

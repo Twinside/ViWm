@@ -9,6 +9,7 @@ namespace ViWm
     {
         SetBorders( false );
         SetTransparency( Opaque );
+        GetWindowRect( realWindow, &initialSize );
     }
 
     TilledWindow::~TilledWindow()
@@ -18,6 +19,13 @@ namespace ViWm
             SetTransparency( Opaque );
             SetBorders( true );
         	ShowWindow(hwnd, SW_RESTORE);
+            SetWindowPos( hwnd, NULL
+                        , initialSize.left
+                        , initialSize.top
+                        , initialSize.right - initialSize.left
+                        , initialSize.bottom - initialSize.top
+                        , SWP_SHOWWINDOW
+                        );
         }
     }
 
