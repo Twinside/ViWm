@@ -15,9 +15,6 @@ namespace ViWm
         , hotkeysDefinition( originalCollection )
     {
         layouter.reserve( LastTillingMode );
-        layouter.push_back( LayoutPtr( new Layout::VerticalLayout() ) );
-        layouter.push_back( LayoutPtr( new Layout::HorizontalLayout() ) );
-        layouter.push_back( LayoutPtr( new Layout::FullScreenLayout() ) );
         layouter.push_back( LayoutPtr( new Layout::ManualVimLayout() ) );
     }
 

@@ -7,9 +7,6 @@ namespace ViWm
 {
     enum TillingMode
     {
-        VerticalTilling,
-        HorizontalTilling,
-        FullScreenTilling,
         ManualVimTilling,
         LastTillingMode
     };

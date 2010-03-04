@@ -339,14 +339,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ActionFunctors.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\ActionFunctors.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Configuration.cc"
 				>
 			</File>
@@ -419,30 +411,6 @@
 			Name="Layouter"
 			>
 			<File
-				RelativePath=".\Layouter\FullScreenLayout.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\FullScreenLayout.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\GridLayout.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\GridLayout.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\HorizontalLayout.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\HorizontalLayout.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Layouter\Layouts.h"
 				>
 			</File>
@@ -452,14 +420,6 @@
 			</File>
 			<File
 				RelativePath=".\Layouter\ManualVimLayout.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\VerticalLayout.cc"
-				>
-			</File>
-			<File
-				RelativePath=".\Layouter\VerticalLayout.h"
 				>
 			</File>
 		</Filter>
