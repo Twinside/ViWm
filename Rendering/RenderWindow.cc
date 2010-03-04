@@ -9,6 +9,7 @@ namespace Renderer
         , m_window( window )
     {
         transparentColor = CreateBrush(0,0,0, 0);
+        nearlyTransparent = CreateBrush( 0, 0, 0, 1);
     }
     
     RenderWindow::~RenderWindow()
@@ -43,7 +44,7 @@ namespace Renderer
         }
     }
 
-    void RenderWindow::begin()
+    void RenderWindow::begin( bool fullyTransparent )
     {
         int err;
         int width = m_info.GetWidth();
@@ -72,7 +73,11 @@ namespace Renderer
         err = GetLastError();
 
         assert( oldBitmap != 0 );
-        drawRect( transparentColor, 0, 0, width, height );
+
+        if ( fullyTransparent )
+            drawRect( transparentColor, 0, 0, width, height );
+        else
+            drawRect( nearlyTransparent, 0, 0, width, height );
     }
 
     void RenderWindow::end()

@@ -22,6 +22,7 @@ namespace Layout
             TilledWindow&  what;
             EmptyFinder( TilledWindow& n ) : what( n ) {}
             
+
             bool operator() ( LayoutNode::SizePair &p )
             {
                 if ( p.subTree == 0 )
@@ -32,6 +33,9 @@ namespace Layout
 
                 return false;
             }
+
+        private:
+            void operator =(const EmptyFinder&) {}
         } finder( newWindow );
 
         LayoutNode::IteratingPredicate  pred( finder );

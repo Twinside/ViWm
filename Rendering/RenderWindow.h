@@ -19,7 +19,7 @@ namespace Renderer
         void    DeleteBrush( Brush /*b*/ ) {}
 
 
-        void    begin();
+        void    begin( bool fullyTransparent );
         void    drawRect( Brush color, int x, int y, int width, int height );
         void    end();
         
@@ -33,6 +33,7 @@ namespace Renderer
         HWND                    m_window;
         LayeredWindowInfo       m_info;
         Brush                   transparentColor;
+        Brush                   nearlyTransparent;
         COLORREF                *voidBits;
     };
 }}

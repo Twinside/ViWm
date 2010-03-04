@@ -153,25 +153,26 @@ namespace ViWm
         // first we need do collect some size constraints.
         int unconstrainedWidth = dim.width;
         int unconstrainedHeight = dim.height;
-        int unconstrainedWidthCount = 0;
-        int unconstrainedHeightCount = 0;
+        int constrainedWidthCount = 0;
+        int constrainedHeightCount = 0;
 
         for (cit = nodes.begin(); cit != nodes.end(); ++cit )
         {
+            int realWidth = int(cit->width * currentScreen.getWidth());
+            int realHeight = int(cit->height * currentScreen.getHeight());
+
             if (cit->width > 0)
             {
-                unconstrainedWidth -= cit->width;
-                unconstrainedWidthCount++;
+                unconstrainedWidth -= realWidth;
+                constrainedWidthCount++;
             }
 
             if (cit->height > 0)
             {
-                unconstrainedHeight -= cit->height;
-                unconstrainedHeightCount++;
+                unconstrainedHeight -= realHeight;
+                constrainedHeightCount++;
             }
         }
-        unconstrainedWidth -= (nodes.size() - 1) * SplitWidth;
-        unconstrainedHeight -= (nodes.size() - 1) * SplitWidth;
 
         Rect        subSize;
         subSize = dim;
@@ -199,8 +200,8 @@ namespace ViWm
         //
         if ( side == SplitHorizontal )
         {
-            int unconstrainedSize = unconstrainedHeightCount > 0
-                ? unconstrainedHeight / unconstrainedHeightCount
+            int unconstrainedSize = constrainedHeightCount > 0
+                ? unconstrainedHeight / (nodes.size() - constrainedHeightCount)
                 : dim.height / static_cast<int>( nodes.size() );
 
             size_t i = 0;
@@ -220,7 +221,10 @@ namespace ViWm
                 }
 
                 if ( it->height )
-                    subSize.height = it->height - sizeSub;
+                {
+                    int realHeight = int(it->height * currentScreen.getHeight());
+                    subSize.height = realHeight - sizeSub;
+                }
                 else
                     subSize.height = unconstrainedSize - sizeSub;
 
@@ -237,8 +241,8 @@ namespace ViWm
         }
         else // SplitVertical
         {
-            int unconstrainedSize = unconstrainedWidthCount > 0
-                ? unconstrainedWidth / unconstrainedWidthCount
+            int unconstrainedSize = constrainedWidthCount > 0
+                ? unconstrainedWidth / (nodes.size() - constrainedWidthCount)
                 : dim.width / static_cast<int>( nodes.size() );
 
             size_t i = 0;
@@ -254,12 +258,13 @@ namespace ViWm
                     leftShift = 0;
                 }
                 else if (i != nodes.size() - 1)
-                {
                     sizeSub = HalfSplit;
-                }
 
                 if ( it->width )
-                    subSize.width = it->width - sizeSub;
+                {
+                    int realWidth = int(it->width * currentScreen.getWidth());
+                    subSize.width = realWidth - sizeSub;
+                }
                 else
                     subSize.width = unconstrainedSize - sizeSub;
 
@@ -454,6 +459,68 @@ namespace ViWm
     }
 
     //////////////////////////////////////////////////////////////////////////
+    ////                        Layout Retrieving
+    //////////////////////////////////////////////////////////////////////////
+    LayoutTree::SplitCoord LayoutLeaf::FindPointedSplit( int /*x*/, int /*y*/ )
+        { return SplitCoord( NULL, 0 ); }
+
+    LayoutTree::SplitCoord LayoutNode::FindPointedSplit( int x, int y )
+    {
+        Collection::const_iterator it;
+        size_t i = 0;
+
+        assert( x >= 0 && y >= 0 );
+
+        if ( lastDirection == SplitHorizontal )
+        {
+            for (it = nodes.begin(); it != nodes.end() - 1; ++it, i++)
+            {
+                const Rect    &prev = it->lastDim;
+
+                if ( y < prev.y + prev.height )
+                {
+                    // we must recurse in the current block
+                    if ( it->subTree )
+                        return it->subTree->FindPointedSplit( x, y );
+                    else // we didn't found it.
+                        return SplitCoord( NULL, 0 );
+                }
+                else if ( y < (it+1)->lastDim.y )
+                {
+                    // we are selected
+                    return SplitCoord( this, i );
+                }
+                // else not
+            }
+        }
+        else // SplitVertical
+        {
+            for (it = nodes.begin(); it != nodes.end() - 1; ++it, i++)
+            {
+                const Rect    &prev = it->lastDim;
+
+                if ( x < prev.x + prev.width )
+                {
+                    // we must recurse in the current block
+                    if ( it->subTree )
+                        return it->subTree->FindPointedSplit( x, y );
+                    else // we didn't found it.
+                        return SplitCoord( NULL, 0 );
+                }
+                else if ( x < (it+1)->lastDim.x )
+                {
+                    // we are selected
+                    return SplitCoord( this, i );
+                }
+                // else not
+            }
+        }
+
+        // if we haven't found anything...
+        return SplitCoord( NULL, 0 );
+    }
+    
+    //////////////////////////////////////////////////////////////////////////
     ////                        Layout drawing
     //////////////////////////////////////////////////////////////////////////
     void LayoutLeaf::displayLayoutStructure
@@ -496,14 +563,6 @@ namespace ViWm
                 it->subTree->displayLayoutStructure( r, defaultBrush );
     }
 
-    void LayoutTree::DisplaySplitTree( Renderer::RenderWindow &r
-                                     , Renderer::RenderWindow::Brush &defaultBrush ) const
-    {
-        r.begin();
-        displayLayoutStructure(r, defaultBrush);
-        r.end();
-    }
-
     bool LayoutNode::FocusTopIteration(IteratingPredicate &p)
     {
         LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
@@ -540,5 +599,32 @@ namespace ViWm
         }
 
         return false;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    ////                  Interface drag'n drop
+    //////////////////////////////////////////////////////////////////////////
+    void    LayoutNode::moveSplit( const Screen &current
+                                 , int x, int y
+                                 , size_t splitIndex )
+    {
+        SizePair    &previous = nodes[splitIndex];
+
+        if ( lastDirection == SplitVertical )
+        {
+            int size = std::max<int>( SplitWidth
+                                    , x - previous.lastDim.x );
+
+            previous.width = float( size )
+                           / float( current.getWidth() );
+        }
+        else // SplitHorizontal
+        {
+            int size = std::max<int>( SplitWidth
+                                    , y - previous.lastDim.y );
+
+            previous.height = float( size )
+                            / float( current.getHeight() );
+        }
     }
 }

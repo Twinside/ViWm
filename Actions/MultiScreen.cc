@@ -36,7 +36,7 @@ namespace Actions
         LayoutTree::removeClean( l[ state.currentScreen ].layoutRoot
                                , selected );
 
-        l[ state.currentScreen ].replace();
+        l[ state.currentScreen ].replace( false );
         state.currentScreen = nextScreen;
 
         return NeedRelayout;

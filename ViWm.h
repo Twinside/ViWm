@@ -64,6 +64,13 @@ namespace ViWm
 
         void                  AddHotkey( HotKey k );
 
+
+        void    beginPick( int x, int y );
+        void    movePick( int x, int y );
+        void    endPick();
+
+        LayoutTree::SplitSide   QuerySplitDirection( int x, int y ) const;
+
     private:
         //////////////////////////////////////////////////////////////////////////
         ////                    Just to avoid compiler warning
@@ -112,7 +119,9 @@ namespace ViWm
          * Modkey used to define global hotkey.
          */
         int modkeys;
-        
+        LayoutTree::SplitCoord  currentSplitMove;
+        size_t                  currentScreenMove;
+
         HINSTANCE               hInstance;
         DesktopLayout           currentLayout;
         WindowMakerState        currentState;

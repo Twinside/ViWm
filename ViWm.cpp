@@ -149,7 +149,7 @@ namespace ViWm
         layouter[currentState.tilingMode]->layout( currentState, currentLayout );
         if ( currentLayout.size() > currentState.currentScreen )
         {
-            currentLayout[currentState.currentScreen].replace();
+            currentLayout[currentState.currentScreen].replace( true );
         }
         FocusCurrent();
     }
@@ -213,4 +213,34 @@ namespace ViWm
         }
     }
 
+    void    ViWmManager::beginPick( int x, int y )
+    {
+        for ( size_t i = 0; i < currentLayout.size(); i++ )
+        {
+            if ( currentLayout[i].isInScreenBound( x, y ) )
+            {
+                currentSplitMove = currentLayout[i].FindPointedSplit( x, y );
+                currentScreenMove = i;
+                currentLayout[i].replace( false );
+            }
+        }
+    }
+
+    void    ViWmManager::movePick( int x, int y )
+    {
+        if ( currentSplitMove.first == NULL )
+            return;
+
+        Screen &s = currentLayout[ currentScreenMove ];
+        currentSplitMove.first->moveSplit( s , x - s.getX(), y - s.getY()
+                                         , currentSplitMove.second );
+
+        s.replace( false );
+    }
+
+    void    ViWmManager::endPick()
+    {
+        currentSplitMove = LayoutTree::SplitCoord( NULL, 0 );
+        currentLayout[currentScreenMove].replace( true );
+    }
 }

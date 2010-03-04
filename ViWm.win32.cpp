@@ -80,7 +80,7 @@ namespace ViWm
         myLayout.push_back( newScreen );
 
         // we make the window transparent here
-        newWindow->begin();
+        newWindow->begin( true );
         newWindow->end();
 
         assert( myLayout.size() >= 1 );
@@ -187,16 +187,38 @@ namespace ViWm
         case WM_NCHITTEST: return HTCLIENT;
 
         case WM_MOUSEACTIVATE:
-            return MA_NOACTIVATE;
+            return MA_ACTIVATE;
 
         case WM_CLOSE: break;
 
+        case WM_LBUTTONDOWN:
         case WM_NCLBUTTONDOWN:
+            globalManager->beginPick( LOWORD(lParam)
+                                    , HIWORD(lParam) );
             // get selected band
             break;
 
+        case WM_LBUTTONUP:
+        case WM_NCLBUTTONUP:
+            globalManager->endPick();
+            break;
+
         case WM_MOUSEMOVE:
+
             // move the splits
+            if ( wParam & MK_LBUTTON )
+            {
+                globalManager->movePick( LOWORD(lParam)
+                                       , HIWORD(lParam));
+            }
+            else
+            {
+                // cursor thingie
+                /*
+                IDC_SIZENS
+                IDC_SIZEWE
+                */
+            }
             break;
 
         default:

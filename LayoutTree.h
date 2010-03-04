@@ -21,6 +21,8 @@ namespace ViWm
         int width, height;
     };
 
+    class LayoutNode;
+
     /**
      * This struct only exist to provide a type
      * token. the tree structure is really a sum
@@ -31,12 +33,51 @@ namespace ViWm
         LayoutTree();
         virtual ~LayoutTree();
 
+        /**
+         * Describe how the space will be split.
+         */
         enum SplitSide
         {
+            // +--------------------------------------------------+
+            // |                                                  |
+            // |           Window 1 (or an imbricated split)      |
+            // |                                                  |
+            // +--------------------------------------------------+
+            // +--------------------------------------------------+
+            // |                                                  |
+            // |          Window 2                                |
+            // |                                                  |
+            // |                                                  |
+            // +--------------------------------------------------+
+            // +--------------------------------------------------+
+            // |                                                  |
+            // |          Window 3                                |
+            // |                                                  |
+            // +--------------------------------------------------+
             SplitHorizontal,
+
+            // +-------------+-+----------------+-+---------------+
+            // |             | |                | |               |
+            // |  Window 1   | |  Window2       | |  Window3      |
+            // |             | |  (or an        | |               |
+            // |             | |   imbricated   | |               |
+            // |             | |      split)    | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // |             | |                | |               |
+            // +-------------+-+----------------+-+---------------+
             SplitVertical
         };
 
+        /**
+         * Used to refer to a system window.
+         */
         typedef HWND    WindowKey;
 
         enum CompStatus
@@ -51,18 +92,6 @@ namespace ViWm
             Done        /**< The action has been performed. */
         };
 
-        void   DisplaySplitTree( Renderer::RenderWindow &r, Renderer::RenderWindow::Brush &defaultBrush ) const;
-
-        virtual CompStatus addNode( LayoutTree *subTree ) = 0;
-        virtual CompStatus removeNode( WindowKey toRemove ) = 0;
-        virtual CompStatus removeNode( LayoutTree *toRemove ) = 0;
-        virtual CompStatus selectNode( WindowKey toRemove ) = 0;
-        virtual LayoutTree* getSelected() = 0;
-
-        static CompStatus addCreate( LayoutTree *&root, LayoutTree &tree );
-        static CompStatus removeClean( LayoutTree *&root, WindowKey key );
-        static CompStatus removeClean( LayoutTree *&root, LayoutTree *tree );
-
         /**
          * Force the subnode/contained window to fit
          * the current tree dimension. Refresh the
@@ -73,14 +102,61 @@ namespace ViWm
                                  , SplitSide side
                                  ) = 0;
 
+        /**
+         * Add a node to the tree. The new node is inserted
+         * near the currently selected node
+         */
+        virtual CompStatus addNode( LayoutTree *subTree ) = 0;
+
+        /**
+         * Remove the leaf with the given window if it exists.
+         */
+        virtual CompStatus removeNode( WindowKey toRemove ) = 0;
+
+        /**
+         * Remove ALL LayoutTree that has the same adress. It
+         * means you can cleanup all the empty cell by calling
+         * it with 0.
+         */
+        virtual CompStatus removeNode( LayoutTree *toRemove ) = 0;
+
+        /**
+         * Search the tree for a node, and give it the focus.
+         */
+        virtual CompStatus selectNode( WindowKey toSelect ) = 0;
+
+        /**
+         * Get the currently selected leaf.
+         */
+        virtual LayoutTree* getSelected() = 0;
+
+        typedef std::pair<LayoutNode*, size_t> SplitCoord;
+        virtual SplitCoord FindPointedSplit( int x, int y ) = 0;
+
+        /**
+         * Given a tree root, update the root to add the new node.
+         * The root can be null. If root exist, the tree will be
+         * appended.
+         */
+        static CompStatus addCreate( LayoutTree *&root, LayoutTree &tree );
+
+        /**
+         * Remove a window, and if there is no need for a tree anymore,
+         * reset root to null.
+         */
+        static CompStatus removeClean( LayoutTree *&root, WindowKey key );
+        static CompStatus removeClean( LayoutTree *&root, LayoutTree *tree );
+
         LayoutTree  *parent;
 
-    protected:
+        /**
+         * Draw the splits given a window and a good brush.
+         * Use the information computed in the Establish
+         * method. And thus, must be called after Establish.
+         */
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
                             , Renderer::RenderWindow::Brush defaultBrush ) const = 0;
-
-        friend class LayoutNode;
 
     private:
         static CompStatus   globalPack( LayoutTree *&root, CompStatus st );
@@ -112,10 +188,12 @@ namespace ViWm
 
             /**
              * Constraining weight. If width == 0,
-             * then the width is free of constraint
+             * then the width is free of constraint.
+             * Constraint is exrpimed in ration of screen
+             * size.
              */
-            int         width;
-            int         height; /**< Same thing as width */
+            float       width;
+            float       height; /**< Same thing as width */
 
             /**
              * Store the width atributed to the subtree
@@ -148,6 +226,7 @@ namespace ViWm
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual LayoutTree*   getSelected();
+        virtual SplitCoord    FindPointedSplit( int x, int y );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
@@ -166,6 +245,8 @@ namespace ViWm
 
         inline void    rotate( int about )
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
+
+        void    moveSplit( const Screen &current, int x, int y, size_t splitIndex );
 
     protected:
         virtual void        displayLayoutStructure
@@ -200,6 +281,7 @@ namespace ViWm
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual LayoutTree*   getSelected();
+        virtual SplitCoord    FindPointedSplit( int x, int y );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim

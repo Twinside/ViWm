@@ -13,6 +13,16 @@ namespace ViWm
      */
     struct Screen 
     {
+        /** 
+         * Represent a physical screen.
+         * The coordinate (x,y) can be negative as we need
+         * to handle the multi view scenario.
+         * @param associated Render window used to display splits.
+         * @param x horizontal position of upper left corner
+         * @param y vertical position of upper left corner
+         * @param width in pixels
+         * @param height in pixels
+         */
         Screen( Renderer::RenderWindow &associated
               , int x, int y, int width, int height );
 
@@ -25,7 +35,10 @@ namespace ViWm
         int getWidth() const { return size.width; }
         int getHeight() const { return size.height; }
 
-        void   replace();
+        bool   isInScreenBound( int x, int y ) const;
+        LayoutTree::SplitCoord    FindPointedSplit( int x, int y );
+
+        void   replace( bool transparentVoid );
 
         LayoutTree::SplitSide   initialSplit;
         LayoutTree              *layoutRoot;

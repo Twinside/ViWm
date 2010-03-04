@@ -37,9 +37,6 @@ namespace Renderer
         BOOL rez = UpdateLayeredWindowIndirect(window, &m_info);
 
         if (rez == 0)
-        {
-            DWORD errorCode = GetLastError();
             throw;
-        }
     }
 }}
