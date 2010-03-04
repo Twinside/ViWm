@@ -177,10 +177,16 @@ namespace ViWm
     LRESULT CALLBACK ViWmManager::windowListenerProc( HWND hwnd , UINT msg 
                                                     , WPARAM wParam , LPARAM lParam )
     {
+        static HCURSOR horizontalSplitCursor = 0;
+        static HCURSOR verticalSplitCUrsor = 0;
+
         switch (msg)
         {
         case WM_NCCREATE: return TRUE;
-        case WM_CREATE: return 0;
+        case WM_CREATE:
+            horizontalSplitCursor = LoadCursor( NULL, IDC_SIZENS );
+            verticalSplitCUrsor = LoadCursor( NULL, IDC_SIZEWE );
+            return 0;
 
         // we handle this message to be able
         // to get back mouse tracking messages.
@@ -214,10 +220,12 @@ namespace ViWm
             else
             {
                 // cursor thingie
-                /*
-                IDC_SIZENS
-                IDC_SIZEWE
-                */
+                if (globalManager->QuerySplitDirection( LOWORD( lParam )
+                                                      , HIWORD( lParam ) )
+                           == LayoutTree::SplitHorizontal)
+                    SetCursor( horizontalSplitCursor );
+                else
+                    SetCursor( verticalSplitCUrsor );
             }
             break;
 

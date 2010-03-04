@@ -226,6 +226,24 @@ namespace ViWm
         }
     }
 
+    LayoutTree::SplitSide ViWmManager::QuerySplitDirection( int x, int y )
+    {
+        // if now currently dragging
+        if ( currentSplitMove.first != NULL )
+            return currentSplitMove.first->getLastDirection();
+
+        // we find the good split =)
+        for ( size_t i = 0; i < currentLayout.size(); i++ )
+        {
+            if ( currentLayout[i].isInScreenBound( x, y ) )
+            {
+                LayoutNode *n = currentLayout[i].FindPointedSplit( x, y ).first;
+                return n ? n->getLastDirection() : LayoutTree::SplitHorizontal;
+            }
+        }
+        return LayoutTree::SplitHorizontal;
+    }
+
     void    ViWmManager::movePick( int x, int y )
     {
         if ( currentSplitMove.first == NULL )
