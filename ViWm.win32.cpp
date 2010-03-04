@@ -127,6 +127,8 @@ namespace ViWm
 
         case HSHELL_RUDEAPPACTIVATED:
         case HSHELL_WINDOWACTIVATED:
+            if (globalManager->inDrag()) break;
+
             found = currentState.FindNode((HWND)lParam);
             if (found) {
                 if (currentState.current) {

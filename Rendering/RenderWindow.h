@@ -19,6 +19,9 @@ namespace Renderer
         void    DeleteBrush( Brush /*b*/ ) {}
 
 
+        void    putAtTop();
+        void    putAtBottom();
+
         void    begin( bool fullyTransparent );
         void    drawRect( Brush color, int x, int y, int width, int height );
         void    end();

@@ -99,7 +99,14 @@ namespace ViWm
     }
 
     void TilledWindow::SetSize( int x, int y, int width, int height )
-        { ::SetWindowPos( hwnd, HWND_TOP, x, y, width, height, SWP_SHOWWINDOW ); }
+    {
+        // Why HWND_BOTTOM ?
+        // well for a weird reason it appeared that the first window
+        // wasn't cool enough to stay where it was, and was at front.
+        // This was really annoying when a split is moved, and trying
+        // to reduce the first window of the layout level.
+        ::SetWindowPos( hwnd, HWND_BOTTOM, x, y, width, height, NULL );
+    }
 
     void TilledWindow::GetClassName( std::string &name )
     {

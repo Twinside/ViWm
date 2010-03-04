@@ -222,6 +222,7 @@ namespace ViWm
                 currentSplitMove = currentLayout[i].FindPointedSplit( x, y );
                 currentScreenMove = i;
                 currentLayout[i].replace( false );
+                currentLayout[i].putAtTop();
             }
         }
     }
@@ -260,5 +261,6 @@ namespace ViWm
     {
         currentSplitMove = LayoutTree::SplitCoord( NULL, 0 );
         currentLayout[currentScreenMove].replace( true );
+        currentLayout[currentScreenMove].putAtBottom();
     }
 }

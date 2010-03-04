@@ -567,10 +567,9 @@ namespace ViWm
     {
         LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
 
-        if ( !sub )
-            return false;
-
-        if ( sub->FocusTopIteration( p ))
+        if ( sub && sub->FocusTopIteration( p ))
+            return true;
+        else if ( p( nodes[selectedRoute] ) )
             return true;
 
         for ( Collection::iterator it = nodes.begin()
@@ -615,8 +614,27 @@ namespace ViWm
             int size = std::max<int>( SplitWidth
                                     , x - previous.lastDim.x );
 
-            previous.width = float( size )
+            // the size we hope to gain
+            float newWidth = float( size )
                            / float( current.getWidth() );
+
+            previous.width = newWidth;
+
+            // we're forcing the left
+            /*
+            if ( newWidth < previous.width )
+            {
+                for ( int i = int(splitIndex) - 1; i >= 0; i-- )
+                {
+
+                    previous.width = newWidth;
+                }
+            }
+            else // we're forcing the right
+            {
+
+                previous.width = newWidth;
+            } //*/
         }
         else // SplitHorizontal
         {

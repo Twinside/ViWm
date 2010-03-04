@@ -69,6 +69,7 @@ namespace ViWm
         void    movePick( int x, int y );
         void    endPick();
 
+        bool    inDrag() { return currentSplitMove.first != NULL; }
         LayoutTree::SplitSide   QuerySplitDirection( int x, int y );
 
     private:

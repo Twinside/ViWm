@@ -43,6 +43,9 @@ namespace ViWm
         LayoutTree::SplitSide   initialSplit;
         LayoutTree              *layoutRoot;
 
+        void    putAtTop() { fullScreenWin->putAtTop(); }
+        void    putAtBottom() { fullScreenWin->putAtBottom(); }
+
     private:
         //void    operator =( const Screen& );
 
