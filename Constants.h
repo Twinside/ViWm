@@ -20,4 +20,6 @@ enum    ConfigurationConstants
     DEFAULT_MODKEY = MOD_CONTROL | MOD_ALT,
 };
 
+extern const char* keyListenerClassName;
+extern const char* fullScreenWindowClassName;
 #endif /* CONSTANTS_H */

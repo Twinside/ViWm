@@ -13,6 +13,9 @@ using namespace ViWm;
 
 ViWmManager    *globalManager;
 
+const char* fullScreenWindowClassName = "ViWmScreenBack";
+const char* keyListenerClassName = "ViWm";
+
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     reinterpret_cast<ViWmManager*>( lParam )->AddNode( hwnd );

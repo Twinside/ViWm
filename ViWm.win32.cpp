@@ -22,13 +22,16 @@ namespace ViWm
         minfo.cbSize = sizeof( MONITORINFOEX );
         GetMonitorInfo( hMonitor, &minfo );
 
+        // as MSDN state that some value may be negative for non-primary
+        // displays, we abs the width & height to get correct value to
+        // work on.
         int winWidth = abs(minfo.rcWork.right - minfo.rcWork.left);
         int winHeight = abs(minfo.rcWork.bottom - minfo.rcWork.top);
 
         // yeah our nice window...
         HWND fullScreenWin =
             CreateWindowEx ( WS_EX_LAYERED
-                           , "ViWmScreenBack"
+                           , fullScreenWindowClassName
                            , "ABack"
                            , WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS 
                             /* style */
@@ -59,9 +62,6 @@ namespace ViWm
                     , /*SWP_NOACTIVATE | */SWP_NOMOVE | SWP_NOSIZE
                     );
 
-        // as MSDN state that some value may be negative for non-primary
-        // displays, we abs the width & height to get correct value to
-        // work on.
         Renderer::RenderWindow    *newWindow =
             new Renderer::RenderWindow( fullScreenWin
                                       , minfo.rcWork.left
@@ -181,6 +181,7 @@ namespace ViWm
     {
         static HCURSOR horizontalSplitCursor = 0;
         static HCURSOR verticalSplitCUrsor = 0;
+        POINT   coord;
 
         switch (msg)
         {
@@ -198,14 +199,16 @@ namespace ViWm
         case WM_NCHITTEST: return HTCLIENT;
 
         case WM_MOUSEACTIVATE:
-            return MA_ACTIVATE;
+            return MA_NOACTIVATE;
 
         case WM_CLOSE: break;
 
         case WM_LBUTTONDOWN:
         case WM_NCLBUTTONDOWN:
-            globalManager->beginPick( LOWORD(lParam)
-                                    , HIWORD(lParam) );
+            coord.x = LOWORD( lParam );
+            coord.y = HIWORD( lParam );
+            MapWindowPoints( hwnd, NULL, &coord, 1 );
+            globalManager->beginPick( coord.x, coord.y );
             // get selected band
             break;
 
@@ -219,14 +222,18 @@ namespace ViWm
             // move the splits
             if ( wParam & MK_LBUTTON )
             {
-                globalManager->movePick( LOWORD(lParam)
-                                       , HIWORD(lParam));
+                coord.x = LOWORD( lParam );
+                coord.y = HIWORD( lParam );
+                MapWindowPoints( hwnd, NULL, &coord, 1 );
+                globalManager->movePick( coord.x, coord.y );
             }
             else
             {
+                coord.x = LOWORD( lParam );
+                coord.y = HIWORD( lParam );
+                MapWindowPoints( hwnd, NULL, &coord, 1 );
                 // cursor thingie
-                if (globalManager->QuerySplitDirection( LOWORD( lParam )
-                                                      , HIWORD( lParam ) )
+                if (globalManager->QuerySplitDirection( coord.x, coord.y )
                            == LayoutTree::SplitHorizontal)
                     SetCursor( horizontalSplitCursor );
                 else

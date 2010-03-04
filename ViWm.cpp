@@ -97,7 +97,7 @@ namespace ViWm
         winClass.hCursor = NULL;
         winClass.hbrBackground = NULL;
         winClass.lpszMenuName = NULL;
-        winClass.lpszClassName = "ViWm";
+        winClass.lpszClassName = keyListenerClassName;
 
         if (!RegisterClassEx(&winClass)) {
             MessageBox(NULL, "Error Registering Window Class", "Error", MB_OK | MB_ICONERROR);
@@ -105,7 +105,7 @@ namespace ViWm
         }
 
         // create a message only window
-        globalHotkeyListener = CreateWindowEx( 0, "ViWm", "ViWm"
+        globalHotkeyListener = CreateWindowEx( 0, keyListenerClassName, "ViWm"
             , 0, 0, 0, 0, 0
             , HWND_MESSAGE, NULL
             , hInstance, NULL);
@@ -128,7 +128,7 @@ namespace ViWm
         winClass.hCursor = NULL;
         winClass.hbrBackground = NULL;
         winClass.lpszMenuName = NULL;
-        winClass.lpszClassName = "ViWmScreenBack";
+        winClass.lpszClassName = fullScreenWindowClassName;
 
         if (!RegisterClassEx(&winClass)) {
             MessageBox( NULL

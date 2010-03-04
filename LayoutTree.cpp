@@ -153,8 +153,8 @@ namespace ViWm
         // first we need do collect some size constraints.
         int unconstrainedWidth = dim.width;
         int unconstrainedHeight = dim.height;
-        int constrainedWidthCount = 0;
-        int constrainedHeightCount = 0;
+        size_t constrainedWidthCount = 0;
+        size_t constrainedHeightCount = 0;
 
         for (cit = nodes.begin(); cit != nodes.end(); ++cit )
         {
@@ -200,9 +200,18 @@ namespace ViWm
         //
         if ( side == SplitHorizontal )
         {
-            int unconstrainedSize = constrainedHeightCount > 0
-                ? unconstrainedHeight / (nodes.size() - constrainedHeightCount)
-                : dim.height / static_cast<int>( nodes.size() );
+            int unconstrainedSize;
+
+            if (constrainedHeightCount > 0 && constrainedHeightCount < nodes.size())
+            {
+                unconstrainedSize = unconstrainedHeight
+                                  / (nodes.size() - constrainedHeightCount);
+            }
+            else
+            {
+                unconstrainedSize = dim.height
+                                  / static_cast<int>( nodes.size() );
+            }
 
             size_t i = 0;
             for (it = nodes.begin(); it != nodes.end(); ++it, i++)
@@ -241,9 +250,18 @@ namespace ViWm
         }
         else // SplitVertical
         {
-            int unconstrainedSize = constrainedWidthCount > 0
-                ? unconstrainedWidth / (nodes.size() - constrainedWidthCount)
-                : dim.width / static_cast<int>( nodes.size() );
+            int unconstrainedSize;
+            
+            if ( constrainedWidthCount > 0 && constrainedWidthCount < nodes.size())
+            {
+                unconstrainedSize = unconstrainedWidth 
+                                  / (nodes.size() - constrainedWidthCount);
+            }
+            else
+            {
+                unconstrainedSize = dim.width
+                                  / static_cast<int>( nodes.size() );
+            }
 
             size_t i = 0;
 
