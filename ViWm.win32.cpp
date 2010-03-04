@@ -184,8 +184,11 @@ namespace ViWm
         {
         case WM_NCCREATE: return TRUE;
         case WM_CREATE:
-            horizontalSplitCursor = LoadCursor( NULL, IDC_SIZENS );
-            verticalSplitCUrsor = LoadCursor( NULL, IDC_SIZEWE );
+            if ( !horizontalSplitCursor || !verticalSplitCUrsor )
+            {
+                horizontalSplitCursor = LoadCursor( NULL, IDC_SIZENS );
+                verticalSplitCUrsor = LoadCursor( NULL, IDC_SIZEWE );
+            }
             return 0;
 
         // we handle this message to be able
