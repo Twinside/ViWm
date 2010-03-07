@@ -7,7 +7,6 @@ namespace ViWm
         : size( nx, ny, nwidth, nheight)
         , layoutRoot( 0 )
         , fullScreenWin( &associated )
-        //, initialSplit( LayoutTree::SplitVertical )
         , initialSplit( LayoutTree::SplitHorizontal )
     {}
     

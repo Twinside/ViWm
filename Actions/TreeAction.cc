@@ -37,10 +37,11 @@ namespace Actions
         else
         {
             LayoutNode  *newNode = new LayoutNode();
+            parent->replace( selected, newNode );
+
+            // order is important
             newNode->addNode( selected );
             newNode->addNode( 0 );
-
-            parent->replace( selected, newNode );
         }
     }
 

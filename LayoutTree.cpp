@@ -43,8 +43,11 @@ namespace ViWm
 
         it = std::find_if( nodes.begin(), nodes.end(), finder );
 
+        toSearch->parent = NULL;
+
         if (it == nodes.end()) return false;
         it->subTree = replacent;
+        it->subTree->parent = this;
 
         return true;
     }
@@ -671,7 +674,7 @@ namespace ViWm
                 return false;
             }
 
-            float newWidth = delta / float( current.getHeight() );
+            float newWidth = delta / float( current.getWidth() );
 
             // Allright, we are expending ourselves, we just have
             // to make sure that there is enough place to expand
