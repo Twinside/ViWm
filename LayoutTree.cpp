@@ -649,15 +649,45 @@ namespace ViWm
             int delta = y - previous.lastDim.y;
 
             // if we already are at the minimum size, we can't be even
-            // smaller.
+            // smaller. Or we can try to "push" previous windows.
             if ( delta < MinimumViewableSize )
-                return false;
-
-            float   newHeight = float( delta )
-                              / float( current.getHeight() );
-
-            if ( splitDeltaPropagate( current, splitIndex + 1, previous.height - newHeight ) )
             {
+                if ( splitIndex == 0 ) return false;
+
+                float newHeight = float(MinimumViewableSize)
+                                / float(current.getHeight());
+
+                float diff = delta / float(current.getHeight())
+                           - newHeight;
+
+                if ( splitDeltaPropagate
+                            ( current
+                            , splitIndex - 1
+                            , Backward
+                            , diff
+                            ) )
+                {
+                    previous.height = newHeight;
+                    nodes[splitIndex + 1].height -= diff;
+                    return true;
+                }
+
+                return false;
+            }
+
+            float newHeight = delta / float( current.getHeight() );
+
+            // Allright, we are expending ourselves, we just have
+            // to make sure that there is enough place to expand
+            // without violating the minimum size constraint.
+            if ( splitDeltaPropagate
+                        ( current
+                        , splitIndex + 1
+                        , Forward
+                        , previous.height - newHeight
+                        ) )
+            {
+                // everything ok, commit the size change
                 previous.height = newHeight;
                 return true;
             }
@@ -666,7 +696,11 @@ namespace ViWm
         return false;
     }
 
-    bool LayoutNode::splitDeltaPropagate( const Screen &s, size_t splitIndex, float delta )
+    bool LayoutNode::splitDeltaPropagate( const Screen &s
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , float  delta
+                                        )
     {
         SizePair    &previous = nodes[splitIndex];
 
@@ -679,12 +713,13 @@ namespace ViWm
             {
                 // if we are at the end of the box, we
                 // cannot do anything
-                if ( splitIndex == nodes.size() - 1 )
+                if ( (int(dir) > 0 && splitIndex == nodes.size() - 1)
+                    || (int(dir) < 0 && splitIndex == 0) )
                     return false;
 
                 // if we got followers, we can try to propagate
                 // the loss
-                return splitDeltaPropagate( s, splitIndex + 1, delta );
+                return splitDeltaPropagate( s, splitIndex + int(dir), dir, delta );
             }
             else
             {
@@ -701,12 +736,13 @@ namespace ViWm
             {
                 // if we are at the end of the box, we
                 // cannot do anything
-                if ( splitIndex == nodes.size() - 1 )
+                if ( (int(dir) > 0 && splitIndex == nodes.size() - 1)
+                    || (int(dir) < 0 && splitIndex == 0) )
                     return false;
 
                 // if we got followers, we can try to propagate
                 // the loss
-                return splitDeltaPropagate( s, splitIndex + 1, delta );
+                return splitDeltaPropagate( s, splitIndex + int(dir), dir, delta );
             }
             else
             {

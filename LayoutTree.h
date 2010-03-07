@@ -278,7 +278,18 @@ namespace ViWm
             MinimumViewableSize = SplitWidth * 2
         };
 
-        bool        splitDeltaPropagate( const Screen &s, size_t splitIndex, float delta );
+        enum IterationDirection
+        {
+            Forward = 1,
+            Backward = -1
+        };
+
+        bool        splitDeltaPropagate( const Screen &s
+                                       , size_t splitIndex
+                                       , IterationDirection dir
+                                       , float delta
+                                       );
+
         Rect        getMyPreviousDimension( const Screen &current ) const;
         SplitSide   lastDirection;
         Collection  nodes;
