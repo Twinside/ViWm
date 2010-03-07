@@ -16,6 +16,13 @@ namespace Actions
     private:
         LayoutTree::WindowKey toSend;
     };
+
+    class InverseScreenLayout : public Action
+    {
+    public:
+
+        ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s);
+    };
 }}
 
 #endif /* SYSTEM_H */

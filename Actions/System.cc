@@ -12,4 +12,16 @@ namespace Actions
         PostMessage(toSend, WM_CLOSE, 0, 0);
         return Nothing;
     }
+
+    Action::ReturnInfo InverseScreenLayout::operator()( DesktopLayout &l, WindowMakerState &s )
+    {
+        Screen &screen = l[s.currentScreen];
+
+        if ( screen.initialSplit == LayoutTree::SplitVertical )
+            screen.initialSplit = LayoutTree::SplitHorizontal;
+        else
+            screen.initialSplit = LayoutTree::SplitVertical;
+
+        return NeedRelayout;
+    }
 }}

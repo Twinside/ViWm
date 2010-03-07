@@ -638,7 +638,55 @@ namespace ViWm
 
         if ( lastDirection == SplitVertical )
         {
-            // TODO : rewrite =)
+            // if we are out of our bounds, we can't resize
+            if ( x < prevDim.x || x >= prevDim.x + prevDim.width )
+                return false;
+
+            int delta = x - previous.lastDim.x;
+
+            // if we already are at the minimum size, we can't be even
+            // smaller. Or we can try to "push" previous windows.
+            if ( delta < MinimumViewableSize )
+            {
+                if ( splitIndex == 0 ) return false;
+
+                float newWidth = float(MinimumViewableSize)
+                               / float(current.getWidth());
+
+                float diff = delta / float(current.getWidth())
+                           - newWidth;
+
+                if ( splitDeltaPropagate
+                            ( current
+                            , splitIndex - 1
+                            , Backward
+                            , diff
+                            ) )
+                {
+                    previous.width = newWidth;
+                    nodes[splitIndex + 1].width -= diff;
+                    return true;
+                }
+
+                return false;
+            }
+
+            float newWidth = delta / float( current.getHeight() );
+
+            // Allright, we are expending ourselves, we just have
+            // to make sure that there is enough place to expand
+            // without violating the minimum size constraint.
+            if ( splitDeltaPropagate
+                        ( current
+                        , splitIndex + 1
+                        , Forward
+                        , previous.width - newWidth
+                        ) )
+            {
+                // everything ok, commit the size change
+                previous.width = newWidth;
+                return true;
+            }
         }
         else // SplitHorizontal
         {

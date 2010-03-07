@@ -49,6 +49,7 @@ int WINAPI WinMain( HINSTANCE hInstance
     defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
     defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
+    defs.push_back( HotKey( 'I', new Actions::InverseScreenLayout()));
     defs.push_back( HotKey(  VK_LEFT, new Actions::ScreenMoverBounded( -1 )));
     defs.push_back( HotKey( VK_RIGHT, new Actions::ScreenMoverBounded( 1 )));
 
