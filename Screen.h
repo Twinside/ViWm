@@ -34,6 +34,7 @@ namespace ViWm
         int getY() const { return size.y; }
         int getWidth() const { return size.width; }
         int getHeight() const { return size.height; }
+        const Rect& getSize() const { return size; }
 
         bool   isInScreenBound( int x, int y ) const;
         LayoutTree::SplitCoord    FindPointedSplit( int x, int y );

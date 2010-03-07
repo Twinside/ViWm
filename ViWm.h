@@ -7,6 +7,7 @@
 #include "TilledWindow.h"
 #include "Screen.h"
 #include "State.h"
+#include "Configuration.h"
 
 namespace ViWm
 {
@@ -73,6 +74,8 @@ namespace ViWm
         LayoutTree::SplitSide   QuerySplitDirection( int x, int y );
 
     private:
+        Configuration   conf;
+
         //////////////////////////////////////////////////////////////////////////
         ////                    Just to avoid compiler warning
         //////////////////////////////////////////////////////////////////////////

@@ -27,24 +27,7 @@ namespace ViWm
         TilledWindow*   FindNode( HWND hwnd );
         void            RemoveNode( HWND hwnd );
 
-        /*
-        bool    disableNext;
-        bool    lockMouse;
-
-        int experimental_mouse;
-        int mouse_pos_out;
-        int margin;
-        */
-
         int alpha;
-        /*
-        int borders;
-        int ignoreCount;
-        int ignoreCountBorders;
-
-        // Xmonad style Master area count
-        uint16 masterarea_count;
-        */
 
         TillingMode tilingMode;
 

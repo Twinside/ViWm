@@ -2,6 +2,7 @@
 #define MANUALVIMLAYOUT_H
 
 #include "../Layouter.h"
+#include "../Configuration.h"
 
 namespace ViWm {
 namespace Layout
@@ -9,11 +10,18 @@ namespace Layout
     class ManualVimLayout : public Layouter
     {
     public:
+        ManualVimLayout( const Configuration &c );
+
         virtual void layout( const WindowMakerState &s, DesktopLayout &l );
         virtual void addNewWindowToLayout( TilledWindow &newWindow
                                          , const WindowMakerState &st
                                          , DesktopLayout          &l
                                          );
+    private:
+        void operator =(const ManualVimLayout &);
+
+        const   Configuration &conf;
+        void    normalizeNode( LayoutLeaf *leaf, LayoutNode* node );
     };
 }}
 

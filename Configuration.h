@@ -9,8 +9,10 @@ namespace ViWm
         Configuration( const char *filename );
         ~Configuration();
         
+        bool    getEqualAlways() const { return equalAlways; };
 
     private:
+        bool    equalAlways;
     };
 }
 

@@ -311,7 +311,9 @@ namespace ViWm
         if ( nodes.size() == 0
             || (nodes[selectedRoute].subTree &&
                 nodes[selectedRoute].subTree->addNode( window ) == Todo) )
+        {
             nodes.push_back( window );
+        }
 
         if ( window )
             window->parent = this;
@@ -581,15 +583,9 @@ namespace ViWm
                 it->subTree->displayLayoutStructure( r, defaultBrush );
     }
 
-    bool LayoutNode::FocusTopIteration(IteratingPredicate &p)
+
+    bool LayoutNode::Iter( IteratingPredicate &p )
     {
-        LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
-
-        if ( sub && sub->FocusTopIteration( p ))
-            return true;
-        else if ( p( nodes[selectedRoute] ) )
-            return true;
-
         for ( Collection::iterator it = nodes.begin()
             ; it != nodes.end()
             ; ++it )
@@ -600,6 +596,18 @@ namespace ViWm
         }
 
         return false;
+    }
+
+    bool LayoutNode::FocusTopIteration(IteratingPredicate &p)
+    {
+        LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
+
+        if ( sub && sub->FocusTopIteration( p ))
+            return true;
+        else if ( p( nodes[selectedRoute] ) )
+            return true;
+
+        return Iter( p );
     }
 
     bool LayoutNode::DepthFirstIteration(IteratingPredicate &p)
@@ -621,46 +629,108 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     ////                  Interface drag'n drop
     //////////////////////////////////////////////////////////////////////////
-    void    LayoutNode::moveSplit( const Screen &current
+    bool    LayoutNode::moveSplit( const Screen &current
                                  , int x, int y
                                  , size_t splitIndex )
+    {
+        SizePair    &previous = nodes[splitIndex];
+        Rect        prevDim = getMyPreviousDimension( current );
+
+        if ( lastDirection == SplitVertical )
+        {
+            // TODO : rewrite =)
+        }
+        else // SplitHorizontal
+        {
+            // if we are out of our bounds, we can't resize
+            if ( y < prevDim.y || y >= prevDim.y + prevDim.height )
+                return false;
+
+            int delta = y - previous.lastDim.y;
+
+            // if we already are at the minimum size, we can't be even
+            // smaller.
+            if ( delta < MinimumViewableSize )
+                return false;
+
+            float   newHeight = float( delta )
+                              / float( current.getHeight() );
+
+            if ( splitDeltaPropagate( current, splitIndex + 1, previous.height - newHeight ) )
+            {
+                previous.height = newHeight;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool LayoutNode::splitDeltaPropagate( const Screen &s, size_t splitIndex, float delta )
     {
         SizePair    &previous = nodes[splitIndex];
 
         if ( lastDirection == SplitVertical )
         {
-            int size = std::max<int>( SplitWidth
-                                    , x - previous.lastDim.x );
+            const float minSize = MinimumViewableSize / float(s.getWidth());
 
-            // the size we hope to gain
-            float newWidth = float( size )
-                           / float( current.getWidth() );
-
-            previous.width = newWidth;
-
-            // we're forcing the left
-            /*
-            if ( newWidth < previous.width )
+            // we cannot satisfy the constraint.
+            if ( previous.width + delta < minSize ) 
             {
-                for ( int i = int(splitIndex) - 1; i >= 0; i-- )
-                {
+                // if we are at the end of the box, we
+                // cannot do anything
+                if ( splitIndex == nodes.size() - 1 )
+                    return false;
 
-                    previous.width = newWidth;
-                }
+                // if we got followers, we can try to propagate
+                // the loss
+                return splitDeltaPropagate( s, splitIndex + 1, delta );
             }
-            else // we're forcing the right
+            else
             {
-
-                previous.width = newWidth;
-            } //*/
+                previous.width += delta;
+                return true;
+            }
         }
         else // SplitHorizontal
         {
-            int size = std::max<int>( SplitWidth
-                                    , y - previous.lastDim.y );
+            const float minSize = MinimumViewableSize / float(s.getHeight());
 
-            previous.height = float( size )
-                            / float( current.getHeight() );
+            // we cannot satisfy the constraint.
+            if ( previous.height + delta < minSize ) 
+            {
+                // if we are at the end of the box, we
+                // cannot do anything
+                if ( splitIndex == nodes.size() - 1 )
+                    return false;
+
+                // if we got followers, we can try to propagate
+                // the loss
+                return splitDeltaPropagate( s, splitIndex + 1, delta );
+            }
+            else
+            {
+                previous.height += delta;
+                return true;
+            }
         }
+    }
+
+    Rect LayoutNode::getMyPreviousDimension( const Screen &current ) const
+    {
+        if ( parent == 0 )
+            return current.getSize();
+
+        LayoutNode  *p = static_cast<LayoutNode*>(parent);
+
+        for (size_t i = 0; i < p->nodes.size(); i++)
+        {
+            if ( p->nodes[i].subTree == this )
+                return p->nodes[i].lastDim;
+        }
+
+        // if we reach this code path, we clearly have a problem
+        // and a degenerated tree.
+        throw;
     }
 }

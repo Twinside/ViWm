@@ -13,9 +13,10 @@ namespace ViWm
         , hInstance( inithInstance )
         , shellhookid( (UINT)-1 )
         , hotkeysDefinition( originalCollection )
+        , conf( ".viwmrc" )
     {
         layouter.reserve( LastTillingMode );
-        layouter.push_back( LayoutPtr( new Layout::ManualVimLayout() ) );
+        layouter.push_back( LayoutPtr( new Layout::ManualVimLayout( conf ) ) );
     }
 
     ViWmManager::~ViWmManager()

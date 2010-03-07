@@ -207,6 +207,8 @@ namespace ViWm
 
         bool FocusTopIteration( IteratingPredicate &p );
         bool DepthFirstIteration( IteratingPredicate &p );
+        bool Iter( IteratingPredicate &p );
+        size_t  getSubNodeCount() const { return nodes.size(); }
 
         SplitSide   getLastDirection() { return lastDirection; }
 
@@ -246,7 +248,16 @@ namespace ViWm
         inline void    rotate( int about )
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
 
-        void    moveSplit( const Screen &current, int x, int y, size_t splitIndex );
+        /** 
+         * Physically move a virtual split on screen.
+         * Try to enforce some constraint to get a coherent screen.
+         * @param current Screen containing the layout.
+         * @param x horizontal position in screen coordinate
+         * @param y vertical position in screen coordinate
+         * @param splitIndex ID of the selected index
+         * @return true if the split has been moved, false otherwise.
+         */
+        bool moveSplit( const Screen &current, int x, int y, size_t splitIndex );
 
     protected:
         virtual void        displayLayoutStructure
@@ -263,9 +274,12 @@ namespace ViWm
         enum    Conf
         {
             SplitWidth = 8,
-            HalfSplit = SplitWidth / 2
+            HalfSplit = SplitWidth / 2,
+            MinimumViewableSize = SplitWidth * 2
         };
 
+        bool        splitDeltaPropagate( const Screen &s, size_t splitIndex, float delta );
+        Rect        getMyPreviousDimension( const Screen &current ) const;
         SplitSide   lastDirection;
         Collection  nodes;
         size_t      selectedRoute;
