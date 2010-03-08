@@ -28,6 +28,12 @@ namespace Actions
     private:
         int amount;
     };
+
+    class Relayout : public Action
+    {
+    public:
+        virtual ReturnInfo  operator ()( DesktopLayout& l, WindowMakerState &s );
+    };
 }}
 
 #endif /* TREEACTION_H */

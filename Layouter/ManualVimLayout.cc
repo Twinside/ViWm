@@ -10,8 +10,17 @@ namespace Layout
     {}
 
     void ManualVimLayout::layout( const WindowMakerState &s, DesktopLayout &l )
-    { 
-        // need to check constraint consistency.
+    {
+        Screen  &cs = l[ s.currentScreen ];
+
+        if ( !cs.layoutRoot )
+            return;
+
+        LayoutTree *tree = cs.layoutRoot->getSelected();
+
+        normalizeNode( cs
+                     , static_cast<LayoutLeaf*>( tree )
+                     , static_cast<LayoutNode*>(tree->parent) );
     }
 
     void ManualVimLayout::addNewWindowToLayout( TilledWindow &newWindow

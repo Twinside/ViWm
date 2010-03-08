@@ -77,4 +77,10 @@ namespace Actions
 
         return NeedRelayout;
     }
+
+    Action::ReturnInfo Relayout::operator ()( DesktopLayout& l, WindowMakerState &s )
+    {
+        /* TODO : implement here */
+    }
 }}
+

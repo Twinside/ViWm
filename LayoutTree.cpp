@@ -528,6 +528,9 @@ namespace ViWm
                 }
                 // else not
             }
+
+            if ( y > nodes[i].lastScreenDim.y && nodes[i].subTree )
+                return nodes[i].subTree->FindPointedSplit( x, y );
         }
         else // SplitVertical
         {
@@ -553,6 +556,9 @@ namespace ViWm
                 }
                 // else not
             }
+
+            if ( x > nodes[i].lastScreenDim.x && nodes[i].subTree )
+                return nodes[i].subTree->FindPointedSplit( x, y );
         }
 
         // if we haven't found anything...
