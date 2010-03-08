@@ -287,9 +287,15 @@ namespace ViWm
                     sizeSub = HalfSplit;
 
                 if ( it->width )
+                {
                     subSize.width = it->width - sizeSub;
+                    logicalSubsize.width = it->width;
+                }
                 else
+                {
                     subSize.width = unconstrainedSize - sizeSub;
+                    logicalSubsize.width = unconstrainedSize;
+                }
 
                 subSize.x += leftShift;
                 if ( it->subTree )
@@ -299,7 +305,10 @@ namespace ViWm
                                           , SplitHorizontal );
                 }
                 it->lastScreenDim = subSize;
+                it->lastLogicalDimension = logicalSubsize;
+
                 subSize.x += subSize.width + HalfSplit;
+                logicalSubsize.x += logicalSubsize.width;
             }
         }
     }
@@ -648,7 +657,70 @@ namespace ViWm
 
         if ( lastDirection == SplitVertical )
         {
-            // TODO : rewrite
+            // if we are out of our bounds, we can't resize
+            if ( x < prevDim.x || x >= prevDim.x + prevDim.width )
+                return false;
+
+            int desiredWidth = x - previous.lastLogicalDimension.x;
+
+            // the size doesn't change, so we don't care
+            if ( desiredWidth == previous.lastLogicalDimension.width )
+                return false;
+
+            // *ugh* we're asked to be very small, yet we can't be smaller
+            // than "MinimumViewableSize"
+            if ( desiredWidth < 0 )
+            {
+                // at the beginning of the box, we can't shrink
+                // more.
+                if ( splitIndex == 0 ) return false;
+
+                if ( splitDeltaPropagate( current, splitIndex - 1
+                                        , Backward, desiredWidth ) )
+                {
+                    nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
+                                                 - MinimumViewableSize
+                                                 - desiredWidth;
+                    previous.width = MinimumViewableSize;
+                    return true;
+                }
+            }
+            // if we already are at the minimum size, we can't be even
+            // smaller. Or we can try to "push" previous windows.
+            if ( desiredWidth < MinimumViewableSize )
+            {
+                if ( splitIndex == 0 ) return false;
+
+                int diff = desiredWidth - MinimumViewableSize;
+
+                if ( splitDeltaPropagate( current, splitIndex - 1
+                                        , Backward, diff ) )
+                {
+                    nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
+                                                 - desiredWidth;
+                    previous.width = MinimumViewableSize;
+                    return true;
+                }
+            }
+            // we are shrinking ourselves but we are in normal
+            // operating range
+            else if ( previous.lastLogicalDimension.width > desiredWidth )
+            {
+                nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
+                                             - desiredWidth;
+                previous.width = desiredWidth;
+                return true;
+            }
+            // Allright, we are expending ourselves, we just have
+            // to make sure that there is enough place to expand
+            // without violating the minimum size constraint.
+            else if ( splitDeltaPropagate( current, splitIndex + 1
+                                         , Forward, previous.width - desiredWidth ) )
+            {
+                // everything ok, commit the size change
+                previous.width= desiredWidth;
+                return true;
+            }
         }
         else // SplitHorizontal
         {
@@ -731,10 +803,36 @@ namespace ViWm
         SizePair    &previous = nodes[splitIndex];
 
         if ( delta == 0 ) return true;
-        //assert( delta < 0 );
 
         if ( lastDirection == SplitVertical )
         {
+            // we cannot satisfy the constraint.
+            if ( previous.width + delta < minSize )
+            {
+                // if we are at the end of the box, we
+                // cannot do anything
+                if ( (int(dir) > 0 && splitIndex == nodes.size() - 1)
+                    || (int(dir) < 0 && splitIndex == 0) )
+                    return false;
+
+                // we can safely assume that delta is negative. If it was positive
+                // we couldn't be smaller than the minSize.
+                int newProp = delta + (previous.lastLogicalDimension.width - minSize);
+
+                // we can try to take the maximum of delta and forward the rest
+                // to others.
+                if ( splitDeltaPropagate( s, splitIndex + int(dir), dir, newProp ))
+                {
+                    previous.width= minSize;
+                    return true;
+                }
+                else return false;
+            }
+            else
+            {
+                previous.width += delta;
+                return true;
+            }
         }
         else // SplitHorizontal
         {
