@@ -661,11 +661,15 @@ namespace ViWm
         SizePair    &previous = nodes[splitIndex];
         Rect        prevDim = getMyPreviousDimension( current );
 
+        prevDim.x = 0;
+        prevDim.y = 0;
+
         if ( lastDirection == SplitVertical )
         {
             // if we are out of our bounds, we can't resize
             if ( x < prevDim.x || x >= prevDim.x + prevDim.width )
-                return false;
+                return false;   // TODO : fix this, doesn't work when root
+                                // is the screen :(
 
             int desiredWidth = x - previous.lastLogicalDimension.x;
 

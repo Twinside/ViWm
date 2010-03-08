@@ -22,6 +22,7 @@ namespace Actions
             n->addNode( 0 );
 
             l[ state.currentScreen ].layoutRoot = n;
+            l[ state.currentScreen ].initialSplit = goodSide;
 
             return;
         }
