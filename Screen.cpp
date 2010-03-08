@@ -42,7 +42,7 @@ namespace ViWm
     LayoutTree::SplitCoord    Screen::FindPointedSplit( int x, int y )
     {
         if ( !layoutRoot )
-            return LayoutTree::SplitCoord( NULL, 0 );
+            return LayoutTree::SplitCoord();
 
         return layoutRoot->FindPointedSplit( x - size.x, y - size.y );
     }

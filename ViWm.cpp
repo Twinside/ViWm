@@ -3,6 +3,7 @@
 #include "Layouter.h"
 #include "LayoutTree.h"
 
+#include <iostream>
 namespace ViWm
 {
     ViWmManager::ViWmManager( HINSTANCE inithInstance
@@ -153,8 +154,6 @@ namespace ViWm
 
     void ViWmManager::AddNode( HWND hwnd )
     {
-        OutputDebugString( __FUNCTION__ "\n" );
-
         char TempClassName[MAX_PATH];
         GetClassName( hwnd, TempClassName, MAX_PATH );
 
@@ -177,7 +176,6 @@ namespace ViWm
                 , currentState
                 , currentLayout );
         ArrangeWindows();
-
     }
 
     void ViWmManager::FocusCurrent()
@@ -227,15 +225,15 @@ namespace ViWm
     LayoutTree::SplitSide ViWmManager::QuerySplitDirection( int x, int y )
     {
         // if now currently dragging
-        if ( currentSplitMove.first != NULL )
-            return currentSplitMove.first->getLastDirection();
+        if ( currentSplitMove.splitFather != NULL )
+            return currentSplitMove.splitFather->getLastDirection();
 
         // we find the good split =)
         for ( size_t i = 0; i < currentLayout.size(); i++ )
         {
             if ( currentLayout[i].isInScreenBound( x, y ) )
             {
-                LayoutNode *n = currentLayout[i].FindPointedSplit( x, y ).first;
+                LayoutNode *n = currentLayout[i].FindPointedSplit( x, y ).splitFather;
                 return n ? n->getLastDirection() : LayoutTree::SplitHorizontal;
             }
         }
@@ -244,19 +242,22 @@ namespace ViWm
 
     void    ViWmManager::movePick( int x, int y )
     {
-        if ( currentSplitMove.first == NULL )
+        if ( currentSplitMove.splitFather == NULL )
             return;
 
         Screen &s = currentLayout[ currentScreenMove ];
-        currentSplitMove.first->moveSplit( s , x - s.getX(), y - s.getY()
-                                         , currentSplitMove.second );
+        currentSplitMove.splitFather->moveSplit
+                                 ( s 
+                                 , x - s.getX() + currentSplitMove.xDelta
+                                 , y - s.getY() + currentSplitMove.yDelta
+                                 , currentSplitMove.splitIndex );
 
         s.replace( false );
     }
 
     void    ViWmManager::endPick()
     {
-        currentSplitMove = LayoutTree::SplitCoord( NULL, 0 );
+        currentSplitMove = LayoutTree::SplitCoord();
         currentLayout[currentScreenMove].replace( true );
         currentLayout[currentScreenMove].putAtBottom();
     }

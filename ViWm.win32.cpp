@@ -209,12 +209,14 @@ namespace ViWm
             coord.y = HIWORD( lParam );
             MapWindowPoints( hwnd, NULL, &coord, 1 );
             globalManager->beginPick( coord.x, coord.y );
+            SetCapture( hwnd );
             // get selected band
             break;
 
         case WM_LBUTTONUP:
         case WM_NCLBUTTONUP:
             globalManager->endPick();
+            ReleaseCapture();
             break;
 
         case WM_MOUSEMOVE:

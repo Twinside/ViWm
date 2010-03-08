@@ -130,7 +130,19 @@ namespace ViWm
          */
         virtual LayoutTree* getSelected() = 0;
 
-        typedef std::pair<LayoutNode*, size_t> SplitCoord;
+        struct SplitCoord
+        {
+            SplitCoord();
+            SplitCoord( LayoutNode* father, size_t id
+                      , int deltaX, int deltaY );
+
+            LayoutNode* splitFather;
+            size_t      splitIndex;
+
+            int         xDelta;
+            int         yDelta;
+        };
+
         virtual SplitCoord FindPointedSplit( int x, int y ) = 0;
 
         /**
@@ -199,7 +211,13 @@ namespace ViWm
              * Store the width atributed to the subtree
              * during the last establishment
              */
-            Rect        lastDim;
+            Rect        lastScreenDim;
+
+            /**
+             * Store "logical" dimension, without split size.
+             * Can be used to manipulate split size effectively.
+             */
+            Rect        lastLogicalDimension;
             LayoutTree* subTree;
         };
 
