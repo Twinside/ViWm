@@ -36,6 +36,10 @@ namespace Actions
         LayoutTree::removeClean( l[ state.currentScreen ].layoutRoot
                                , selected );
 
+        // force update of the old screen
+        state.getCurrentLayouter().layout( state, l );
+        l[ state.currentScreen ].replace( true );
+
         state.currentScreen = nextScreen;
 
         return NeedRelayout;
