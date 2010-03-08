@@ -161,18 +161,15 @@ namespace ViWm
 
         for (cit = nodes.begin(); cit != nodes.end(); ++cit )
         {
-            int realWidth = int(cit->width * currentScreen.getWidth());
-            int realHeight = int(cit->height * currentScreen.getHeight());
-
             if (cit->width > 0)
             {
-                unconstrainedWidth -= realWidth;
+                unconstrainedWidth -= cit->width;
                 constrainedWidthCount++;
             }
 
             if (cit->height > 0)
             {
-                unconstrainedHeight -= realHeight;
+                unconstrainedHeight -= cit->height;
                 constrainedHeightCount++;
             }
         }
@@ -233,10 +230,7 @@ namespace ViWm
                 }
 
                 if ( it->height )
-                {
-                    int realHeight = int(it->height * currentScreen.getHeight());
-                    subSize.height = realHeight - sizeSub;
-                }
+                    subSize.height = it->height - sizeSub;
                 else
                     subSize.height = unconstrainedSize - sizeSub;
 
@@ -282,10 +276,7 @@ namespace ViWm
                     sizeSub = HalfSplit;
 
                 if ( it->width )
-                {
-                    int realWidth = int(it->width * currentScreen.getWidth());
-                    subSize.width = realWidth - sizeSub;
-                }
+                    subSize.width = it->width - sizeSub;
                 else
                     subSize.width = unconstrainedSize - sizeSub;
 
@@ -653,11 +644,7 @@ namespace ViWm
             {
                 if ( splitIndex == 0 ) return false;
 
-                float newWidth = float(MinimumViewableSize)
-                               / float(current.getWidth());
-
-                float diff = delta / float(current.getWidth())
-                           - newWidth;
+                int diff = delta - MinimumViewableSize;
 
                 if ( splitDeltaPropagate
                             ( current
@@ -666,15 +653,13 @@ namespace ViWm
                             , diff
                             ) )
                 {
-                    previous.width = newWidth;
+                    previous.width = MinimumViewableSize;
                     nodes[splitIndex + 1].width -= diff;
                     return true;
                 }
 
                 return false;
             }
-
-            float newWidth = delta / float( current.getWidth() );
 
             // Allright, we are expending ourselves, we just have
             // to make sure that there is enough place to expand
@@ -683,11 +668,11 @@ namespace ViWm
                         ( current
                         , splitIndex + 1
                         , Forward
-                        , previous.width - newWidth
+                        , previous.width - delta
                         ) )
             {
                 // everything ok, commit the size change
-                previous.width = newWidth;
+                previous.width = delta;
                 return true;
             }
         }
@@ -705,11 +690,7 @@ namespace ViWm
             {
                 if ( splitIndex == 0 ) return false;
 
-                float newHeight = float(MinimumViewableSize)
-                                / float(current.getHeight());
-
-                float diff = delta / float(current.getHeight())
-                           - newHeight;
+                int diff = delta - MinimumViewableSize;
 
                 if ( splitDeltaPropagate
                             ( current
@@ -718,15 +699,13 @@ namespace ViWm
                             , diff
                             ) )
                 {
-                    previous.height = newHeight;
+                    previous.height = MinimumViewableSize;
                     nodes[splitIndex + 1].height -= diff;
                     return true;
                 }
 
                 return false;
             }
-
-            float newHeight = delta / float( current.getHeight() );
 
             // Allright, we are expending ourselves, we just have
             // to make sure that there is enough place to expand
@@ -735,11 +714,11 @@ namespace ViWm
                         ( current
                         , splitIndex + 1
                         , Forward
-                        , previous.height - newHeight
+                        , previous.height - delta 
                         ) )
             {
                 // everything ok, commit the size change
-                previous.height = newHeight;
+                previous.height = delta;
                 return true;
             }
         }
@@ -750,14 +729,14 @@ namespace ViWm
     bool LayoutNode::splitDeltaPropagate( const Screen &s
                                         , size_t splitIndex
                                         , IterationDirection dir
-                                        , float  delta
+                                        , int           delta
                                         )
     {
+        const int minSize = MinimumViewableSize;
         SizePair    &previous = nodes[splitIndex];
 
         if ( lastDirection == SplitVertical )
         {
-            const float minSize = MinimumViewableSize / float(s.getWidth());
 
             // we cannot satisfy the constraint.
             if ( previous.width + delta < minSize ) 
@@ -780,8 +759,6 @@ namespace ViWm
         }
         else // SplitHorizontal
         {
-            const float minSize = MinimumViewableSize / float(s.getHeight());
-
             // we cannot satisfy the constraint.
             if ( previous.height + delta < minSize ) 
             {

@@ -1,7 +1,6 @@
 #include "ViWm.h"
 #include "Action.h"
 #include "Layouter.h"
-#include "Layouter/Layouts.h"
 #include "LayoutTree.h"
 
 namespace ViWm
@@ -14,9 +13,8 @@ namespace ViWm
         , shellhookid( (UINT)-1 )
         , hotkeysDefinition( originalCollection )
         , conf( ".viwmrc" )
+        , currentState( conf )
     {
-        layouter.reserve( LastTillingMode );
-        layouter.push_back( LayoutPtr( new Layout::ManualVimLayout( conf ) ) );
     }
 
     ViWmManager::~ViWmManager()
@@ -144,7 +142,7 @@ namespace ViWm
 
     void ViWmManager::ArrangeWindows()
     {
-        layouter[currentState.tilingMode]->layout( currentState, currentLayout );
+        currentState.getCurrentLayouter().layout( currentState, currentLayout );
         if ( currentLayout.size() > currentState.currentScreen )
         {
             currentLayout[currentState.currentScreen].replace( true );
@@ -174,9 +172,10 @@ namespace ViWm
         .windowList
             .push_back( newWindow );
 
-        layouter[currentState.tilingMode]->addNewWindowToLayout( *newWindow
-            , currentState
-            , currentLayout );
+        currentState.getCurrentLayouter().addNewWindowToLayout
+                ( *newWindow
+                , currentState
+                , currentLayout );
         ArrangeWindows();
 
     }

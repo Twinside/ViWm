@@ -192,8 +192,8 @@ namespace ViWm
              * Constraint is exrpimed in ration of screen
              * size.
              */
-            float       width;
-            float       height; /**< Same thing as width */
+            int         width;
+            int         height; /**< Same thing as width */
 
             /**
              * Store the width atributed to the subtree
@@ -259,6 +259,8 @@ namespace ViWm
          */
         bool moveSplit( const Screen &current, int x, int y, size_t splitIndex );
 
+        Rect        getMyPreviousDimension( const Screen &current ) const;
+
     protected:
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
@@ -287,10 +289,9 @@ namespace ViWm
         bool        splitDeltaPropagate( const Screen &s
                                        , size_t splitIndex
                                        , IterationDirection dir
-                                       , float delta
+                                       , int delta
                                        );
 
-        Rect        getMyPreviousDimension( const Screen &current ) const;
         SplitSide   lastDirection;
         Collection  nodes;
         size_t      selectedRoute;

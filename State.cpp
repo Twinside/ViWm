@@ -1,23 +1,22 @@
 #include <algorithm>
 #include "TilledWindow.h"
 #include "State.h"
+#include "Layouter/Layouts.h"
+#include "Configuration.h"
 
 namespace ViWm
 {
-    WindowMakerState::WindowMakerState()
+    WindowMakerState::WindowMakerState( const Configuration &conf )
         : tilingMode( ManualVimTilling )
         , alpha( 245 )
         , currentScreen( 0 )
         , currentTag( 0 )
         , current( 0 )
-        //, borders( 1 )
-        //, ignoreCount( 0 )
-        //, ignoreCountBorders( 0 )
-        //, experimental_mouse( 0 )
-        //, mouse_pos_out( 0 )
-        //, margin( 120 ), masterarea_count( 1 )
     {
         windowList.resize( LastTag );
+
+        layouter.reserve( LastTillingMode );
+        layouter.push_back( LayoutPtr( new Layout::ManualVimLayout( conf ) ) );
     }
 
     TilledWindow* WindowMakerState::FindNode( HWND hwnd )

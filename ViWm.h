@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <set>
-#include <memory>
 #include "TilledWindow.h"
 #include "Screen.h"
 #include "State.h"
@@ -110,14 +109,10 @@ namespace ViWm
                                   , LPRECT   intersectionRect
                                   , LPARAM   userData );
 
-        typedef std::tr1::shared_ptr<Layouter>
-                LayoutPtr;
-
         //////////////////////////////////////////////////////////////////////////
         ////              Our data!
         //////////////////////////////////////////////////////////////////////////
         HotKeyCollection        hotkeysDefinition;
-        std::vector<LayoutPtr>  layouter;
 
         /**
          * Modkey used to define global hotkey.

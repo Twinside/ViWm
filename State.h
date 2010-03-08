@@ -3,20 +3,22 @@
 
 #include <list>
 #include <vector>
+#include <memory>
 #include "Constants.h"
 #include "Layouter.h"
 
 namespace ViWm
 {
     class TilledWindow;
+    class Configuration;
 
     class WindowMakerState
     {
     public:
-        WindowMakerState();
+        WindowMakerState( const Configuration &conf );
         ~WindowMakerState();
         
-        enum Configuration
+        enum StateConfiguration
         {
             // max recursion for layout tree
             // 10 is a reasonable value, MaxRecursion,
@@ -29,7 +31,9 @@ namespace ViWm
 
         int alpha;
 
-        TillingMode tilingMode;
+        TillingMode getTillingMode() { return tilingMode; }
+        Layouter&   getCurrentLayouter()
+            { return *layouter[tilingMode]; }
 
         /* Should always point to current node */
         TilledWindow *current; 	
@@ -46,6 +50,14 @@ namespace ViWm
          * One window list per tag.
          */
         std::vector<Bucket> windowList;
+
+    private:
+        TillingMode tilingMode;
+
+        typedef std::tr1::shared_ptr<Layouter>
+                LayoutPtr;
+
+        std::vector<LayoutPtr>  layouter;
     };
 }
 

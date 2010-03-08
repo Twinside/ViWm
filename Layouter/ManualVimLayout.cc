@@ -54,23 +54,37 @@ namespace Layout
         LayoutTree::addCreate( l[ st.currentScreen ].layoutRoot
                              , *leaf );
 
-        normalizeNode( leaf, static_cast<LayoutNode*>(leaf->parent) );
+        normalizeNode( l[ st.currentScreen ]
+                     , leaf
+                     , static_cast<LayoutNode*>(leaf->parent) );
     }
 
-    void ManualVimLayout::normalizeNode( LayoutLeaf *leaf, LayoutNode* node )
+    void ManualVimLayout::normalizeNode( const Screen &s, LayoutLeaf *leaf, LayoutNode* node )
     {
         if (!node) return;
 
         // please use lambda when updating compiler.
         struct SizeSetter
         {
-            float  amount;
-            SizeSetter( float namount ) : amount( namount ) {}
+            int widthAdd, widthRest;
+            int heightAdd, heightRest;
+            int i;
+
+            SizeSetter( int w, int wrest, int h, int hrest )
+                : widthAdd( w ), widthRest( wrest )
+                , heightAdd( h ), heightRest( hrest )
+                , i( 0 ) {}
             
             bool   operator() ( LayoutNode::SizePair &p )
             {
-                p.height = amount;
-                p.width = amount;
+                p.width = widthAdd;
+                p.height = heightAdd;
+
+                if ( i++ == 0 )
+                {
+                    p.width += widthRest;
+                    p.height += heightRest;
+                }
                 return false;
             }
         };
@@ -86,20 +100,24 @@ namespace Layout
                 prev = &p;
                 if ( p.subTree == leaf )
                 {
-                    p.width = prev->width / 2.0f;
-                    p.height = prev->height / 2.0f;
-                    prev->width /= 2.0f;
-                    prev->height /= 2.0f;
+                    p.width = prev->width / 2;
+                    p.height = prev->height / 2;
+                    prev->width = prev->width / 2 + prev->width % 2;
+                    prev->height = prev->height / 2 + prev->height % 2;
                 }
                 return false;
             }
         };
 
         size_t  nodeCount = node->getSubNodeCount();
+        Rect    size = node->getMyPreviousDimension( s );
 
         if (conf.getEqualAlways())
         {
-            SizeSetter  setter( 1.0f / float(nodeCount) );
+            SizeSetter  setter( size.width / nodeCount
+                              , size.width % nodeCount
+                              , size.height / nodeCount
+                              , size.height % nodeCount );
             LayoutNode::IteratingPredicate functor( setter );
             node->Iter( functor );
         }

@@ -21,7 +21,7 @@ namespace Layout
         void operator =(const ManualVimLayout &);
 
         const   Configuration &conf;
-        void    normalizeNode( LayoutLeaf *leaf, LayoutNode* node );
+        void    normalizeNode( const Screen &s, LayoutLeaf *leaf, LayoutNode* node );
     };
 }}
 
