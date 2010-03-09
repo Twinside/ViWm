@@ -15,6 +15,7 @@ namespace ViWm
         , LPARAM userData
         )
     {
+        static int      monitorCount = 0;
         ViWmManager     &instance = *reinterpret_cast<ViWmManager*>( userData );
         DesktopLayout   &myLayout = instance.currentLayout;
         MONITORINFOEX   minfo;
@@ -30,9 +31,10 @@ namespace ViWm
 
         // yeah our nice window...
         HWND fullScreenWin =
-            CreateWindowEx ( WS_EX_LAYERED
+            CreateWindowEx ( WS_EX_LAYERED | WS_EX_NOACTIVATE
+                                | (monitorCount++ == 0 ? WS_EX_APPWINDOW : 0)
                            , fullScreenWindowClassName
-                           , "ABack"
+                           , TEXT("ABack")
                            , WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS 
                             /* style */
                            , minfo.rcWork.left
@@ -47,7 +49,10 @@ namespace ViWm
 
         if (!fullScreenWin) {
             int err = GetLastError();
-            MessageBox(NULL, "Error Creating Background Window", "Error", MB_OK | MB_ICONERROR);
+            MessageBox( NULL
+                      , TEXT("Error Creating Background Window")
+                      , TEXT("Error")
+                      , MB_OK | MB_ICONERROR);
             exit( err ); /* Bail */
         }
 

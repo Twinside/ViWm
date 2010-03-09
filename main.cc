@@ -13,8 +13,8 @@ using namespace ViWm;
 
 ViWmManager    *globalManager;
 
-const char* fullScreenWindowClassName = "ViWmScreenBack";
-const char* keyListenerClassName = "ViWm";
+const LPTSTR fullScreenWindowClassName = TEXT("ViWmScreenBack");
+const LPTSTR keyListenerClassName = TEXT("ViWm");
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
@@ -42,8 +42,9 @@ int WINAPI WinMain( HINSTANCE hInstance
     if (!SUCCEEDED(hr))
     {
         MessageBox( NULL
-                   , "The programm cannot start because we cannot start the COM interface"
-                   , "ViWm - Launching Error", MB_OK );
+                  , TEXT("The programm cannot start because we cannot start the COM interface")
+                  , TEXT("ViWm - Launching Error")
+                  , MB_OK );
     }
 
     defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));

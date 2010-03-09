@@ -17,7 +17,7 @@ namespace ViWm
         void GiveFocus();
         void SetSize( int x, int y, int width, int height );
 
-        void GetClassName( std::string &name );
+        void GetClassName( std::wstring &name );
 
         bool IsTileable();
         static bool IsHandleTileable( HWND hwnd );
@@ -57,7 +57,7 @@ namespace ViWm
         bool    hasBorder;
         RECT    initialSize;
 
-        static char TempClassName[MAX_PATH];
+        static TCHAR TempClassName[MAX_PATH];
     };
 }
 

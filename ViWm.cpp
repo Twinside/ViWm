@@ -97,19 +97,27 @@ namespace ViWm
         winClass.lpszClassName = keyListenerClassName;
 
         if (!RegisterClassEx(&winClass)) {
-            MessageBox(NULL, "Error Registering Window Class", "Error", MB_OK | MB_ICONERROR);
+            MessageBox( NULL
+                      , TEXT("Error Registering Window Class")
+                      , TEXT("Error")
+                      , MB_OK | MB_ICONERROR);
             exit(1); /* Bail */
         }
 
         // create a message only window
-        globalHotkeyListener = CreateWindowEx( 0, keyListenerClassName, "ViWm"
+        globalHotkeyListener = CreateWindowEx
+            ( 0, keyListenerClassName
+            , TEXT("ViWm")
             , 0, 0, 0, 0, 0
             , HWND_MESSAGE, NULL
             , hInstance, NULL);
 
         if (!globalHotkeyListener) {
             int err = GetLastError();
-            MessageBox(NULL, "Error Creating Window", "Error", MB_OK | MB_ICONERROR);
+            MessageBox( NULL
+                      , TEXT("Error Creating Window")
+                      , TEXT("Error")
+                      , MB_OK | MB_ICONERROR);
             exit( err ); /* Bail */
         }
 
@@ -129,8 +137,8 @@ namespace ViWm
 
         if (!RegisterClassEx(&winClass)) {
             MessageBox( NULL
-                      , "Error While creating Background Window Class"
-                      , "Error"
+                      , TEXT("Error While creating Background Window Class")
+                      , TEXT("Error")
                       , MB_OK | MB_ICONERROR);
 
             exit(1); /* Bail */
@@ -138,7 +146,7 @@ namespace ViWm
         RegisterHotKeys( globalHotkeyListener );
 
         RegisterShellHookWindow( globalHotkeyListener );
-        shellhookid = RegisterWindowMessage("SHELLHOOK");
+        shellhookid = RegisterWindowMessage(TEXT("SHELLHOOK"));
     }
 
     void ViWmManager::ArrangeWindows()
@@ -154,7 +162,7 @@ namespace ViWm
 
     void ViWmManager::AddNode( HWND hwnd )
     {
-        char TempClassName[MAX_PATH];
+        TCHAR TempClassName[MAX_PATH];
         GetClassName( hwnd, TempClassName, MAX_PATH );
 
 
@@ -162,7 +170,7 @@ namespace ViWm
         // For debug purpose and avoiding to messing up with
         // the whole desktop, we only handle the notepad program
         // which has the good taste to be lightweight.
-        if ( strcmp( TempClassName, "Notepad") != 0 )
+        if ( wcscmp( TempClassName, L"Notepad") != 0 )
             return;
 #endif
 

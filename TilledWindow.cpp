@@ -29,7 +29,7 @@ namespace ViWm
         }
     }
 
-    char    TilledWindow::TempClassName[MAX_PATH];
+    TCHAR   TilledWindow::TempClassName[MAX_PATH];
 
     void TilledWindow::SetTransparency(int alpha)
     {
@@ -108,7 +108,7 @@ namespace ViWm
         ::SetWindowPos( hwnd, HWND_BOTTOM, x, y, width, height, NULL );
     }
 
-    void TilledWindow::GetClassName( std::string &name )
+    void TilledWindow::GetClassName( std::wstring &name )
     {
         ::GetClassName( hwnd, TempClassName, MAX_PATH );
         name = TempClassName;
