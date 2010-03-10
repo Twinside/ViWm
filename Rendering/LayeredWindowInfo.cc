@@ -34,7 +34,15 @@ namespace Renderer
     void LayeredWindowInfo::Update( HWND window, HDC source)
     {
         m_info.hdcSrc = source;
-        BOOL rez = UpdateLayeredWindowIndirect(window, &m_info);
+        BOOL rez = UpdateLayeredWindow( window
+                                      , NULL
+                                      , &m_windowPosition
+                                      , &m_size
+                                      , source
+                                      , &m_sourcePosition
+                                      , 0
+                                      , &m_blend
+                                      , ULW_ALPHA );
 
         if (rez == 0)
             throw;
