@@ -2,6 +2,7 @@
 #include "Action.h"
 #include "Layouter.h"
 #include "LayoutTree.h"
+#include "resource.h"
 
 #include <iostream>
 namespace ViWm
@@ -128,7 +129,7 @@ namespace ViWm
         winClass.cbClsExtra = 0;
         winClass.cbWndExtra = 0;
         winClass.hInstance = hInstance;
-        winClass.hIcon = NULL;
+        winClass.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE(IDI_VIWMICON) );
         winClass.hIconSm = NULL;
         winClass.hCursor = NULL;
         winClass.hbrBackground = NULL;

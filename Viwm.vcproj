@@ -371,10 +371,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Screen.cpp"
 				>
 			</File>
@@ -476,7 +472,15 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ressources.rc"
+			>
+		</File>
+		<File
+			RelativePath=".\viwmicon.ico"
 			>
 		</File>
 	</Files>
