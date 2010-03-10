@@ -52,14 +52,24 @@ namespace Actions
         return NeedRelayout;
     }
 
+    HorizontalSplit::HorizontalSplit( StringId display, StringId descr )
+        : Action( display, descr )
+    {}
+
     Action::ReturnInfo VerticalSplit::operator()( DesktopLayout &l, WindowMakerState &state )
     {
         reSplit( LayoutTree::SplitVertical, l, state );
         return NeedRelayout;
     }
 
-    NodeRotate::NodeRotate( int directionAmount )
-        : amount( directionAmount )
+    VerticalSplit::VerticalSplit( StringId display, StringId descr )
+        : Action( display, descr )
+    {}
+
+    NodeRotate::NodeRotate( StringId display, StringId descr
+                          , int directionAmount )
+        : Action( display, descr )
+        , amount( directionAmount )
     {}
 
     Action::ReturnInfo NodeRotate::operator()( DesktopLayout &l, WindowMakerState &state )
@@ -84,5 +94,9 @@ namespace Actions
         /* yes, that's it */
         return NeedRelayout;
     }
+
+    Relayout::Relayout( StringId display, StringId descr )
+        : Action( display, descr )
+    {}
 }}
 

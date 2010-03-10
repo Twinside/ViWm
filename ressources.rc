@@ -54,7 +54,25 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_VIWMICON                       ICON                    "viwmicon.ico"
+IDI_VIWMICON            ICON                    "viwmicon.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ACTION_MOVENEXTSCREEN "Move to next screen"
+    IDS_ACTION_MOVEPREVSCREEN "Move to previous screen"
+    IDS_ACTION_SPLIT_HORIZONTALLY "Split horizontaly"
+    IDS_ACTION_SPLIT_VERTICALY "Split verticaly"
+    IDS_ACTION_RELAYOUT     "Relayout"
+    IDS_ACTION_INVERSELAYOUT "Switch layout"
+    IDS_ACTION_ROTATE       "Rotate window in layout"
+    IDS_ACTION_QUIT         "Quit"
+END
+
 #endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 

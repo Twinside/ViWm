@@ -8,6 +8,7 @@
 #include "Actions/TreeAction.h"
 #include "Actions/MultiScreen.h"
 #include "Actions/System.h"
+#include "resource.h"
 
 using namespace ViWm;
 
@@ -47,19 +48,28 @@ int WINAPI WinMain( HINSTANCE hInstance
                   , MB_OK );
     }
 
-    defs.push_back( HotKey( 'V', new Actions::VerticalSplit() ));
-    defs.push_back( HotKey( 'S', new Actions::HorizontalSplit() ));
-    defs.push_back( HotKey( 'R', new Actions::NodeRotate( 1 ) ));
-    defs.push_back( HotKey( 'I', new Actions::InverseScreenLayout()));
-    defs.push_back( HotKey( 'L', new Actions::Relayout()));
-    defs.push_back( HotKey(  VK_LEFT, new Actions::ScreenMoverBounded( -1 )));
-    defs.push_back( HotKey( VK_RIGHT, new Actions::ScreenMoverBounded( 1 )));
+    defs.push_back( HotKey( 'V'
+                          , new Actions::VerticalSplit( IDS_ACTION_SPLIT_VERTICALY, NoStringId ) ));
+    defs.push_back( HotKey( 'S'
+                          , new Actions::HorizontalSplit( IDS_ACTION_SPLIT_HORIZONTALLY, NoStringId ) ));
+    defs.push_back( HotKey( 'R'
+                          , new Actions::NodeRotate( IDS_ACTION_ROTATE, NoStringId ,1 ) ));
+    defs.push_back( HotKey( 'I'
+                          , new Actions::InverseScreenLayout( IDS_ACTION_INVERSELAYOUT, NoStringId )));
+    defs.push_back( HotKey( 'L'
+                          , new Actions::Relayout( IDS_ACTION_RELAYOUT, NoStringId )));
+    defs.push_back( HotKey(  VK_LEFT
+                          , new Actions::ScreenMoverBounded( IDS_ACTION_MOVEPREVSCREEN, NoStringId ,-1 )));
+    defs.push_back( HotKey( VK_RIGHT
+                          , new Actions::ScreenMoverBounded( IDS_ACTION_MOVENEXTSCREEN, NoStringId, 1 )));
 
     globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();
 
     globalManager->AddHotkey(
-        HotKey( 'Q', new Actions::ExitAction(globalManager->GetReceivingWindow()) ));
+        HotKey( 'Q', new Actions::ExitAction( IDS_ACTION_QUIT
+                                            , NoStringId
+                                            ,globalManager->GetReceivingWindow()) ));
 
     EnumWindows(EnumWindowsProc, (LPARAM)globalManager);
 

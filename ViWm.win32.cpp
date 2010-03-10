@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "ViWm.h"
 #include "Rendering/RenderWindow.h"
+#include "Actions/Menu.h"
 
 /**
 * Ugly as hell, but, should work
@@ -32,7 +33,7 @@ namespace ViWm
         // yeah our nice window...
         HWND fullScreenWin =
             CreateWindowEx ( WS_EX_LAYERED | WS_EX_NOACTIVATE
-                                | (monitorCount++ == 0 ? WS_EX_APPWINDOW : 0)
+                                | (monitorCount == 0 ? WS_EX_APPWINDOW : 0)
                            , fullScreenWindowClassName
                            , TEXT("ABack")
                            , WS_POPUP | WS_VISIBLE | WS_CLIPSIBLINGS 
@@ -54,6 +55,14 @@ namespace ViWm
                       , TEXT("Error")
                       , MB_OK | MB_ICONERROR);
             exit( err ); /* Bail */
+        }
+
+        // if NULL, we need to create the menu action
+        // a bit hugly :s
+        if ( monitorCount++ == 0 )
+        {
+            instance.hotkeysDefinition.push_back(
+                HotKey( 'Z', new Actions::ActionMenu( fullScreenWin, instance.hotkeysDefinition )));
         }
 
         // ok we need our window to be always on bottom, let's hack to get that
@@ -222,6 +231,10 @@ namespace ViWm
         case WM_NCLBUTTONUP:
             globalManager->endPick();
             ReleaseCapture();
+            break;
+
+        case WM_COMMAND:
+            return 0;
             break;
 
         case WM_MOUSEMOVE:

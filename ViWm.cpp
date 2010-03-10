@@ -28,9 +28,10 @@ namespace ViWm
     void ViWmManager::Init()
     {
         createGlobalListener( hInstance );
-
         EnumDisplayMonitors( NULL, NULL, &ViWmManager::monitorEnumerator
                            , reinterpret_cast<LPARAM>(this) );
+
+        RegisterHotKeys( globalHotkeyListener );
     }
 
     void ViWmManager::HandleHotKey( WPARAM wParam )
@@ -144,7 +145,6 @@ namespace ViWm
 
             exit(1); /* Bail */
         }
-        RegisterHotKeys( globalHotkeyListener );
 
         RegisterShellHookWindow( globalHotkeyListener );
         shellhookid = RegisterWindowMessage(TEXT("SHELLHOOK"));

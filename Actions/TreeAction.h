@@ -9,19 +9,22 @@ namespace Actions
     class HorizontalSplit : public Action
     {
     public:
+        HorizontalSplit( StringId display, StringId descr );
         virtual ReturnInfo   operator() ( DesktopLayout &l, WindowMakerState &state );
     };
 
     class VerticalSplit : public Action
     {
     public:
+        VerticalSplit( StringId display, StringId descr );
         virtual ReturnInfo   operator() ( DesktopLayout &l, WindowMakerState &state );
     };
 
     class NodeRotate : public Action
     {
     public:
-        NodeRotate( int directionAmount );
+        NodeRotate( StringId display, StringId descr
+                  , int directionAmount );
         virtual ReturnInfo   operator() ( DesktopLayout &l
                                         , WindowMakerState &state );
 
@@ -32,6 +35,7 @@ namespace Actions
     class Relayout : public Action
     {
     public:
+        Relayout( StringId display, StringId descr );
         virtual ReturnInfo  operator ()( DesktopLayout& l, WindowMakerState &s );
     };
 }}

@@ -3,8 +3,10 @@
 namespace ViWm {
 namespace Actions
 {
-    ExitAction::ExitAction( LayoutTree::WindowKey key )
-        : toSend( key )
+    ExitAction::ExitAction( StringId display, StringId descr
+                          , LayoutTree::WindowKey key )
+        : Action( display, descr )
+        , toSend( key )
     {}
 
     Action::ReturnInfo   ExitAction::operator() ( DesktopLayout &l, WindowMakerState &s )
@@ -24,4 +26,8 @@ namespace Actions
 
         return NeedRelayout;
     }
+
+    InverseScreenLayout::InverseScreenLayout( StringId display, StringId descr )
+        : Action( display, descr )
+    {}
 }}

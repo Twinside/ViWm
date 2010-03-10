@@ -9,7 +9,8 @@ namespace Actions
     class ExitAction : public Action
     {
     public:
-        ExitAction( LayoutTree::WindowKey key );
+        ExitAction( StringId display, StringId descr
+                  , LayoutTree::WindowKey key );
 
         ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s);
 
@@ -20,6 +21,7 @@ namespace Actions
     class InverseScreenLayout : public Action
     {
     public:
+        InverseScreenLayout( StringId display, StringId descr );
 
         ReturnInfo operator() ( DesktopLayout &l, WindowMakerState &s);
     };
