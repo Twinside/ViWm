@@ -118,7 +118,7 @@ namespace Layout
             }
         };
 
-        size_t  nodeCount = node->getSubNodeCount();
+        int     nodeCount = int(node->getSubNodeCount());
         Rect    size = node->getMyPreviousDimension( s );
 
         if (conf.getEqualAlways())

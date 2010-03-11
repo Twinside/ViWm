@@ -55,13 +55,13 @@ namespace ViWm
     void ViWmManager::UnregisterHotKeys(HWND hwnd)
     {
         for (size_t i = 0; i < hotkeysDefinition.size(); i++)
-            UnregisterHotKey(hwnd, i);
+            UnregisterHotKey(hwnd, int(i));
     }
 
     void ViWmManager::AddHotkey( HotKey k )
     {
         RegisterHotKey( globalHotkeyListener
-                      , hotkeysDefinition.size()
+                      , int(hotkeysDefinition.size())
                       , modkeys
                       , k.first );
 

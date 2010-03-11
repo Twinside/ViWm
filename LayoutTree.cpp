@@ -207,7 +207,7 @@ namespace ViWm
             if (constrainedHeightCount > 0 && constrainedHeightCount < nodes.size())
             {
                 unconstrainedSize = unconstrainedHeight
-                                  / (nodes.size() - constrainedHeightCount);
+                                  / (int(nodes.size()) - int(constrainedHeightCount));
             }
             else
             {
@@ -263,7 +263,7 @@ namespace ViWm
             if ( constrainedWidthCount > 0 && constrainedWidthCount < nodes.size())
             {
                 unconstrainedSize = unconstrainedWidth 
-                                  / (nodes.size() - constrainedWidthCount);
+                                  / (int(nodes.size()) - int(constrainedWidthCount));
             }
             else
             {

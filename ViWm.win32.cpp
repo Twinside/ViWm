@@ -62,7 +62,8 @@ namespace ViWm
         if ( monitorCount++ == 0 )
         {
             instance.hotkeysDefinition.push_back(
-                HotKey( 'Z', new Actions::ActionMenu( fullScreenWin, instance.hotkeysDefinition )));
+                HotKey( 'Z', new Actions::ActionMenu( instance.globalHotkeyListener
+                                                    , instance.hotkeysDefinition )));
         }
 
         // ok we need our window to be always on bottom, let's hack to get that
@@ -176,6 +177,10 @@ namespace ViWm
             PostQuitMessage(WM_QUIT);
             break;
 
+        case WM_COMMAND:
+            return 0;
+            break;
+
         case WM_DESTROY:
             PostQuitMessage(WM_QUIT);
             break;
@@ -231,10 +236,6 @@ namespace ViWm
         case WM_NCLBUTTONUP:
             globalManager->endPick();
             ReleaseCapture();
-            break;
-
-        case WM_COMMAND:
-            return 0;
             break;
 
         case WM_MOUSEMOVE:

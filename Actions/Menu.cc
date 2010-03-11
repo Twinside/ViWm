@@ -14,9 +14,9 @@ namespace Actions
     ActionMenu::~ActionMenu()
     {}
 
-    TCHAR   str[MAX_PATH];
     void ActionMenu::populateMenu( HMENU menu )
     {
+        TCHAR   str[MAX_PATH];
         HINSTANCE   hInst = GetModuleHandle( NULL );
 
         for ( size_t i = 0; i < commands.size(); i++ )
@@ -26,16 +26,16 @@ namespace Actions
             {
                 LoadString( hInst, act->getDisplayName(), str
                           , sizeof( str ) / sizeof( TCHAR ) );
-                addToMenu( menu, i,  str );
+                addToMenu( menu, int(i), int(i),  str );
             }
         }
     }
 
-    void ActionMenu::addToMenu( HMENU menu, int index, TCHAR* str )
+    void ActionMenu::addToMenu( HMENU menu, int position, int index, TCHAR* str )
     {
-        if (AppendMenu( menu, MF_STRING, index, str ) == 0)
+        if (AppendMenu( menu, MF_STRING, NULL, str ) == 0)
         {
-            int errCode = GetLastError();
+            //int errCode = GetLastError();
             MessageBox( NULL
                       , TEXT("Error while creating menu item")
                       , TEXT("Menu creation error")
@@ -52,21 +52,23 @@ namespace Actions
         menu = CreatePopupMenu();
         populateMenu( menu );
 
+        //SetMenu( receivingWindow, menu );
         SetForegroundWindow( receivingWindow );
         GetCursorPos( &pt );
-        int i = 19;
-        AppendMenu( menu, MF_STRING, i++, _TEXT("mouais mouais mouais") );
-        AppendMenu( menu, MF_STRING, i++, _TEXT("mouais mouais") );
-        AppendMenu( menu, MF_STRING, i++, _TEXT("mouais ") );
-        AppendMenu( menu, MF_STRING, i++, _TEXT("mouais mouais joaiejfoia mouais") );
-        TrackPopupMenuEx( menu
-                        , 0
-                        , pt.x, pt.y
-                        , receivingWindow
-                        , NULL );
 
-        // required to make menu show and hide correctly
-        PostMessage( receivingWindow, WM_NULL, 0, 0 );
+        DrawMenuBar( receivingWindow );
+        BOOL good =
+            TrackPopupMenuEx( menu
+                            , TPM_RIGHTALIGN
+                            , pt.x, pt.y
+                            , receivingWindow
+                            , NULL );
+
+        if ( good == FALSE )
+        {
+            //int err = GetLastError();
+            throw;
+        }
         DestroyMenu( menu );
 
         return Nothing;

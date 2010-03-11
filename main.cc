@@ -83,5 +83,5 @@ int WINAPI WinMain( HINSTANCE hInstance
 
     CoUninitialize();
 
-    return msg.wParam;
+    return 0;
 }
