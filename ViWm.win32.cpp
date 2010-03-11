@@ -177,14 +177,11 @@ namespace ViWm
             PostQuitMessage(WM_QUIT);
             break;
 
-        case WM_COMMAND:
-            return 0;
-            break;
-
         case WM_DESTROY:
             PostQuitMessage(WM_QUIT);
             break;
 
+        case WM_COMMAND:
         case WM_HOTKEY:
             globalManager->HandleHotKey( wParam );
             break;
