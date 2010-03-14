@@ -894,6 +894,17 @@ namespace ViWm
         throw;
     }
 
+    bool LayoutNode::moveSelection( int by )
+    {
+        int newIndex = int( selectedRoute ) + by;
+
+        if (newIndex < 0 || newIndex >= int(nodes.size()))
+            return false;
+
+        selectedRoute = int( newIndex );
+        return true;
+    }
+
     LayoutTree::SplitCoord::SplitCoord()
         : splitFather( NULL ) , splitIndex( 0 )
     {}

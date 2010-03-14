@@ -36,7 +36,7 @@ namespace ViWm
          * one the window.
          */
         void    Discard() { hwnd = NULL; }
-        HWND    getWinowKey() { return hwnd; }
+        HWND    getWinowKey() const { return hwnd; }
 
         struct Finder {
             HWND  toFind;

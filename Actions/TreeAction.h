@@ -38,6 +38,30 @@ namespace Actions
         Relayout( StringId display, StringId descr );
         virtual ReturnInfo  operator ()( DesktopLayout& l, WindowMakerState &s );
     };
+
+    class VerticalMove : public Action
+    {
+    public:
+        VerticalMove( StringId display, StringId descr, int amount );
+        
+        virtual ReturnInfo  operator ()( DesktopLayout& l
+                                       , WindowMakerState &s );
+
+    private:
+        int _moveAmount;
+    };
+
+    class HorizontalMove : public Action
+    {
+    public:
+        HorizontalMove( StringId display, StringId descr, int amount );
+        
+
+        virtual ReturnInfo  operator ()( DesktopLayout& l
+                                       , WindowMakerState &s );
+    private:
+        int _moveAmount;
+    };
 }}
 
 #endif /* TREEACTION_H */

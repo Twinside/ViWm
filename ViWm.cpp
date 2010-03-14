@@ -16,6 +16,7 @@ namespace ViWm
         , hotkeysDefinition( originalCollection )
         , conf( ".viwmrc" )
         , currentState( conf )
+        , currentScreenMove( 0 )
     {
     }
 
@@ -176,9 +177,7 @@ namespace ViWm
 #endif
 
         TilledWindow    *newWindow = new TilledWindow( hwnd );
-        currentState.windowList[ currentState.currentTag ]
-        .windowList
-            .push_back( newWindow );
+        currentState.addWindow( *newWindow );
 
         currentState.getCurrentLayouter().addNewWindowToLayout
                 ( *newWindow

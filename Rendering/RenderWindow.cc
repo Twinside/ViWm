@@ -7,6 +7,7 @@ namespace Renderer
     RenderWindow::RenderWindow( HWND window, int x, int y, int width, int height )
         : m_info( x, y, width, height )
         , m_window( window )
+        , voidBits( 0 )
     {
         transparentColor = CreateBrush(0,0,0, 0);
         nearlyTransparent = CreateBrush( 0, 0, 255, 64);
@@ -46,14 +47,11 @@ namespace Renderer
 
     void RenderWindow::begin( bool fullyTransparent )
     {
-        int err;
         int width = m_info.GetWidth();
         int height = m_info.GetHeight();
 
         screenDC = GetDC( NULL );
-        err = GetLastError();
         memDC = CreateCompatibleDC( screenDC );
-        err = GetLastError();
 
         if (memDC == NULL) throw;
 
@@ -66,11 +64,9 @@ namespace Renderer
         bitmapInfo.bmiHeader.biCompression = BI_RGB;
 
         bitmap = CreateDIBSection( memDC, &bitmapInfo, DIB_RGB_COLORS, (void**)&voidBits,  NULL, 0 );
-        err = GetLastError();
         if (bitmap == NULL) throw;
 
         oldBitmap = (HBITMAP)SelectObject( memDC, bitmap );
-        err = GetLastError();
 
         assert( oldBitmap != 0 );
 

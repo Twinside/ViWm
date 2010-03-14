@@ -266,6 +266,8 @@ namespace ViWm
         inline void    rotate( int about )
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
 
+        bool    moveSelection( int by );
+
         /** 
          * Physically move a virtual split on screen.
          * Try to enforce some constraint to get a coherent screen.

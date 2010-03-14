@@ -9,10 +9,12 @@ namespace ViWm
         Configuration( const char *filename );
         ~Configuration();
         
-        bool    getEqualAlways() const { return equalAlways; };
+        bool    getEqualAlways() const { return equalAlways; }
+        int     idleTransparency() const { return alpha; }
 
     private:
         bool    equalAlways;
+        int     alpha;
     };
 }
 

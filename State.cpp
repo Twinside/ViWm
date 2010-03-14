@@ -8,7 +8,6 @@ namespace ViWm
 {
     WindowMakerState::WindowMakerState( const Configuration &conf )
         : tilingMode( ManualVimTilling )
-        , alpha( 245 )
         , currentScreen( 0 )
         , currentTag( 0 )
         , current( 0 )

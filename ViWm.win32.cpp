@@ -147,7 +147,7 @@ namespace ViWm
             found = currentState.FindNode((HWND)lParam);
             if (found) {
                 if (currentState.current) {
-                    currentState.current->SetTransparency( currentState.alpha );
+                    currentState.current->SetTransparency( globalManager->conf.idleTransparency() );
                 }
                 currentState.current = found;
                 found->SetTransparency( 255 );
@@ -168,7 +168,6 @@ namespace ViWm
         {
         case WM_CREATE:
             return 0;
-            break;
 
         case WM_CLOSE:
             ClipCursor(0); 	/* Release Cursor Lock */

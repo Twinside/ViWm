@@ -98,5 +98,62 @@ namespace Actions
     Relayout::Relayout( StringId display, StringId descr )
         : Action( display, descr )
     {}
+
+
+    VerticalMove::VerticalMove(StringId display, StringId descr, int amount)
+        : Action( display, descr ), _moveAmount( amount )
+    {
+    }
+
+    Action::ReturnInfo VerticalMove::operator ()( DesktopLayout& l, WindowMakerState &s )
+    {
+        /* TODO : implement here */
+        return Nothing;
+    }
+
+    HorizontalMove::HorizontalMove(StringId display, StringId descr, int amount)
+        : Action( display, descr ), _moveAmount( amount )
+    {}
+
+    LayoutNode* findWellOriented( LayoutTree::SplitSide direction, LayoutTree *src )
+    {
+        LayoutNode* parent = static_cast<LayoutNode*>( src->parent );
+        if ( parent == 0 ) return 0;
+
+        if ( parent->getLastDirection() == direction )
+            return parent;
+        else return findWellOriented( direction, parent );
+    }
+
+    Action::ReturnInfo HorizontalMove::operator ()( DesktopLayout& l
+                                                  , WindowMakerState &s )
+    {
+        LayoutTree* root = l[ s.currentScreen ].layoutRoot;
+        if ( !root ) return Nothing;
+
+        LayoutNode* goodParent =
+            findWellOriented( LayoutTree::SplitVertical, root );
+
+        if ( goodParent && goodParent->moveSelection( _moveAmount ) )
+        {
+            if ( s.current )
+                s.current->GiveFocus();
+
+            return Nothing;
+        }
+        // we didn't find a split with the good orientation
+        // so, we want to give focus to another screen, if
+        // any.
+        if ( ! goodParent )
+        {
+        }
+        else if (false)
+        {
+
+        }
+
+
+        return Nothing;
+    }
 }}
 

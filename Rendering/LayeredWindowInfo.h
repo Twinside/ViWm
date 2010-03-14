@@ -14,8 +14,8 @@ namespace Renderer
         UINT GetWidth() const { return m_size.cx; }
         UINT GetHeight() const { return m_size.cy; }
 
-        int GetX() { return m_windowPosition.x; }
-        int GetY() { return m_windowPosition.y; }
+        int GetX() const { return m_windowPosition.x; }
+        int GetY() const { return m_windowPosition.y; }
 
     private:
         void    operator= (const LayeredWindowInfo&);

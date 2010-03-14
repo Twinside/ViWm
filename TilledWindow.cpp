@@ -6,6 +6,7 @@ namespace ViWm
         : applyedAlpha( 0 )
         , hwnd( realWindow )
         , hasBorder( true )
+        , tags( 0 )
     {
         SetBorders( false );
         SetTransparency( Opaque );

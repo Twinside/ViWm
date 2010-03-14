@@ -46,7 +46,7 @@ namespace Layout
             }
 
         private:
-            void operator =(const EmptyFinder&) {}
+            void operator =(const EmptyFinder&) const {}
         } finder( newWindow );
 
         LayoutNode::IteratingPredicate  pred( finder );

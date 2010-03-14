@@ -16,7 +16,7 @@ namespace Renderer
         typedef COLORREF    Brush;
 
         Brush   CreateBrush( int r, int g, int b, int a );
-        void    DeleteBrush( Brush /*b*/ ) {}
+        void    DeleteBrush( Brush /*b*/ ) const {}
 
 
         void    putAtTop();

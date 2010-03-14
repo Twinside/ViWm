@@ -29,15 +29,14 @@ namespace ViWm
         TilledWindow*   FindNode( HWND hwnd );
         void            RemoveNode( HWND hwnd );
 
-        int alpha;
-
-        TillingMode getTillingMode() { return tilingMode; }
+        TillingMode getTillingMode() const { return tilingMode; }
         Layouter&   getCurrentLayouter()
             { return *layouter[tilingMode]; }
+        void addWindow( TilledWindow &window )
+            { windowList[ currentTag ].windowList.push_back( &window ); }
 
         /* Should always point to current node */
         TilledWindow *current; 	
-        size_t       currentTag;
         size_t       currentScreen;
 
         struct Bucket
@@ -53,6 +52,7 @@ namespace ViWm
 
     private:
         TillingMode tilingMode;
+        size_t      currentTag;
 
         typedef std::tr1::shared_ptr<Layouter>
                 LayoutPtr;
