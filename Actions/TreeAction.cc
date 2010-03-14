@@ -14,7 +14,7 @@ namespace Actions
         LayoutTree  *selected = root->getSelected();
 
         // it's an end node, so must add a new Node
-        if ( selected->parent == 0 )
+        if ( selected->getParent() == 0 )
         {
             LayoutNode  *n = new LayoutNode();
 
@@ -27,7 +27,7 @@ namespace Actions
             return;
         }
 
-        LayoutNode  *parent = static_cast<LayoutNode*>( selected->parent );
+        LayoutNode  *parent = selected->getParent();
 
         // already well splited, so add a new node.
         if (parent->getLastDirection() == goodSide)
@@ -81,10 +81,10 @@ namespace Actions
         LayoutTree  *selected = root->getSelected();
 
         // it's an end node, so must add a new Node
-        if ( selected->parent == 0 )
+        if ( selected->getParent() == 0 )
             return Nothing;
 
-        static_cast<LayoutNode*>(selected->parent)->rotate( 1 );
+        selected->getParent()->rotate( 1 );
 
         return NeedRelayout;
     }
@@ -117,7 +117,7 @@ namespace Actions
 
     LayoutNode* findWellOriented( LayoutTree::SplitSide direction, LayoutTree *src )
     {
-        LayoutNode* parent = static_cast<LayoutNode*>( src->parent );
+        LayoutNode* parent = src->getParent();
         if ( parent == 0 ) return 0;
 
         if ( parent->getLastDirection() == direction )

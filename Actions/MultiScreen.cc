@@ -32,9 +32,10 @@ namespace Actions
             static_cast<LayoutLeaf*>(currentTree->getSelected());
 
         LayoutTree::addCreate( l[ nextScreen ].layoutRoot
-                             , *new LayoutLeaf( selected->window ) );
+                             , *new LayoutLeaf( selected->getWindow()) );
 
-        l[ nextScreen ].layoutRoot->selectNode( selected->window.getWinowKey());
+        l[ nextScreen ].layoutRoot->selectNode(
+                selected->getWindow().getWinowKey());
 
         LayoutTree::removeClean( l[ state.currentScreen ].layoutRoot
                                , selected );

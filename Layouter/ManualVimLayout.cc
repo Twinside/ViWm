@@ -20,7 +20,7 @@ namespace Layout
 
         normalizeNode( cs
                      , static_cast<LayoutLeaf*>( tree )
-                     , static_cast<LayoutNode*>(tree->parent) );
+                     , tree->getParent() );
     }
 
     void ManualVimLayout::addNewWindowToLayout( TilledWindow &newWindow
@@ -65,7 +65,7 @@ namespace Layout
 
         normalizeNode( l[ st.currentScreen ]
                      , leaf
-                     , static_cast<LayoutNode*>(leaf->parent) );
+                     , leaf->getParent() );
     }
 
     void ManualVimLayout::normalizeNode( const Screen &s, LayoutLeaf *leaf, LayoutNode* node )

@@ -159,7 +159,8 @@ namespace ViWm
         static CompStatus removeClean( LayoutTree *&root, WindowKey key );
         static CompStatus removeClean( LayoutTree *&root, LayoutTree *tree );
 
-        LayoutTree  *parent;
+        LayoutNode*         getParent() { return parent; }
+        LayoutNode const*   getParent() const { return parent; }
 
         /**
          * Draw the splits given a window and a good brush.
@@ -169,6 +170,11 @@ namespace ViWm
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
                             , Renderer::RenderWindow::Brush defaultBrush ) const = 0;
+
+    protected:
+        friend class LayoutNode;
+
+        LayoutNode *parent;
 
     private:
         static CompStatus   globalPack( LayoutTree *&root, CompStatus st );
@@ -333,7 +339,8 @@ namespace ViWm
                                  , const Rect &dim
                                  , SplitSide side );
 
-        TilledWindow   &window;
+        TilledWindow&   getWindow() { return window; }
+        const TilledWindow&   getWindow() const { return window; }
 
     protected:
         virtual void        displayLayoutStructure
@@ -342,6 +349,7 @@ namespace ViWm
 
     private:
         void operator = ( const LayoutLeaf& l );
+        TilledWindow   &window;
     };
 
     class WindowMakerState;
