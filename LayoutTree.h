@@ -22,6 +22,7 @@ namespace ViWm
     };
 
     class LayoutNode;
+    class LayoutLeaf;
 
     /**
      * This struct only exist to provide a type
@@ -128,7 +129,7 @@ namespace ViWm
         /**
          * Get the currently selected leaf.
          */
-        virtual LayoutTree* getSelected() = 0;
+        virtual LayoutLeaf* getSelected() = 0;
 
         struct SplitCoord
         {
@@ -251,7 +252,7 @@ namespace ViWm
         virtual CompStatus    removeNode( WindowKey toRemove );
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual CompStatus    selectNode( WindowKey toSelect );
-        virtual LayoutTree*   getSelected();
+        virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
 
         virtual void    Establish( const Screen &currentScreen
@@ -332,7 +333,7 @@ namespace ViWm
         virtual CompStatus    removeNode( WindowKey toRemove );
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual CompStatus    removeNode( LayoutTree *toRemove );
-        virtual LayoutTree*   getSelected();
+        virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
 
         virtual void    Establish( const Screen &currentScreen

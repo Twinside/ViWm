@@ -468,10 +468,10 @@ namespace ViWm
 
 
     // with a bit of luck, it'l even be tail recursive.
-    LayoutTree* LayoutLeaf::getSelected()
+    LayoutLeaf* LayoutLeaf::getSelected()
     { return this; }
 
-    LayoutTree* LayoutNode::getSelected()
+    LayoutLeaf* LayoutNode::getSelected()
     { 
         if ( ! nodes[selectedRoute].subTree )
             return 0;

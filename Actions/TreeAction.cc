@@ -136,6 +136,7 @@ namespace Actions
 
         if ( goodParent && goodParent->moveSelection( _moveAmount ) )
         {
+            LayoutLeaf* selected = goodParent->getSelected();
             if ( s.current )
                 s.current->GiveFocus();
 

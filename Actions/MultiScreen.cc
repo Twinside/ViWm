@@ -28,8 +28,7 @@ namespace Actions
         if (!currentTree || state.currentScreen == nextScreen)
             return Nothing;
 
-        LayoutLeaf* selected =
-            static_cast<LayoutLeaf*>(currentTree->getSelected());
+        LayoutLeaf* selected = currentTree->getSelected();
 
         LayoutTree::addCreate( l[ nextScreen ].layoutRoot
                              , *new LayoutLeaf( selected->getWindow()) );
