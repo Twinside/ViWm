@@ -107,18 +107,6 @@ namespace Actions
         assert( amount != 0 );
     }
 
-    Action::ReturnInfo VerticalMove::operator ()( DesktopLayout& l, WindowMakerState &s )
-    {
-        /* TODO : implement here */
-        return Nothing;
-    }
-
-    HorizontalMove::HorizontalMove(StringId display, StringId descr, int amount)
-        : Action( display, descr ), _moveAmount( amount )
-    {
-        assert( amount != 0 );
-    }
-
     LayoutNode* findWellOriented( LayoutTree::SplitSide direction, LayoutTree *src )
     {
         LayoutNode* parent = src->getParent();
@@ -127,6 +115,52 @@ namespace Actions
         if ( parent->getLastDirection() == direction )
             return parent;
         else return findWellOriented( direction, parent );
+    }
+
+    Action::ReturnInfo VerticalMove::operator ()( DesktopLayout& l, WindowMakerState &s )
+    {
+        LayoutTree* root = l[ s.currentScreen ].layoutRoot;
+        if ( !root ) return Nothing;
+
+        LayoutLeaf* selected = root->getSelected();
+        if ( !selected ) return Nothing;
+
+        const Rect& selectSize =
+            selected->getParent() != 0
+            ? selected->getParent()->getSelectedSize()
+            : l[ s.currentScreen ].getSize();
+
+        LayoutNode* goodParent =
+            findWellOriented( LayoutTree::SplitVertical, selected );
+
+        LayoutLeaf* nextSelection;
+
+        if ( !goodParent || !goodParent->moveSelection( _moveAmount ) )
+            return Nothing;
+
+        if ( _moveAmount < 0 )
+            goodParent->pickNode( selectSize.x + selectSize.width / 2 
+                                , selectSize.y - LayoutNode::SplitWidth - 1 );
+        else
+            goodParent->pickNode( selectSize.x + selectSize.width / 2
+                                , selectSize.y + selectSize.height + 1 );
+
+        // our next window, still in the same screen.
+        nextSelection = goodParent->getSelected();
+
+        if ( s.current )
+            s.current->SetTransparency( s.getConf().idleTransparency() );
+
+        s.current = &nextSelection->getWindow();
+        s.current->GiveFocus();
+
+        return Nothing;
+    }
+
+    HorizontalMove::HorizontalMove(StringId display, StringId descr, int amount)
+        : Action( display, descr ), _moveAmount( amount )
+    {
+        assert( amount != 0 );
     }
 
     Action::ReturnInfo HorizontalMove::operator ()( DesktopLayout& l
@@ -146,19 +180,16 @@ namespace Actions
         LayoutNode* goodParent =
             findWellOriented( LayoutTree::SplitVertical, selected );
 
-        int     pickHeight = selectSize.y + selectSize.width / 2
-                           - l[ s.currentScreen ].getY();
-
         LayoutLeaf* nextSelection;
 
         if ( goodParent && goodParent->moveSelection( _moveAmount ) )
         {
             if ( _moveAmount < 0 )
                 goodParent->pickNode( selectSize.x - LayoutNode::SplitWidth - 1
-                                    , selectSize.y + selectSize.width / 2 );
+                                    , selectSize.y + selectSize.height / 2 );
             else
                 goodParent->pickNode( selectSize.x + selectSize.width + 1
-                                    , selectSize.y + selectSize.width / 2 );
+                                    , selectSize.y + selectSize.height / 2 );
 
             // our next window, still in the same screen.
             nextSelection = goodParent->getSelected();
@@ -178,6 +209,9 @@ namespace Actions
             if ( !l[ prevScreen ].layoutRoot )
                 return Nothing;
 
+            int     pickHeight = selectSize.y + selectSize.height / 2
+                               - l[ prevScreen ].getY();
+
             l[prevScreen].layoutRoot->pickNode( l[prevScreen].getX() + l[prevScreen].getWidth() - 1
                                               , pickHeight );
 
@@ -193,6 +227,9 @@ namespace Actions
 
             if ( !l[nextScreen].layoutRoot )
                 return Nothing;
+
+            int     pickHeight = selectSize.y + selectSize.height / 2
+                               - l[ nextScreen ].getY();
 
             l[nextScreen].layoutRoot->pickNode( -1, pickHeight );
             nextSelection = l[nextScreen].layoutRoot->getSelected();
