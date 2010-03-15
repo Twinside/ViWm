@@ -617,7 +617,7 @@ namespace ViWm
             ; it != nodes.end()
             ; ++it )
         {
-            bool    status = p( *it );
+            bool    status = p( *this, *it );
             if ( status )
                 return true;
         }
@@ -631,7 +631,7 @@ namespace ViWm
 
         if ( sub && sub->FocusTopIteration( p ))
             return true;
-        else if ( p( nodes[selectedRoute] ) )
+        else if ( p( *this, nodes[selectedRoute] ) )
             return true;
 
         return Iter( p );
@@ -646,7 +646,7 @@ namespace ViWm
             LayoutNode  *sub = dynamic_cast<LayoutNode*>(it->subTree);
 
             if ( (sub && sub->DepthFirstIteration( p ))
-                || p( *it ) )
+                || p( *this, *it ) )
                 return true;
         }
 

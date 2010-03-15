@@ -23,6 +23,7 @@ namespace ViWm
 
     class LayoutNode;
     class LayoutLeaf;
+    namespace Layout { class EmptyFinder; }
 
     /**
      * This struct only exist to provide a type
@@ -180,6 +181,7 @@ namespace ViWm
 
     protected:
         friend class LayoutNode;
+        friend class Layout::EmptyFinder;
 
         LayoutNode *parent;
 
@@ -234,7 +236,7 @@ namespace ViWm
             LayoutTree* subTree;
         };
 
-        typedef std::tr1::function<bool (SizePair&)>   IteratingPredicate;
+        typedef std::tr1::function<bool (LayoutNode&,SizePair&)>   IteratingPredicate;
 
         bool FocusTopIteration( IteratingPredicate &p );
         bool DepthFirstIteration( IteratingPredicate &p );
@@ -297,6 +299,13 @@ namespace ViWm
 
         Rect        getMyPreviousDimension( const Screen &current ) const;
 
+        enum    Conf
+        {
+            SplitWidth = 8,
+            HalfSplit = SplitWidth / 2,
+            MinimumViewableSize = SplitWidth * 2
+        };
+
     protected:
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
@@ -308,13 +317,6 @@ namespace ViWm
                           , LayoutTree  *toAdd
                           , int plusMinus );
 
-
-        enum    Conf
-        {
-            SplitWidth = 8,
-            HalfSplit = SplitWidth / 2,
-            MinimumViewableSize = SplitWidth * 2
-        };
 
         enum IterationDirection
         {

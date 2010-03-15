@@ -23,32 +23,34 @@ namespace Layout
                      , tree->getParent() );
     }
 
+    class EmptyFinder
+    {
+    public:
+        EmptyFinder( TilledWindow& n ) : what( n ) {}
+
+        bool operator() ( LayoutNode&   father, LayoutNode::SizePair &p )
+        {
+            if ( p.subTree == 0 )
+            {
+                p.subTree = new LayoutLeaf( what );
+                p.subTree->parent = &father;
+                return true;
+            }
+
+            return false;
+        }
+
+    private:
+        TilledWindow&  what;
+        void operator =(const EmptyFinder&) const {}
+    };
+
     void ManualVimLayout::addNewWindowToLayout( TilledWindow &newWindow
                                               , const WindowMakerState &st
                                               , DesktopLayout &l )
     {
         // first we try to find an open view in the tree
-        struct EmptyFinder
-        {
-            TilledWindow&  what;
-            EmptyFinder( TilledWindow& n ) : what( n ) {}
-            
-
-            bool operator() ( LayoutNode::SizePair &p )
-            {
-                if ( p.subTree == 0 )
-                {
-                    // BUG !!!
-                    p.subTree = new LayoutLeaf( what );
-                    return true;
-                }
-
-                return false;
-            }
-
-        private:
-            void operator =(const EmptyFinder&) const {}
-        } finder( newWindow );
+        EmptyFinder finder( newWindow );
 
         LayoutNode::IteratingPredicate  pred( finder );
 
@@ -85,7 +87,7 @@ namespace Layout
                 , heightAdd( h ), heightRest( hrest )
                 , i( 0 ) {}
             
-            bool   operator() ( LayoutNode::SizePair &p )
+            bool   operator() ( LayoutNode& /*doesn't need*/, LayoutNode::SizePair &p )
             {
                 p.width = widthAdd;
                 p.height = heightAdd;
@@ -105,7 +107,7 @@ namespace Layout
             LayoutLeaf              *leaf;
             SizeSplitter( LayoutLeaf *l ) : prev( 0 ), leaf(l) {}
 
-            bool   operator() ( LayoutNode::SizePair &p )
+            bool   operator() ( LayoutNode& /*doesn't need*/, LayoutNode::SizePair &p )
             {
                 prev = &p;
                 if ( p.subTree == leaf )

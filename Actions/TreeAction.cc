@@ -154,7 +154,7 @@ namespace Actions
         if ( goodParent && goodParent->moveSelection( _moveAmount ) )
         {
             if ( _moveAmount < 0 )
-                goodParent->pickNode( selectSize.x - 1
+                goodParent->pickNode( selectSize.x - LayoutNode::SplitWidth - 1
                                     , selectSize.y + selectSize.width / 2 );
             else
                 goodParent->pickNode( selectSize.x + selectSize.width + 1
