@@ -104,6 +104,12 @@ namespace ViWm
                                  ) = 0;
 
         /**
+         * Try to create a meaningfull "index" to be matched
+         * when performing focus move operation.
+         */
+        virtual LayoutTree*          pickNode( int xHope, int yHope ) = 0;
+
+        /**
          * Add a node to the tree. The new node is inserted
          * near the currently selected node
          */
@@ -254,6 +260,7 @@ namespace ViWm
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
+        virtual LayoutTree*   pickNode( int xHope, int yHope );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
@@ -274,6 +281,8 @@ namespace ViWm
             { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
 
         bool    moveSelection( int by );
+
+        const Rect& getSelectedSize() const;
 
         /** 
          * Physically move a virtual split on screen.
@@ -335,6 +344,7 @@ namespace ViWm
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
+        virtual LayoutTree*   pickNode( int xHope, int yHope );
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim

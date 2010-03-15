@@ -38,6 +38,7 @@ namespace Layout
             {
                 if ( p.subTree == 0 )
                 {
+                    // BUG !!!
                     p.subTree = new LayoutLeaf( what );
                     return true;
                 }

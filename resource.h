@@ -12,6 +12,10 @@
 #define IDS_ACTION_INVERSELAYOUT        108
 #define IDS_ACTION_ROTATE               109
 #define IDS_ACTION_QUIT                 110
+#define IDS_ACTION_MOVELEFT             111
+#define IDS_ACTION_MOVERIGHT            112
+#define IDS_ACTION_MOVEUP               113
+#define IDS_ACTION_MOVEDOWN             114
 
 // Next default values for new objects
 // 

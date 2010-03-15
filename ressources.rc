@@ -71,6 +71,14 @@ BEGIN
     IDS_ACTION_INVERSELAYOUT "Switch layout"
     IDS_ACTION_ROTATE       "Rotate window in layout"
     IDS_ACTION_QUIT         "Quit"
+    IDS_ACTION_MOVELEFT     "Move Left"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ACTION_MOVERIGHT    "Move Right"
+    IDS_ACTION_MOVEUP       "Move Up"
+    IDS_ACTION_MOVEDOWN     "Move Down"
 END
 
 #endif    // French (France) resources

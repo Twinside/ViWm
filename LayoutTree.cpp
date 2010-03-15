@@ -114,6 +114,7 @@ namespace ViWm
         return Done;
     }
 
+
     LayoutNode::~LayoutNode()
     {
         for ( Collection::iterator it = nodes.begin()
@@ -571,6 +572,7 @@ namespace ViWm
     void LayoutLeaf::displayLayoutStructure
                             ( Renderer::RenderWindow &/*r*/
                             , Renderer::RenderWindow::Brush /*defaultBrush*/ ) const {}
+
     void LayoutNode::displayLayoutStructure
                             ( Renderer::RenderWindow &r
                             , Renderer::RenderWindow::Brush defaultBrush ) const
@@ -903,6 +905,56 @@ namespace ViWm
 
         selectedRoute = int( newIndex );
         return true;
+    }
+
+    const Rect& LayoutNode::getSelectedSize() const
+        { return nodes[selectedRoute].lastLogicalDimension; }
+
+
+    LayoutTree* LayoutLeaf::pickNode( int /*xHope*/, int /*yHope*/ ) { return this; }
+    LayoutTree* LayoutNode::pickNode( int xHope, int yHope )
+    {
+        switch(lastDirection)
+        {
+        case SplitHorizontal:
+            if ( yHope < 0 )
+            {
+                selectedRoute = 0;
+                return nodes[0].subTree->pickNode( xHope, yHope );
+            }
+
+            for (size_t i = 0; i < nodes.size(); i++)
+            {
+                const Rect& r = nodes[i].lastLogicalDimension;
+                if ( r.y + r.height > yHope )
+                {
+                    selectedRoute = i;
+                    return nodes[i].subTree->pickNode( xHope, yHope );
+                }
+            }
+        	break;
+
+        case SplitVertical:
+            if ( xHope < 0 )
+            {
+                selectedRoute = 0;
+                return nodes[0].subTree->pickNode( xHope, yHope );
+            }
+
+            for (size_t i = 0; i < nodes.size(); i++)
+            {
+                const Rect& r = nodes[i].lastLogicalDimension;
+                if ( r.x + r.width > xHope )
+                {
+                    selectedRoute = i;
+                    return nodes[i].subTree->pickNode( xHope, yHope );
+                }
+            }
+        	break;
+        }
+
+        selectedRoute = nodes.size() - 1;
+        return nodes[ nodes.size() - 1 ].subTree->pickNode( xHope, yHope );
     }
 
     LayoutTree::SplitCoord::SplitCoord()

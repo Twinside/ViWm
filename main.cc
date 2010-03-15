@@ -48,20 +48,15 @@ int WINAPI WinMain( HINSTANCE hInstance
                   , MB_OK );
     }
 
-    defs.push_back( HotKey( 'V'
-                          , new Actions::VerticalSplit( IDS_ACTION_SPLIT_VERTICALY, NoStringId ) ));
-    defs.push_back( HotKey( 'S'
-                          , new Actions::HorizontalSplit( IDS_ACTION_SPLIT_HORIZONTALLY, NoStringId ) ));
-    defs.push_back( HotKey( 'R'
-                          , new Actions::NodeRotate( IDS_ACTION_ROTATE, NoStringId ,1 ) ));
-    defs.push_back( HotKey( 'I'
-                          , new Actions::InverseScreenLayout( IDS_ACTION_INVERSELAYOUT, NoStringId )));
-    defs.push_back( HotKey( 'L'
-                          , new Actions::Relayout( IDS_ACTION_RELAYOUT, NoStringId )));
-    defs.push_back( HotKey(  VK_LEFT
-                          , new Actions::ScreenMoverBounded( IDS_ACTION_MOVEPREVSCREEN, NoStringId ,-1 )));
-    defs.push_back( HotKey( VK_RIGHT
-                          , new Actions::ScreenMoverBounded( IDS_ACTION_MOVENEXTSCREEN, NoStringId, 1 )));
+    defs.push_back( HotKey( 'V', new Actions::VerticalSplit( IDS_ACTION_SPLIT_VERTICALY, NoStringId ) ));
+    defs.push_back( HotKey( 'S', new Actions::HorizontalSplit( IDS_ACTION_SPLIT_HORIZONTALLY, NoStringId ) ));
+    defs.push_back( HotKey( 'R', new Actions::NodeRotate( IDS_ACTION_ROTATE, NoStringId ,1 ) ));
+    defs.push_back( HotKey( 'I', new Actions::InverseScreenLayout( IDS_ACTION_INVERSELAYOUT, NoStringId )));
+    defs.push_back( HotKey( 'U', new Actions::Relayout( IDS_ACTION_RELAYOUT, NoStringId )));
+    defs.push_back( HotKey( 'H', new Actions::HorizontalMove( IDS_ACTION_MOVELEFT, NoStringId, -1 )));
+    defs.push_back( HotKey( 'L', new Actions::HorizontalMove( IDS_ACTION_MOVERIGHT, NoStringId,  1 )));
+    defs.push_back( HotKey( VK_LEFT, new Actions::ScreenMoverBounded( IDS_ACTION_MOVEPREVSCREEN, NoStringId ,-1 )));
+    defs.push_back( HotKey( VK_RIGHT, new Actions::ScreenMoverBounded( IDS_ACTION_MOVENEXTSCREEN, NoStringId, 1 )));
 
     globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();

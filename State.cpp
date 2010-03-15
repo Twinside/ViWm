@@ -6,11 +6,12 @@
 
 namespace ViWm
 {
-    WindowMakerState::WindowMakerState( const Configuration &conf )
+    WindowMakerState::WindowMakerState( const Configuration &iconf )
         : tilingMode( ManualVimTilling )
         , currentScreen( 0 )
         , currentTag( 0 )
         , current( 0 )
+        , conf( iconf )
     {
         windowList.resize( LastTag );
 

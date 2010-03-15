@@ -50,9 +50,14 @@ namespace ViWm
          */
         std::vector<Bucket> windowList;
 
+        const Configuration&  getConf() const { return conf; }
+
     private:
-        TillingMode tilingMode;
-        size_t      currentTag;
+        void    operator =( const WindowMakerState & );
+
+        const Configuration   &conf;
+        TillingMode     tilingMode;
+        size_t          currentTag;
 
         typedef std::tr1::shared_ptr<Layouter>
                 LayoutPtr;

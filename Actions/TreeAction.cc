@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "TreeAction.h"
 
 namespace ViWm {
@@ -103,6 +104,7 @@ namespace Actions
     VerticalMove::VerticalMove(StringId display, StringId descr, int amount)
         : Action( display, descr ), _moveAmount( amount )
     {
+        assert( amount != 0 );
     }
 
     Action::ReturnInfo VerticalMove::operator ()( DesktopLayout& l, WindowMakerState &s )
@@ -113,7 +115,9 @@ namespace Actions
 
     HorizontalMove::HorizontalMove(StringId display, StringId descr, int amount)
         : Action( display, descr ), _moveAmount( amount )
-    {}
+    {
+        assert( amount != 0 );
+    }
 
     LayoutNode* findWellOriented( LayoutTree::SplitSide direction, LayoutTree *src )
     {
@@ -131,28 +135,74 @@ namespace Actions
         LayoutTree* root = l[ s.currentScreen ].layoutRoot;
         if ( !root ) return Nothing;
 
+        LayoutLeaf* selected = root->getSelected();
+        if ( !selected ) return Nothing;
+
+        const Rect& selectSize =
+            selected->getParent() != 0
+            ? selected->getParent()->getSelectedSize()
+            : l[ s.currentScreen ].getSize();
+
         LayoutNode* goodParent =
-            findWellOriented( LayoutTree::SplitVertical, root );
+            findWellOriented( LayoutTree::SplitVertical, selected );
+
+        int     pickHeight = selectSize.y + selectSize.width / 2
+                           - l[ s.currentScreen ].getY();
+
+        LayoutLeaf* nextSelection;
 
         if ( goodParent && goodParent->moveSelection( _moveAmount ) )
         {
-            LayoutLeaf* selected = goodParent->getSelected();
-            if ( s.current )
-                s.current->GiveFocus();
+            if ( _moveAmount < 0 )
+                goodParent->pickNode( selectSize.x - 1
+                                    , selectSize.y + selectSize.width / 2 );
+            else
+                goodParent->pickNode( selectSize.x + selectSize.width + 1
+                                    , selectSize.y + selectSize.width / 2 );
 
-            return Nothing;
+            // our next window, still in the same screen.
+            nextSelection = goodParent->getSelected();
         }
         // we didn't find a split with the good orientation
         // so, we want to give focus to another screen, if
         // any.
-        if ( ! goodParent )
+        else if ( _moveAmount < 0 ) // we are moving to the left =)
         {
+            // we're already at the left margin, cannot
+            // jump elsewhere
+            if (int(s.currentScreen) + _moveAmount < 0)
+                return Nothing;
+
+            size_t  prevScreen = int(s.currentScreen) + _moveAmount;
+
+            if ( !l[ prevScreen ].layoutRoot )
+                return Nothing;
+
+            l[prevScreen].layoutRoot->pickNode( l[prevScreen].getX() + l[prevScreen].getWidth() - 1
+                                              , pickHeight );
+
+            nextSelection = l[prevScreen].layoutRoot->getSelected();
         }
-        else if (false)
+        else // assume _moveAmount > 0
         {
+            // we are at the right margin.
+            if (s.currentScreen + size_t(_moveAmount) >= l.size())
+                return Nothing;
 
+            size_t nextScreen = s.currentScreen + size_t( _moveAmount );
+
+            if ( !l[nextScreen].layoutRoot )
+                return Nothing;
+
+            l[nextScreen].layoutRoot->pickNode( -1, pickHeight );
+            nextSelection = l[nextScreen].layoutRoot->getSelected();
         }
 
+        if ( s.current )
+            s.current->SetTransparency( s.getConf().idleTransparency() );
+
+        s.current = &nextSelection->getWindow();
+        s.current->GiveFocus();
 
         return Nothing;
     }
