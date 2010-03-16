@@ -13,6 +13,7 @@ namespace Layout
         ManualVimLayout( const Configuration &c );
 
         virtual void layout( const WindowMakerState &s, DesktopLayout &l );
+        virtual void reLayout( const Screen &s, LayoutNode &n );
         virtual void addNewWindowToLayout( TilledWindow &newWindow
                                          , const WindowMakerState &st
                                          , DesktopLayout          &l

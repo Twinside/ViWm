@@ -23,6 +23,10 @@ namespace Layout
                      , tree->getParent() );
     }
 
+
+    void ManualVimLayout::reLayout( const Screen &s, LayoutNode &n )
+        { normalizeNode( s, 0, &n ); }
+
     class EmptyFinder
     {
     public:
@@ -140,5 +144,4 @@ namespace Layout
             node->Iter( functor );
         }
     }
-
 }}

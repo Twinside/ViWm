@@ -35,6 +35,8 @@ namespace ViWm
          * You also have to resize windows.
          */
         virtual void layout( const WindowMakerState &s, DesktopLayout &l ) = 0;
+
+        virtual void reLayout( const Screen &s, LayoutNode &n ) = 0;
     };
 }
 

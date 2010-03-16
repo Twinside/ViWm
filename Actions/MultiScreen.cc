@@ -29,6 +29,11 @@ namespace Actions
             return Nothing;
 
         LayoutLeaf* selected = currentTree->getSelected();
+        LayoutNode* parent = selected->getParent();
+
+        // we need to check if we can relayout this node
+        // because it might be deleted by the removeClen.
+        bool        needRelayout = parent->getSubNodeCount() > 2;
 
         LayoutTree::addCreate( l[ nextScreen ].layoutRoot
                              , *new LayoutLeaf( selected->getWindow()) );
@@ -40,7 +45,10 @@ namespace Actions
                                , selected );
 
         // force update of the old screen
-        state.getCurrentLayouter().layout( state, l );
+        if ( needRelayout )
+            state.getCurrentLayouter().reLayout( l[ state.currentScreen ], *parent);
+        else
+            state.getCurrentLayouter().layout( state, l );
         l[ state.currentScreen ].replace( true );
 
         state.currentScreen = nextScreen;
