@@ -8,6 +8,7 @@
 #include "Actions/TreeAction.h"
 #include "Actions/MultiScreen.h"
 #include "Actions/System.h"
+#include "Actions/Debug.h"
 #include "resource.h"
 
 using namespace ViWm;
@@ -61,6 +62,8 @@ int WINAPI WinMain( HINSTANCE hInstance
 
     defs.push_back( HotKey( VK_LEFT, new Actions::ScreenMoverBounded( IDS_ACTION_MOVEPREVSCREEN, NoStringId ,-1 )));
     defs.push_back( HotKey( VK_RIGHT, new Actions::ScreenMoverBounded( IDS_ACTION_MOVENEXTSCREEN, NoStringId, 1 )));
+
+    defs.push_back( HotKey( 'D', new Actions::GraphVizDump( NoStringId, NoStringId, "dump.dot" )));
 
     globalManager = new ViWmManager( hInstance, defs );
     globalManager->Init();

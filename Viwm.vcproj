@@ -427,6 +427,14 @@
 			Name="Actions"
 			>
 			<File
+				RelativePath=".\Actions\Debug.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Actions\Debug.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Actions\Menu.cc"
 				>
 			</File>
