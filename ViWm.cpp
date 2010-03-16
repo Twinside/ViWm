@@ -168,13 +168,11 @@ namespace ViWm
         GetClassName( hwnd, TempClassName, MAX_PATH );
 
 
-#ifdef _DEBUG
         // For debug purpose and avoiding to messing up with
         // the whole desktop, we only handle the notepad program
         // which has the good taste to be lightweight.
         if ( wcscmp( TempClassName, L"Notepad") != 0 )
             return;
-#endif
 
         TilledWindow    *newWindow = new TilledWindow( hwnd );
         currentState.addWindow( *newWindow );

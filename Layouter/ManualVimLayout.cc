@@ -18,6 +18,9 @@ namespace Layout
 
         LayoutTree *tree = cs.layoutRoot->getSelected();
 
+        if ( !tree )
+            return;
+
         normalizeNode( cs
                      , static_cast<LayoutLeaf*>( tree )
                      , tree->getParent() );

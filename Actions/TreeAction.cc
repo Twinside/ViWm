@@ -79,13 +79,14 @@ namespace Actions
 
         if ( ! root ) return Nothing;
 
-        LayoutTree  *selected = root->getSelected();
+        LayoutLeaf *selected = root->getSelected();
 
         // it's an end node, so must add a new Node
-        if ( selected->getParent() == 0 )
+        if ( !selected || selected->getParent() == 0 )
             return Nothing;
 
         selected->getParent()->rotate( 1 );
+        selected->getParent()->selectNode( selected->getWindow().getWinowKey() );
 
         return NeedRelayout;
     }
