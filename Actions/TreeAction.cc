@@ -135,7 +135,17 @@ namespace Actions
 
         LayoutLeaf* nextSelection;
 
-        if ( !goodParent || !goodParent->moveSelection( _moveAmount ) )
+        // try each horizontal layer till we find a good one
+        while ( goodParent )
+        {
+            if ( goodParent->moveSelection( _moveAmount ) )
+                break;
+            goodParent =
+                findWellOriented( LayoutTree::SplitHorizontal, goodParent );
+        }
+
+        // if we didn't found a good horizontal layer
+        if ( !goodParent )
             return Nothing;
 
         if ( _moveAmount < 0 )
@@ -182,7 +192,18 @@ namespace Actions
 
         LayoutLeaf* nextSelection;
 
-        if ( goodParent && goodParent->moveSelection( _moveAmount ) )
+        // try each vertical layer till we find one which can
+        // move us
+        while ( goodParent )
+        {
+            if ( goodParent->moveSelection( _moveAmount ) )
+                break;
+
+            goodParent = findWellOriented( LayoutTree::SplitVertical
+                                         , goodParent );
+        }
+
+        if ( goodParent )
         {
             if ( _moveAmount < 0 )
                 goodParent->pickNode( selectSize.x - LayoutNode::SplitWidth - 1

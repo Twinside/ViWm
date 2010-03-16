@@ -929,7 +929,18 @@ namespace ViWm
                 if ( r.y + r.height > yHope )
                 {
                     selectedRoute = i;
-                    return nodes[i].subTree->pickNode( xHope, yHope );
+
+                    if ( nodes[i].subTree )
+                        return nodes[i].subTree->pickNode( xHope, yHope );
+                    else
+                    {
+                        for (int j = int(i) - 1; j >= 0; --j)
+                        {
+                            if (nodes[j].subTree)
+                                return nodes[j].subTree->pickNode( xHope, yHope );
+                        }
+                        // else we let the last one do the job.
+                    }
                 }
             }
         	break;
@@ -947,14 +958,28 @@ namespace ViWm
                 if ( r.x + r.width > xHope )
                 {
                     selectedRoute = i;
-                    return nodes[i].subTree->pickNode( xHope, yHope );
+
+                    if ( nodes[i].subTree )
+                        return nodes[i].subTree->pickNode( xHope, yHope );
+                    else
+                    {
+                        for (int j = int(i) - 1; j >= 0; --j)
+                        {
+                            if (nodes[j].subTree)
+                                return nodes[j].subTree->pickNode( xHope, yHope );
+                        }
+                        // else we let the last one do the job.
+                    }
                 }
             }
         	break;
         }
 
         selectedRoute = nodes.size() - 1;
-        return nodes[ nodes.size() - 1 ].subTree->pickNode( xHope, yHope );
+        if ( nodes[ selectedRoute ].subTree )
+            return nodes[ selectedRoute ].subTree->pickNode( xHope, yHope );
+        else
+            return 0;
     }
 
     LayoutTree::SplitCoord::SplitCoord()
