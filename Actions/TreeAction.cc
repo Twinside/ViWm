@@ -131,7 +131,7 @@ namespace Actions
             : l[ s.currentScreen ].getSize();
 
         LayoutNode* goodParent =
-            findWellOriented( LayoutTree::SplitVertical, selected );
+            findWellOriented( LayoutTree::SplitHorizontal, selected );
 
         LayoutLeaf* nextSelection;
 
@@ -143,7 +143,7 @@ namespace Actions
                                 , selectSize.y - LayoutNode::SplitWidth - 1 );
         else
             goodParent->pickNode( selectSize.x + selectSize.width / 2
-                                , selectSize.y + selectSize.height + 1 );
+                                , selectSize.y + selectSize.height + LayoutNode::SplitWidth + 1 );
 
         // our next window, still in the same screen.
         nextSelection = goodParent->getSelected();
@@ -188,7 +188,7 @@ namespace Actions
                 goodParent->pickNode( selectSize.x - LayoutNode::SplitWidth - 1
                                     , selectSize.y + selectSize.height / 2 );
             else
-                goodParent->pickNode( selectSize.x + selectSize.width + 1
+                goodParent->pickNode( selectSize.x + selectSize.width + LayoutNode::SplitWidth + 1
                                     , selectSize.y + selectSize.height / 2 );
 
             // our next window, still in the same screen.
