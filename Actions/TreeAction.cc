@@ -162,8 +162,11 @@ namespace Actions
         if ( s.current )
             s.current->SetTransparency( s.getConf().idleTransparency() );
 
-        s.current = &nextSelection->getWindow();
-        s.current->GiveFocus();
+        if ( nextSelection )
+        {
+            s.current = &nextSelection->getWindow();
+            s.current->GiveFocus();
+        }
 
         return Nothing;
     }
@@ -260,8 +263,11 @@ namespace Actions
         if ( s.current )
             s.current->SetTransparency( s.getConf().idleTransparency() );
 
-        s.current = &nextSelection->getWindow();
-        s.current->GiveFocus();
+        if ( nextSelection )
+        {
+            s.current = &nextSelection->getWindow();
+            s.current->GiveFocus();
+        }
 
         return Nothing;
     }
