@@ -4,11 +4,15 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
-#include "TilledWindow.h"
-#include "Rendering/RenderWindow.h"
+#ifndef MSVC
+#   include <tr1/functional>
+#endif
+#include "Constants.h"
 
 namespace ViWm
 {
+    namespace Renderer { class RenderWindow; }
+
     struct Screen;
 
     struct Rect
@@ -23,6 +27,7 @@ namespace ViWm
 
     class LayoutNode;
     class LayoutLeaf;
+    class TilledWindow;
     namespace Layout { class EmptyFinder; }
 
     /**
@@ -177,7 +182,7 @@ namespace ViWm
          */
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
-                            , Renderer::RenderWindow::Brush defaultBrush ) const = 0;
+                            , Renderer::Brush defaultBrush ) const = 0;
 
     protected:
         friend class LayoutNode;
@@ -236,7 +241,8 @@ namespace ViWm
             LayoutTree* subTree;
         };
 
-        typedef std::tr1::function<bool (LayoutNode&,SizePair&)>   IteratingPredicate;
+        typedef std::tr1::function<bool (LayoutNode&,SizePair&)>   
+            IteratingPredicate;
 
         bool FocusTopIteration( IteratingPredicate &p );
         bool DepthFirstIteration( IteratingPredicate &p );
@@ -309,7 +315,7 @@ namespace ViWm
     protected:
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
-                            , Renderer::RenderWindow::Brush defaultBrush ) const;
+                            , Renderer::Brush defaultBrush ) const;
 
     private:
         CompStatus  pack( CompStatus what, size_t &index );
@@ -358,7 +364,7 @@ namespace ViWm
     protected:
         virtual void        displayLayoutStructure
                             ( Renderer::RenderWindow &r
-                            , Renderer::RenderWindow::Brush defaultBrush ) const;
+                            , Renderer::Brush defaultBrush ) const;
 
     private:
         void operator = ( const LayoutLeaf& l );

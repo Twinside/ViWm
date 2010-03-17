@@ -1,19 +1,23 @@
 #ifndef __RENDERWINDOW_H__
 #define __RENDERWINDOW_H__
 
-#include "LayeredWindowInfo.h"
+#ifdef WIN32
+#   include "LayeredWindowInfo.h"
+#endif
+#include "../LayoutTree.h"
+#include "../Constants.h"
 
 namespace ViWm {
 namespace Renderer
 {
+#if (defined WIN32) && !(defined TEST)
     class RenderWindow
     {
     public:
-        RenderWindow( HWND window, int x, int y, int width, int height );
+        RenderWindow( LayoutTree::WindowKey
+                    , window, int x, int y, int width, int height );
 
         ~RenderWindow();
-
-        typedef COLORREF    Brush;
 
         Brush   CreateBrush( int r, int g, int b, int a );
         void    DeleteBrush( Brush /*b*/ ) const {}
@@ -39,6 +43,32 @@ namespace Renderer
         Brush                   nearlyTransparent;
         COLORREF                *voidBits;
     };
+#else
+    class RenderWindow
+    {
+    public:
+        RenderWindow( LayoutTree::WindowKey window
+                    , int x, int y, int width, int height );
+
+        ~RenderWindow();
+
+        Brush   CreateBrush( int /*r*/, int /*g*/
+                           , int /*b*/, int /*a*/ )
+            { return 0; }
+        void    DeleteBrush( Brush /*b*/ ) const {}
+
+
+        void    putAtTop() {}
+        void    putAtBottom() {}
+
+        void    begin( bool /*fullyTransparent*/ ) {}
+        void    drawRect( Brush /*color*/
+                        , int /*x*/, int /*y*/
+                        , int /*width*/, int /*height*/ )
+            {}
+        void    end() {}
+    };
+#endif
 }}
 
 #endif /* __RENDERWINDOW_H__ */

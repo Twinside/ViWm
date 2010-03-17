@@ -1,9 +1,22 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <windows.h>
+#ifdef WIN32
+#   include <windows.h>
+#else
+typedef char* LPTSTR;
+typedef int   HWND;
+typedef int   COLORREF;
+typedef char  TCHAR;
 
-#pragma warning( disable : 4100 )
+#define MAX_PATH    512
+#define MOD_CONTROL 0
+#define MOD_ALT     1
+#endif
+
+#ifdef MSVC
+#   pragma warning( disable : 4100 )
+#endif
 
 enum    Tags
 {
@@ -19,7 +32,13 @@ enum    ConfigurationConstants
 {
     DEFAULT_MODKEY = MOD_CONTROL | MOD_ALT,
 };
+
 extern const LPTSTR keyListenerClassName;
 extern const LPTSTR fullScreenWindowClassName;
+
+namespace ViWm
+{
+    namespace Renderer { typedef COLORREF    Brush; }
+}
 
 #endif /* CONSTANTS_H */

@@ -1,15 +1,18 @@
 #ifndef TILLEDWINDOW_H
 #define TILLEDWINDOW_H
 
-#include <Windows.h>
+#ifdef WIN32
+#   include <Windows.h>
+#endif
 #include <string>
+#include "LayoutTree.h"
 
 namespace ViWm
 {
     class TilledWindow
     {
     public:
-        TilledWindow(HWND   realWindow);
+        TilledWindow(LayoutTree::WindowKey realWindow);
         ~TilledWindow();
 
         void SetTransparency(int alpha);
@@ -20,14 +23,14 @@ namespace ViWm
         void GetClassName( std::wstring &name );
 
         bool IsTileable();
-        static bool IsHandleTileable( HWND hwnd );
+        static bool IsHandleTileable( LayoutTree::WindowKey hwnd );
 
         unsigned short  tags;
 
-        bool    operator == ( HWND otherWindow ) const
+        bool    operator == ( LayoutTree::WindowKey otherWindow ) const
             { return hwnd == otherWindow; }
 
-        bool    operator != ( HWND otherWindow ) const
+        bool    operator != ( LayoutTree::WindowKey otherWindow ) const
             { return hwnd != otherWindow; }
 
         /**
@@ -36,11 +39,13 @@ namespace ViWm
          * one the window.
          */
         void    Discard() { hwnd = NULL; }
-        HWND    getWinowKey() const { return hwnd; }
+        LayoutTree::WindowKey getWinowKey() const
+            { return hwnd; }
 
         struct Finder {
-            HWND  toFind;
-            Finder( HWND ntoFind ) : toFind( ntoFind ) {}
+            LayoutTree::WindowKey  toFind;
+            Finder( LayoutTree::WindowKey ntoFind )
+                : toFind( ntoFind ) {}
 
             inline bool   operator() ( const TilledWindow* window )
                 { return *window == toFind; }
@@ -52,7 +57,7 @@ namespace ViWm
             Opaque = 255
         };
 
-        HWND    hwnd;
+        LayoutTree::WindowKey    hwnd;
         int     applyedAlpha;
         bool    hasBorder;
         RECT    initialSize;

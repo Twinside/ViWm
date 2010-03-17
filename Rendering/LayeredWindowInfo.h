@@ -1,7 +1,9 @@
 #ifndef __LAYEREDWINDOWINFO_H__
 #define __LAYEREDWINDOWINFO_H__
 
-#include <windows.h>
+#ifdef WIN32
+#   include <windows.h>
+#endif
 
 namespace ViWm {
 namespace Renderer
@@ -10,7 +12,7 @@ namespace Renderer
     {
     public:
         LayeredWindowInfo( int x, int y, UINT width, UINT height);
-        void Update( HWND window, HDC source);  
+        void Update( LayoutTree::WindowKey window, HDC source);  
         UINT GetWidth() const { return m_size.cx; }
         UINT GetHeight() const { return m_size.cy; }
 

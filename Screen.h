@@ -2,7 +2,7 @@
 #define SCREEN_H
 
 #include "LayoutTree.h"
-#include "Rendering\RenderWindow.h"
+#include "Rendering/RenderWindow.h"
 
 namespace ViWm
 {

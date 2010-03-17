@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "LayoutTree.h"
 #include "Screen.h"
+#include "TilledWindow.h"
 
 namespace ViWm
 {
@@ -369,7 +370,11 @@ namespace ViWm
 
         assert( nodes.size() > 1 );
 
-        nodes.erase( std::remove_if( nodes.begin(), nodes.end(), comparer ), nodes.end() );
+        Collection::iterator it = 
+            std::remove_if<Collection::iterator,SizePairComp>
+                          ( nodes.begin(), nodes.end(), comparer );
+
+        nodes.erase( it, nodes.end() );
 
         for ( size_t i = 0; i < nodes.size(); ++i )
             if ( nodes[i].subTree )
@@ -571,11 +576,11 @@ namespace ViWm
     //////////////////////////////////////////////////////////////////////////
     void LayoutLeaf::displayLayoutStructure
                             ( Renderer::RenderWindow &/*r*/
-                            , Renderer::RenderWindow::Brush /*defaultBrush*/ ) const {}
+                            , Renderer::Brush /*defaultBrush*/ ) const {}
 
     void LayoutNode::displayLayoutStructure
                             ( Renderer::RenderWindow &r
-                            , Renderer::RenderWindow::Brush defaultBrush ) const
+                            , Renderer::Brush defaultBrush ) const
     {
         Collection::const_iterator it;
 
