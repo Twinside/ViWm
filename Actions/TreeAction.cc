@@ -91,7 +91,8 @@ namespace Actions
         return NeedRelayout;
     }
 
-    Action::ReturnInfo Relayout::operator ()( DesktopLayout& l, WindowMakerState &s )
+    Action::ReturnInfo Relayout::operator ()( DesktopLayout&    /*l*/
+                                            , WindowMakerState& /*s*/ )
     {
         /* yes, that's it */
         return NeedRelayout;

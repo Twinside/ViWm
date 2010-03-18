@@ -349,24 +349,28 @@ namespace ViWm
     LayoutTree::CompStatus LayoutLeaf::removeNode( LayoutTree* toRemove )
         { return toRemove == this ? Todo : Done; }
 
+    // for a reason I don't understand GCC refuse to instantiate
+    // remove_if when SizePairComp is declared in removeNode
+    struct SizePairComp
+    {
+        LayoutTree  *node;
+        SizePairComp( LayoutTree *nnode ) : node( nnode ) {}
+
+        bool   operator() ( LayoutNode::SizePair &p )
+        {
+            if ( p.subTree == node )
+            {
+                delete p.subTree;
+                p.subTree = 0;
+                return true;
+            }
+            return false;
+        }
+    };
+
     LayoutTree::CompStatus LayoutNode::removeNode( LayoutTree *toRemove )
     {
-        struct SizePairComp
-        {
-            LayoutTree  *node;
-            SizePairComp( LayoutTree *nnode ) : node( nnode ) {}
-
-            bool   operator() ( LayoutNode::SizePair &p )
-            {
-                if ( p.subTree == node )
-                {
-                    delete p.subTree;
-                    p.subTree = 0;
-                    return true;
-                }
-                return false;
-            }
-        }   comparer( toRemove );
+        SizePairComp comparer( toRemove );
 
         assert( nodes.size() > 1 );
 

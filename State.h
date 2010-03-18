@@ -4,6 +4,11 @@
 #include <list>
 #include <vector>
 #include <memory>
+
+#ifndef MSVC
+#   include <tr1/memory>
+#endif /* MSVC */
+
 #include "Constants.h"
 #include "Layouter.h"
 

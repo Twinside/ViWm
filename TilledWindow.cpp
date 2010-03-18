@@ -2,11 +2,12 @@
 
 namespace ViWm
 {
+#if (defined WIN32) && !(defined TEST)
     TilledWindow::TilledWindow(HWND realWindow)
-        : applyedAlpha( 0 )
+        : tags( 0 )
         , hwnd( realWindow )
+        , applyedAlpha( 0 )
         , hasBorder( true )
-        , tags( 0 )
     {
         SetBorders( false );
         SetTransparency( Opaque );
@@ -114,4 +115,28 @@ namespace ViWm
         ::GetClassName( hwnd, TempClassName, MAX_PATH );
         name = TempClassName;
     }
+#else   /* TEST */
+    TilledWindow::TilledWindow(HWND realWindow)
+        : tags( 0 )
+        , hwnd( realWindow )
+        , applyedAlpha( 0 )
+        , hasBorder( true )
+    {}
+
+    TilledWindow::~TilledWindow() {}
+
+    TCHAR   TilledWindow::TempClassName[MAX_PATH];
+
+    void TilledWindow::SetTransparency(int /*alpha*/) {}
+    void TilledWindow::SetBorders( bool /*presentOrNot*/ ) {}
+    bool TilledWindow::IsHandleTileable( HWND /*hwnd*/ )
+        { return true; }
+    bool TilledWindow::IsTileable() { return IsHandleTileable( hwnd ); }
+    void TilledWindow::GiveFocus() {}
+    void TilledWindow::SetSize( int /*x*/, int /*y*/
+                              , int /*width*/, int /*height*/ ) {}
+    void TilledWindow::GetClassName( std::wstring &name )
+        { name = L"meh"; }
+#endif  /* TEST */
 }
+

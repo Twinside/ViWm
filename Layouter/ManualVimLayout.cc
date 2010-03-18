@@ -78,56 +78,59 @@ namespace Layout
                      , leaf->getParent() );
     }
 
+    // Struct outside normalizeNode only because G++
+    // refuse to compile it nicely.
+    struct SizeSetter
+    {
+        int widthAdd, widthRest;
+        int heightAdd, heightRest;
+        int i;
+
+        SizeSetter( int w, int wrest, int h, int hrest )
+            : widthAdd( w ), widthRest( wrest )
+            , heightAdd( h ), heightRest( hrest )
+            , i( 0 ) {}
+        
+        bool   operator() ( LayoutNode& /*doesn't need*/
+                          , LayoutNode::SizePair &p )
+        {
+            p.width = widthAdd;
+            p.height = heightAdd;
+
+            if ( i++ == 0 )
+            {
+                p.width += widthRest;
+                p.height += heightRest;
+            }
+            return false;
+        }
+    };
+
+    struct SizeSplitter
+    {
+        LayoutNode::SizePair    *prev;
+        LayoutLeaf              *leaf;
+        SizeSplitter( LayoutLeaf *l ) : prev( 0 ), leaf(l) {}
+
+        bool   operator() ( LayoutNode& /*doesn't need*/, LayoutNode::SizePair &p )
+        {
+            prev = &p;
+            if ( p.subTree == leaf )
+            {
+                p.width = prev->width / 2;
+                p.height = prev->height / 2;
+                prev->width = prev->width / 2 + prev->width % 2;
+                prev->height = prev->height / 2 + prev->height % 2;
+            }
+            return false;
+        }
+    };
+
     void ManualVimLayout::normalizeNode( const Screen &s, LayoutLeaf *leaf, LayoutNode* node )
     {
         if (!node) return;
 
         // please use lambda when updating compiler.
-        struct SizeSetter
-        {
-            int widthAdd, widthRest;
-            int heightAdd, heightRest;
-            int i;
-
-            SizeSetter( int w, int wrest, int h, int hrest )
-                : widthAdd( w ), widthRest( wrest )
-                , heightAdd( h ), heightRest( hrest )
-                , i( 0 ) {}
-            
-            bool   operator() ( LayoutNode& /*doesn't need*/, LayoutNode::SizePair &p )
-            {
-                p.width = widthAdd;
-                p.height = heightAdd;
-
-                if ( i++ == 0 )
-                {
-                    p.width += widthRest;
-                    p.height += heightRest;
-                }
-                return false;
-            }
-        };
-
-        struct SizeSplitter
-        {
-            LayoutNode::SizePair    *prev;
-            LayoutLeaf              *leaf;
-            SizeSplitter( LayoutLeaf *l ) : prev( 0 ), leaf(l) {}
-
-            bool   operator() ( LayoutNode& /*doesn't need*/, LayoutNode::SizePair &p )
-            {
-                prev = &p;
-                if ( p.subTree == leaf )
-                {
-                    p.width = prev->width / 2;
-                    p.height = prev->height / 2;
-                    prev->width = prev->width / 2 + prev->width % 2;
-                    prev->height = prev->height / 2 + prev->height % 2;
-                }
-                return false;
-            }
-        };
-
         int     nodeCount = int(node->getSubNodeCount());
         Rect    size = node->getMyPreviousDimension( s );
 

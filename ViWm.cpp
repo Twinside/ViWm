@@ -10,13 +10,13 @@ namespace ViWm
     ViWmManager::ViWmManager( HINSTANCE inithInstance
         , const HotKeyCollection &originalCollection
         )
-        : modkeys( DEFAULT_MODKEY )
-        , hInstance( inithInstance )
-        , shellhookid( (UINT)-1 )
+        : conf( ".viwmrc" )
         , hotkeysDefinition( originalCollection )
-        , conf( ".viwmrc" )
-        , currentState( conf )
+        , modkeys( DEFAULT_MODKEY )
         , currentScreenMove( 0 )
+        , hInstance( inithInstance )
+        , currentState( conf )
+        , shellhookid( (UINT)-1 )
     {
     }
 

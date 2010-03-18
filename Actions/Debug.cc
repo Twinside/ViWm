@@ -37,7 +37,7 @@ namespace Actions
     };
 
     Action::ReturnInfo GraphVizDump::operator()( DesktopLayout &l
-                                               , WindowMakerState &state )
+                                               , WindowMakerState& /*state*/ )
     {
         std::ofstream       out( filename );
         GraphVizOutputer    gout( out );
