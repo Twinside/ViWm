@@ -48,25 +48,25 @@ namespace Renderer
     {
     public:
         RenderWindow( LayoutTree::WindowKey window
-                    , int x, int y, int width, int height );
+                    , int x, int y, int width, int height ) {}
 
-        ~RenderWindow();
-
+        inline
         Brush   CreateBrush( int /*r*/, int /*g*/
                            , int /*b*/, int /*a*/ )
             { return 0; }
-        void    DeleteBrush( Brush /*b*/ ) const {}
+        inline void    DeleteBrush( Brush /*b*/ ) const {}
 
 
-        void    putAtTop() {}
-        void    putAtBottom() {}
+        inline void    putAtTop() {}
+        inline void    putAtBottom() {}
 
-        void    begin( bool /*fullyTransparent*/ ) {}
-        void    drawRect( Brush /*color*/
-                        , int /*x*/, int /*y*/
-                        , int /*width*/, int /*height*/ )
+        inline void    begin( bool /*fullyTransparent*/ ) {}
+
+        inline void    drawRect( Brush /*color*/
+                               , int /*x*/, int /*y*/
+                               , int /*width*/, int /*height*/ )
             {}
-        void    end() {}
+        inline void    end() {}
     };
 #endif
 }}
