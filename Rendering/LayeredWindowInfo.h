@@ -1,9 +1,11 @@
 #ifndef __LAYEREDWINDOWINFO_H__
 #define __LAYEREDWINDOWINFO_H__
 
-#ifdef WIN32
+#include "../Constants.h"
+#ifdef REALCODE
 #   include <windows.h>
 #endif
+#include "../LayoutTree.h"
 
 namespace ViWm {
 namespace Renderer

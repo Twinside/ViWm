@@ -12,9 +12,9 @@ namespace Actions
     Action::ReturnInfo   ExitAction::operator() ( DesktopLayout& /*l*/
                                                 , WindowMakerState& /*s*/ )
     {
-#ifdef WIN32
+#ifdef REALCODE
         PostMessage(toSend, WM_CLOSE, 0, 0);
-#endif /* WIN32 */
+#endif /* REALCODE */
         return Nothing;
     }
 

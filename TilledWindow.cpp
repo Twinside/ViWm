@@ -2,7 +2,7 @@
 
 namespace ViWm
 {
-#if (defined WIN32) && !(defined TEST)
+#ifdef REALCODE
     TilledWindow::TilledWindow(HWND realWindow)
         : tags( 0 )
         , hwnd( realWindow )

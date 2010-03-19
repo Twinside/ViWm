@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 
-#ifndef MSVC
+#ifndef _MSC_VER
 #   include <tr1/memory>
-#endif /* MSVC */
+#endif /* _MSC_VER */
 
 #include "Constants.h"
 #include "Layouter.h"

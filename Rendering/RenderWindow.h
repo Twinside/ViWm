@@ -1,21 +1,21 @@
 #ifndef __RENDERWINDOW_H__
 #define __RENDERWINDOW_H__
 
-#ifdef WIN32
+#include "../Constants.h"
+#ifdef REALCODE
 #   include "LayeredWindowInfo.h"
 #endif
 #include "../LayoutTree.h"
-#include "../Constants.h"
 
 namespace ViWm {
 namespace Renderer
 {
-#if (defined WIN32) && !(defined TEST)
+#ifdef REALCODE 
     class RenderWindow
     {
     public:
-        RenderWindow( LayoutTree::WindowKey
-                    , window, int x, int y, int width, int height );
+        RenderWindow( LayoutTree::WindowKey window
+                    , int x, int y, int width, int height );
 
         ~RenderWindow();
 

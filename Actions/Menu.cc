@@ -26,12 +26,12 @@ namespace Actions
             {
                 LoadString( hInst, act->getDisplayName(), str
                           , sizeof( str ) / sizeof( TCHAR ) );
-                addToMenu( menu, int(i), int(i),  str );
+                addToMenu( menu, str );
             }
         }
     }
 
-    void ActionMenu::addToMenu( HMENU menu, int position, int index, TCHAR* str )
+    void ActionMenu::addToMenu( HMENU menu, TCHAR* str )
     {
         if (AppendMenu( menu, MF_STRING, NULL, str ) == 0)
         {
@@ -44,7 +44,7 @@ namespace Actions
         }
     }
 
-    Action::ReturnInfo ActionMenu::operator()( DesktopLayout& l, WindowMakerState &s )
+    Action::ReturnInfo ActionMenu::operator()( DesktopLayout& /*l*/, WindowMakerState &/*s*/ )
     {
         HMENU                      menu;
         POINT pt;

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Viwm", "Viwm.vcproj", "{2A974F73-D7DD-4DD9-957E-7CA271718751}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ViWmTest", "ViWmTest.vcproj", "{420912B0-F679-46BC-B4D1-4DF6172D3622}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,12 @@ Global
 		{2A974F73-D7DD-4DD9-957E-7CA271718751}.Release|Win32.Build.0 = Release|Win32
 		{2A974F73-D7DD-4DD9-957E-7CA271718751}.Release|x64.ActiveCfg = Release|x64
 		{2A974F73-D7DD-4DD9-957E-7CA271718751}.Release|x64.Build.0 = Release|x64
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Debug|Win32.ActiveCfg = Debug|Win32
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Debug|Win32.Build.0 = Debug|Win32
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Debug|x64.ActiveCfg = Debug|Win32
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Release|Win32.ActiveCfg = Release|Win32
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Release|Win32.Build.0 = Release|Win32
+		{420912B0-F679-46BC-B4D1-4DF6172D3622}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

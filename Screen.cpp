@@ -23,7 +23,7 @@ namespace ViWm
 
         layoutRoot->Establish( *this, layoutSize, initialSplit );
 
-        Renderer::RenderWindow::Brush   splitBrush =
+        Renderer::Brush   splitBrush =
             fullScreenWin->CreateBrush( 30, 30, 30, 255 );
 
         fullScreenWin->begin( transparentVoid );

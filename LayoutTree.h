@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
-#ifndef MSVC
+#ifndef _MSC_VER
 #   include <tr1/functional>
 #endif
 #include "Constants.h"

@@ -19,7 +19,7 @@ namespace Actions
     private:
         void operator =( const ActionMenu & );
 
-        void    addToMenu( HMENU menu, int position, int index, TCHAR* str );
+        void    addToMenu( HMENU menu, TCHAR* str );
         void    populateMenu( HMENU menu );
 
         const HotKeyCollection& commands;

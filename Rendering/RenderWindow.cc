@@ -91,7 +91,7 @@ namespace Renderer
         DeleteDC( memDC );
     }
 
-    RenderWindow::Brush RenderWindow::CreateBrush( int r, int g, int b, int a )
+    Brush RenderWindow::CreateBrush( int r, int g, int b, int a )
     {
         assert( a >= 0 && a <= 255 );
         assert( r >= 0 && r <= 255 );

@@ -1,7 +1,11 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#ifdef WIN32
+#if (defined WIN32) && !(defined TEST)
+#   define REALCODE
+#endif
+
+#ifdef REALCODE
 #   include <windows.h>
 #else
 

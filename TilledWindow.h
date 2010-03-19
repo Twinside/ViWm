@@ -1,7 +1,7 @@
 #ifndef TILLEDWINDOW_H
 #define TILLEDWINDOW_H
 
-#ifdef WIN32
+#ifdef REALCODE
 #   include <Windows.h>
 #endif
 #include <string>
