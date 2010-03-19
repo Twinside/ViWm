@@ -43,8 +43,9 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TEST"
 				MinimalRebuild="true"
+				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -171,62 +172,70 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Actions\Debug.cc"
+				RelativePath="..\Actions\Debug.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\Layouter.cpp"
+				RelativePath="..\Layouter.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\LayoutTree.cpp"
+				RelativePath="..\LayoutTree.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Layouter\ManualVimLayout.cc"
+				RelativePath="..\Layouter\ManualVimLayout.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\Actions\MultiScreen.cc"
+				RelativePath="..\Actions\MultiScreen.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\Rendering\RenderWindow.h"
+				RelativePath="..\Rendering\RenderWindow.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Screen.cpp"
+				RelativePath="..\Screen.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\State.cpp"
+				RelativePath="..\State.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Actions\System.cc"
+				RelativePath="..\Actions\System.cc"
 				>
 			</File>
 			<File
-				RelativePath=".\TilledWindow.cpp"
+				RelativePath="..\TilledWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Actions\TreeAction.cc"
+				RelativePath="..\Actions\TreeAction.cc"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			Name="Windows Type Patchers"
 			>
+			<File
+				RelativePath="..\WinTypeTestSet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\WinTypeTestUnset.h"
+				>
+			</File>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+		<File
+			RelativePath=".\mainTest.cc"
 			>
-		</Filter>
+		</File>
+		<File
+			RelativePath=".\ViWmTest.cc"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

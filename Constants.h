@@ -8,34 +8,7 @@
 #ifdef REALCODE
 #   include <windows.h>
 #else
-
-typedef char* LPTSTR;
-typedef int   HWND;
-typedef int   COLORREF;
-typedef char  TCHAR;
-typedef int   HINSTANCE;
-typedef int   LRESULT;
-typedef unsigned int UINT;
-typedef int   WPARAM;
-typedef int   LPARAM;
-typedef int   BOOL;
-
-struct RECT
-{
-    int left;
-    int right;
-    int top;
-    int bottom;
-};
-
-typedef RECT*   LPRECT;
-typedef int     HDC;
-typedef int     HMONITOR;
-
-#define CALLBACK
-#define MAX_PATH    512
-#define MOD_CONTROL 0
-#define MOD_ALT     1
+#   include "WinTypeTestSet.h"
 #endif
 
 #ifdef MSVC
