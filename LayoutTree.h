@@ -317,6 +317,8 @@ namespace ViWm
                             ( Renderer::RenderWindow &r
                             , Renderer::Brush defaultBrush ) const;
 
+        friend class TreeTestBuilder;
+
     private:
         CompStatus  pack( CompStatus what, size_t &index );
         void        insert( LayoutTree  *toSearch

@@ -42,6 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;TEST"
+				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -172,6 +173,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\Configuration.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\Actions\Debug.cc"
 				>
 			</File>
@@ -230,6 +235,10 @@
 		</Filter>
 		<File
 			RelativePath=".\mainTest.cc"
+			>
+		</File>
+		<File
+			RelativePath=".\TestTreeBuilder.h"
 			>
 		</File>
 		<File
