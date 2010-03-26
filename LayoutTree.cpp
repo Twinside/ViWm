@@ -85,6 +85,7 @@ namespace ViWm
             root->addNode( &tree );
         }
 
+        assert( root->checkInvariant() );
         return Done;
     }
 
@@ -92,13 +93,17 @@ namespace ViWm
     {
         if ( root == 0 ) return Done;
 
-        return globalPack( root, root->removeNode( key ) );
+        CompStatus st = globalPack( root, root->removeNode( key ) );
+        assert( root->checkInvariant() );
+        return st;
     }
 
     LayoutTree::CompStatus LayoutTree::removeClean( LayoutTree *&root, LayoutTree *tree )
     {
         if ( root == 0 ) return Done;
-        return globalPack( root, root->removeNode( tree ) );
+        CompStatus st = globalPack( root, root->removeNode( tree ) );
+        assert( root->checkInvariant() );
+        return st;
     }
 
     LayoutTree::CompStatus LayoutTree::globalPack( LayoutTree *&root, CompStatus st )
@@ -490,6 +495,7 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutNode::selectNode( WindowKey toSelect )
     {
+        INV_CHECK;
         for (size_t i = 0; i < nodes.size(); i++)
         {
             if ( nodes[i].subTree
@@ -542,6 +548,8 @@ namespace ViWm
         Collection::const_iterator it;
         size_t i = 0;
 
+        // hmm hard to insert an ending in variant check
+        INV_CHECK;
         assert( x >= 0 && y >= 0 );
 
         if ( lastDirection == SplitHorizontal )
@@ -617,6 +625,7 @@ namespace ViWm
     {
         Collection::const_iterator it;
 
+        INV_CHECK;
         if ( lastDirection == SplitHorizontal )
         {
             for (it = nodes.begin(); it != nodes.end() - 1; ++it)
@@ -646,20 +655,27 @@ namespace ViWm
         for (it = nodes.begin(); it != nodes.end(); ++it)
             if (it->subTree)
                 it->subTree->displayLayoutStructure( r, defaultBrush );
+
+        INV_CHECK;
     }
 
 
     bool LayoutNode::Iter( IteratingPredicate &p )
     {
+        INV_CHECK;
         for ( Collection::iterator it = nodes.begin()
             ; it != nodes.end()
             ; ++it )
         {
             bool    status = p( *this, *it );
             if ( status )
+            {
+                INV_CHECK;
                 return true;
+            }
         }
 
+        INV_CHECK;
         return false;
     }
 
@@ -667,16 +683,24 @@ namespace ViWm
     {
         LayoutNode  *sub = dynamic_cast<LayoutNode*>( nodes[ selectedRoute ].subTree );
 
-        if ( sub && sub->FocusTopIteration( p ))
-            return true;
-        else if ( p( *this, nodes[selectedRoute] ) )
-            return true;
+        INV_CHECK;
+        bool answer;
 
-        return Iter( p );
+        if ( sub && sub->FocusTopIteration( p )
+            || p( *this, nodes[selectedRoute] ) )
+        {
+            answer = true;
+        }
+        else 
+            answer = Iter( p );
+
+        INV_CHECK;
+        return answer;
     }
 
     bool LayoutNode::DepthFirstIteration(IteratingPredicate &p)
     {
+        INV_CHECK;
         for ( Collection::iterator it = nodes.begin()
             ; it != nodes.end()
             ; ++it )
@@ -685,9 +709,13 @@ namespace ViWm
 
             if ( (sub && sub->DepthFirstIteration( p ))
                 || p( *this, *it ) )
+            {
+                INV_CHECK;
                 return true;
+            }
         }
 
+        INV_CHECK;
         return false;
     }
 
@@ -698,6 +726,7 @@ namespace ViWm
                                  , int x, int y
                                  , size_t splitIndex )
     {
+        INV_CHECK;
         SizePair    &previous = nodes[splitIndex];
         Rect        prevDim = getMyPreviousDimension( current );
 
@@ -936,6 +965,7 @@ namespace ViWm
 
     bool LayoutNode::moveSelection( int by )
     {
+        INV_CHECK;
         int newIndex = int( selectedRoute ) + by;
 
         if (newIndex < 0 || newIndex >= int(nodes.size()))
@@ -1043,8 +1073,9 @@ namespace ViWm
     void LayoutNode::rotate( int about )
     {
         std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() );
-        selectedRoute = (selectedRoute + nodes.size() + about)
+        selectedRoute = (selectedRoute + nodes.size() - about)
                       % nodes.size();
+        INV_CHECK;
     }
 
     LayoutTree::SplitCoord::SplitCoord()
