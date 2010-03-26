@@ -4,6 +4,12 @@
 #include "Screen.h"
 #include "TilledWindow.h"
 
+#ifdef _DEBUG
+#   define INV_CHECK assert(checkInvariant())
+#else /* DEBUG */
+#   define INV_CHECK
+#endif /* DEBUG */
+
 namespace ViWm
 {
     struct ChildFinder
@@ -17,6 +23,7 @@ namespace ViWm
 
     void LayoutNode::insert( LayoutTree *toSearch, LayoutTree *toAdd, int plusMinus )
     {
+        INV_CHECK;
         ChildFinder             comparer( toSearch );
         Collection::iterator    it;
 
@@ -35,10 +42,12 @@ namespace ViWm
             if ( toAdd )
                 toAdd->parent = this;
         }
+        INV_CHECK;
     }
 
     bool LayoutNode::replace( LayoutTree *toSearch, LayoutTree *replacent )
     {
+        INV_CHECK;
         ChildFinder             finder( toSearch );
         Collection::iterator    it;
 
@@ -46,10 +55,15 @@ namespace ViWm
 
         toSearch->parent = NULL;
 
-        if (it == nodes.end()) return false;
+        if (it == nodes.end())
+        {
+            INV_CHECK;
+            return false;
+        }
         it->subTree = replacent;
         it->subTree->parent = this;
 
+        INV_CHECK;
         return true;
     }
 
@@ -61,7 +75,6 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutTree::addCreate( LayoutTree *&root, LayoutTree &tree )
     {
-
         if ( root == 0 )
             root = &tree;
         else if (root->addNode( &tree ) == Todo)
@@ -109,9 +122,10 @@ namespace ViWm
             delete child;
             break;
 
-        case Searching: return Done;
-        case Done: return Done;
+        case Searching: break;
+        case Done: break;
         }
+
         return Done;
     }
 
@@ -148,6 +162,7 @@ namespace ViWm
                               , SplitSide side )
 
     {
+        INV_CHECK;
         Collection::const_iterator cit;
         Collection::iterator       it;
 
@@ -313,6 +328,7 @@ namespace ViWm
                 logicalSubsize.x += logicalSubsize.width;
             }
         }
+        INV_CHECK;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -334,7 +350,7 @@ namespace ViWm
         if ( window )
             window->parent = this;
 
-        assert( nodes.size() >= 1 );
+        INV_CHECK;
         return Done;
     }
 
@@ -370,6 +386,7 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutNode::removeNode( LayoutTree *toRemove )
     {
+        INV_CHECK;
         SizePairComp comparer( toRemove );
 
         assert( nodes.size() > 1 );
@@ -389,6 +406,7 @@ namespace ViWm
         if ( selectedRoute >= nodes.size() )
             selectedRoute = nodes.size() - 1;
 
+        INV_CHECK;
         if ( nodes.size() == 0 ) return Todo;
         if ( nodes.size() == 1 ) return Compact;
         return Done;
@@ -400,6 +418,7 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutNode::removeNode( WindowKey toRemove )
     {
+        INV_CHECK;
         CompStatus              lastOperation;
         assert( nodes.size() > 1 );
 
@@ -409,15 +428,20 @@ namespace ViWm
             {
                 lastOperation = pack( nodes[i].subTree->removeNode( toRemove ), i );
                 if ( lastOperation != Searching  )
+                {
+                    INV_CHECK;
                     return lastOperation;
+                }
             }
         }
 
+        INV_CHECK;
         return Searching;
     }
 
     LayoutTree::CompStatus LayoutNode::pack( CompStatus what, size_t &i )
     {
+        INV_CHECK;
         LayoutNode              *child;
 
         switch ( what )
@@ -431,7 +455,7 @@ namespace ViWm
                 return Compact;
 
             i--;
-            return Done;
+            break;
 
         case Compact:
             child = static_cast<LayoutNode*>(nodes[i].subTree);
@@ -443,13 +467,16 @@ namespace ViWm
 
             child->releaseChildren();
             delete child;
+            break;
 
-            return Done;
-
-        case Searching: return Searching;
-        case Done: return Done;
+        case Searching: 
+            INV_CHECK;
+            return Searching;
+        
+        case Done: break;
         }
 
+        INV_CHECK;
         return Done;
     }
 
@@ -469,10 +496,12 @@ namespace ViWm
                 && nodes[i].subTree->selectNode( toSelect ) != Searching )
             {
                 selectedRoute = i;
+                INV_CHECK;
                 return Done;
             }
         }
 
+        INV_CHECK;
         return Searching;
     }
 
@@ -912,7 +941,11 @@ namespace ViWm
         if (newIndex < 0 || newIndex >= int(nodes.size()))
             return false;
 
+        if ( nodes[newIndex].subTree == 0 )
+            return false;
+
         selectedRoute = int( newIndex );
+        INV_CHECK;
         return true;
     }
 
@@ -921,6 +954,10 @@ namespace ViWm
 
 
     LayoutTree* LayoutLeaf::pickNode( int /*xHope*/, int /*yHope*/ ) { return this; }
+
+    bool LayoutLeaf::checkInvariant() const
+        { return &window != NULL; }
+
     LayoutTree* LayoutNode::pickNode( int xHope, int yHope )
     {
         switch(lastDirection)
@@ -989,6 +1026,25 @@ namespace ViWm
             return nodes[ selectedRoute ].subTree->pickNode( xHope, yHope );
         else
             return 0;
+    }
+
+    bool LayoutNode::checkInvariant() const
+    {
+        // the selection must be in range.
+        if ( selectedRoute >= nodes.size() )
+            return false;
+
+        if ( nodes[selectedRoute].subTree == NULL )
+            return false;
+
+        return nodes[selectedRoute].subTree->checkInvariant();
+    }
+
+    void LayoutNode::rotate( int about )
+    {
+        std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() );
+        selectedRoute = (selectedRoute + nodes.size() + about)
+                      % nodes.size();
     }
 
     LayoutTree::SplitCoord::SplitCoord()

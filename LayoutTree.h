@@ -143,6 +143,8 @@ namespace ViWm
          */
         virtual LayoutLeaf* getSelected() = 0;
 
+        virtual bool        checkInvariant() const = 0;
+
         struct SplitCoord
         {
             SplitCoord();
@@ -269,6 +271,7 @@ namespace ViWm
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
         virtual LayoutTree*   pickNode( int xHope, int yHope );
+        virtual bool          checkInvariant() const;
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
@@ -285,8 +288,7 @@ namespace ViWm
         inline void    insertBefore( LayoutTree* toSearch, LayoutTree *toAdd )
             { insert( toSearch, toAdd, 0 ); }
 
-        inline void    rotate( int about )
-            { std::rotate( nodes.begin(), nodes.begin() + about, nodes.end() ); }
+        void    rotate( int about );
 
         bool    moveSelection( int by );
 
@@ -355,6 +357,7 @@ namespace ViWm
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
         virtual LayoutTree*   pickNode( int xHope, int yHope );
+        virtual bool          checkInvariant() const;
 
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
