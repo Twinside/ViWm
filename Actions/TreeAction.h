@@ -42,25 +42,27 @@ namespace Actions
     class VerticalMove : public Action
     {
     public:
-        VerticalMove( StringId display, StringId descr, int amount );
+        VerticalMove( StringId display, StringId descr
+                    , IterationDirection amount );
         
         virtual ReturnInfo  operator ()( DesktopLayout& l
                                        , WindowMakerState &s );
 
     private:
-        int _moveAmount;
+        IterationDirection _moveAmount;
     };
 
     class HorizontalMove : public Action
     {
     public:
-        HorizontalMove( StringId display, StringId descr, int amount );
+        HorizontalMove( StringId display, StringId descr
+                      , IterationDirection amount );
         
 
         virtual ReturnInfo  operator ()( DesktopLayout& l
                                        , WindowMakerState &s );
     private:
-        int _moveAmount;
+        IterationDirection _moveAmount;
     };
 }}
 

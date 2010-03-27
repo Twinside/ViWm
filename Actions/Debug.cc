@@ -25,11 +25,14 @@ namespace Actions
                  << " -> ";
 
             if ( p.subTree == NULL )
-                what << (int)&p;
+                what << (int)&p << ";\n";
             else
-                what << (int)p.subTree;
+            {
+                what << (int)p.subTree << ";\n";
+                what << (int)p.subTree << " -> " 
+                     << int(p.subTree->getParent()) << ";\n";
+            }
 
-            what << ";\n";
             return false;
         }
     private:
@@ -50,7 +53,7 @@ namespace Actions
         {
             LayoutNode* node = dynamic_cast<LayoutNode*>( l[i].layoutRoot );
             if ( node )
-                node->Iter( pred );
+                node->DepthFirstIteration( pred );
         }
 
         out << "}\n";

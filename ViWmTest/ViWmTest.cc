@@ -38,10 +38,10 @@ struct CommandBuilder
         actions.push_back( new Actions::InverseScreenLayout( NoStringId, NoStringId ));
         actions.push_back( new Actions::Relayout( NoStringId, NoStringId ));
 
-        actions.push_back( new Actions::HorizontalMove( NoStringId, NoStringId, -1 ));
-        actions.push_back( new Actions::VerticalMove( NoStringId, NoStringId, 1 ));
-        actions.push_back( new Actions::VerticalMove( NoStringId, NoStringId,  -1 ));
-        actions.push_back( new Actions::HorizontalMove( NoStringId, NoStringId,  1 ));
+        actions.push_back( new Actions::HorizontalMove( NoStringId, NoStringId, Backward ));
+        actions.push_back( new Actions::VerticalMove( NoStringId, NoStringId, Forward ));
+        actions.push_back( new Actions::VerticalMove( NoStringId, NoStringId,  Backward ));
+        actions.push_back( new Actions::HorizontalMove( NoStringId, NoStringId, Forward ));
 
         actions.push_back( new Actions::ScreenMoverBounded( NoStringId, NoStringId ,-1 ));
         actions.push_back( new Actions::ScreenMoverBounded( NoStringId, NoStringId, 1 ));

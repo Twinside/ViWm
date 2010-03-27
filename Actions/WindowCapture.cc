@@ -8,9 +8,10 @@ namespace Actions
         : Action( display, descr )
     {}
 
-    ReturnInfo   WindowCapture::operator() ( DesktopLayout &l
-                                           , WindowMakerState &state )
+    Action::ReturnInfo   WindowCapture::operator() ( DesktopLayout&    /*l*/
+                                                   , WindowMakerState& /*state*/ )
     {
+        return Nothing;
     }
 
     WindowRelease::WindowRelease( StringId display
@@ -18,9 +19,10 @@ namespace Actions
         : Action( display, descr )
     {}
 
-    ReturnInfo   WindowRelease::operator() ( DesktopLayout &l
-                                           , WindowMakerState &state )
+    Action::ReturnInfo   WindowRelease::operator() ( DesktopLayout&    /*l*/
+                                                   , WindowMakerState& /*state*/ )
     {
+        return Nothing;
     }
 }}
 

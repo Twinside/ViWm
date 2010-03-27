@@ -462,6 +462,14 @@
 				RelativePath=".\Actions\TreeAction.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Actions\WindowCapture.cc"
+				>
+			</File>
+			<File
+				RelativePath=".\Actions\WindowCapture.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Renderer"

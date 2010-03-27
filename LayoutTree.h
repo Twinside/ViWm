@@ -25,6 +25,13 @@ namespace ViWm
         int width, height;
     };
 
+    enum IterationDirection
+    {
+        Forward = 1,
+        Backward = -1
+    };
+
+
     class LayoutNode;
     class LayoutLeaf;
     class TilledWindow;
@@ -113,8 +120,8 @@ namespace ViWm
          * Try to create a meaningfull "index" to be matched
          * when performing focus move operation.
          */
-        virtual LayoutTree*          pickNode( int xHope, int yHope ) = 0;
-
+        virtual LayoutTree*          pickNode( IterationDirection dir
+                                             , int xHope, int yHope ) = 0;
         /**
          * Add a node to the tree. The new node is inserted
          * near the currently selected node
@@ -270,7 +277,7 @@ namespace ViWm
         virtual CompStatus    selectNode( WindowKey toSelect );
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
-        virtual LayoutTree*   pickNode( int xHope, int yHope );
+        virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
         virtual bool          checkInvariant() const;
 
         virtual void    Establish( const Screen &currentScreen
@@ -290,7 +297,15 @@ namespace ViWm
 
         void    rotate( int about );
 
-        bool    moveSelection( int by );
+
+        /**
+         * @param Direction of the move
+         * @return 0 if no move has been performed
+         *         if the result is > 0, it return the
+         *         amount of by performed to get to
+         *         a valid location
+         */
+        int moveSelection( IterationDirection by );
 
         const Rect& getSelectedSize() const;
 
@@ -327,13 +342,6 @@ namespace ViWm
                           , LayoutTree  *toAdd
                           , int plusMinus );
 
-
-        enum IterationDirection
-        {
-            Forward = 1,
-            Backward = -1
-        };
-
         bool        splitDeltaPropagate( const Screen &s
                                        , size_t splitIndex
                                        , IterationDirection dir
@@ -356,7 +364,7 @@ namespace ViWm
         virtual CompStatus    removeNode( LayoutTree *toRemove );
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
-        virtual LayoutTree*   pickNode( int xHope, int yHope );
+        virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
         virtual bool          checkInvariant() const;
 
         virtual void    Establish( const Screen &currentScreen

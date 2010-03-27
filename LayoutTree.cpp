@@ -423,7 +423,6 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutNode::removeNode( WindowKey toRemove )
     {
-        INV_CHECK;
         CompStatus              lastOperation;
         assert( nodes.size() > 1 );
 
@@ -446,9 +445,9 @@ namespace ViWm
 
     LayoutTree::CompStatus LayoutNode::pack( CompStatus what, size_t &i )
     {
-        INV_CHECK;
         LayoutNode              *child;
 
+        // what about selection?
         switch ( what )
         {
         case Todo:
@@ -475,13 +474,14 @@ namespace ViWm
             break;
 
         case Searching: 
-            INV_CHECK;
             return Searching;
         
         case Done: break;
         }
 
-        INV_CHECK;
+        // no invariant check because it's often called
+        // by internal functions, thus not finished sabilizing
+        // the internal state
         return Done;
     }
 
@@ -963,32 +963,41 @@ namespace ViWm
         throw;
     }
 
-    bool LayoutNode::moveSelection( int by )
+    int LayoutNode::moveSelection( IterationDirection by )
     {
         INV_CHECK;
-        int newIndex = int( selectedRoute ) + by;
+        int count = 1;
+        int newIndex = int( selectedRoute ) + int(by);
 
-        if (newIndex < 0 || newIndex >= int(nodes.size()))
-            return false;
+        while ( newIndex >= 0 && newIndex < int(nodes.size()))
+        {
+            if ( nodes[newIndex].subTree != 0 )
+            {
+                selectedRoute = int( newIndex );
+                INV_CHECK;
+                return count;
+            }
 
-        if ( nodes[newIndex].subTree == 0 )
-            return false;
+            count++;
+            newIndex += int(by);
+        }
 
-        selectedRoute = int( newIndex );
         INV_CHECK;
-        return true;
+        return 0;
     }
 
     const Rect& LayoutNode::getSelectedSize() const
         { return nodes[selectedRoute].lastLogicalDimension; }
 
 
-    LayoutTree* LayoutLeaf::pickNode( int /*xHope*/, int /*yHope*/ ) { return this; }
+    LayoutTree* LayoutLeaf::pickNode( IterationDirection /*dir*/
+                                    , int /*xHope*/, int /*yHope*/ ) { return this; }
 
     bool LayoutLeaf::checkInvariant() const
         { return &window != NULL; }
 
-    LayoutTree* LayoutNode::pickNode( int xHope, int yHope )
+    LayoutTree* LayoutNode::pickNode( IterationDirection dir
+                                    , int xHope, int yHope )
     {
         switch(lastDirection)
         {
@@ -996,7 +1005,7 @@ namespace ViWm
             if ( yHope < 0 )
             {
                 selectedRoute = 0;
-                return nodes[0].subTree->pickNode( xHope, yHope );
+                return nodes[0].subTree->pickNode( dir, xHope, yHope );
             }
 
             for (size_t i = 0; i < nodes.size(); i++)
@@ -1004,16 +1013,21 @@ namespace ViWm
                 const Rect& r = nodes[i].lastLogicalDimension;
                 if ( r.y + r.height > yHope )
                 {
-                    selectedRoute = i;
-
                     if ( nodes[i].subTree )
-                        return nodes[i].subTree->pickNode( xHope, yHope );
+                    {
+                        return nodes[i].subTree->pickNode( dir, xHope, yHope );
+                    }
                     else
                     {
-                        for (int j = int(i) - 1; j >= 0; --j)
+                        for ( int j = int(i) + int(dir)
+                            ; j >= 0 && j < int(nodes.size())
+                            ; j += int(dir))
                         {
                             if (nodes[j].subTree)
-                                return nodes[j].subTree->pickNode( xHope, yHope );
+                            {
+                                selectedRoute = j;
+                                return nodes[j].subTree->pickNode( dir, xHope, yHope );
+                            }
                         }
                         // else we let the last one do the job.
                     }
@@ -1025,7 +1039,7 @@ namespace ViWm
             if ( xHope < 0 )
             {
                 selectedRoute = 0;
-                return nodes[0].subTree->pickNode( xHope, yHope );
+                return nodes[0].subTree->pickNode( dir, xHope, yHope );
             }
 
             for (size_t i = 0; i < nodes.size(); i++)
@@ -1033,16 +1047,22 @@ namespace ViWm
                 const Rect& r = nodes[i].lastLogicalDimension;
                 if ( r.x + r.width > xHope )
                 {
-                    selectedRoute = i;
-
                     if ( nodes[i].subTree )
-                        return nodes[i].subTree->pickNode( xHope, yHope );
+                    {
+                        selectedRoute = i;
+                        return nodes[i].subTree->pickNode( dir, xHope, yHope );
+                    }
                     else
                     {
-                        for (int j = int(i) - 1; j >= 0; --j)
+                        for ( int j = int(i) + int(dir)
+                            ; j >= 0 && j < int(nodes.size())
+                            ; j += int(dir))
                         {
                             if (nodes[j].subTree)
-                                return nodes[j].subTree->pickNode( xHope, yHope );
+                            {
+                                selectedRoute = j;
+                                return nodes[j].subTree->pickNode( dir, xHope, yHope );
+                            }
                         }
                         // else we let the last one do the job.
                     }
@@ -1051,9 +1071,11 @@ namespace ViWm
         	break;
         }
 
-        selectedRoute = nodes.size() - 1;
-        if ( nodes[ selectedRoute ].subTree )
-            return nodes[ selectedRoute ].subTree->pickNode( xHope, yHope );
+        if ( nodes[ nodes.size() - 1 ].subTree )
+        {
+            selectedRoute = nodes.size() - 1;
+            return nodes[ selectedRoute ].subTree->pickNode( dir, xHope, yHope );
+        }
         else
             return 0;
     }
@@ -1061,13 +1083,18 @@ namespace ViWm
     bool LayoutNode::checkInvariant() const
     {
         // the selection must be in range.
-        if ( selectedRoute >= nodes.size() )
+        if ( selectedRoute >= nodes.size() && nodes.size() > 1 )
             return false;
 
-        if ( nodes[selectedRoute].subTree == NULL )
-            return false;
-
-        return nodes[selectedRoute].subTree->checkInvariant();
+        // we should
+        if ( nodes.size() > 1 )
+        {
+            if ( nodes[selectedRoute].subTree == NULL )
+                return false;
+            return nodes[selectedRoute].subTree->checkInvariant();
+        }
+        else // we should be deleted soon. SO don't care
+            return true;
     }
 
     void LayoutNode::rotate( int about )

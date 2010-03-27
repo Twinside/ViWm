@@ -103,7 +103,8 @@ namespace Actions
     {}
 
 
-    VerticalMove::VerticalMove(StringId display, StringId descr, int amount)
+    VerticalMove::VerticalMove( StringId display, StringId descr
+                              , IterationDirection amount)
         : Action( display, descr ), _moveAmount( amount )
     {
         assert( amount != 0 );
@@ -150,11 +151,16 @@ namespace Actions
         if ( !goodParent )
             return Nothing;
 
+
+        // ok, with luck, it should work when gapping empty
+        // subtree
         if ( _moveAmount < 0 )
-            goodParent->pickNode( selectSize.x + selectSize.width / 2 
+            goodParent->pickNode( _moveAmount
+                                , selectSize.x + selectSize.width / 2 
                                 , selectSize.y - LayoutNode::SplitWidth - 1 );
         else
-            goodParent->pickNode( selectSize.x + selectSize.width / 2
+            goodParent->pickNode( _moveAmount
+                                , selectSize.x + selectSize.width / 2
                                 , selectSize.y + selectSize.height + LayoutNode::SplitWidth + 1 );
 
         // our next window, still in the same screen.
@@ -172,8 +178,10 @@ namespace Actions
         return Nothing;
     }
 
-    HorizontalMove::HorizontalMove(StringId display, StringId descr, int amount)
-        : Action( display, descr ), _moveAmount( amount )
+    HorizontalMove::HorizontalMove( StringId display, StringId descr
+                                  , IterationDirection amount )
+        : Action( display, descr )
+        , _moveAmount( amount )
     {
         assert( amount != 0 );
     }
@@ -201,7 +209,7 @@ namespace Actions
         // move us
         while ( goodParent )
         {
-            if ( goodParent->moveSelection( _moveAmount ) )
+            if ( goodParent->moveSelection( _moveAmount ) != 0 )
                 break;
 
             goodParent = findWellOriented( LayoutTree::SplitVertical
@@ -211,10 +219,12 @@ namespace Actions
         if ( goodParent )
         {
             if ( _moveAmount < 0 )
-                goodParent->pickNode( selectSize.x - LayoutNode::SplitWidth - 1
+                goodParent->pickNode( _moveAmount
+                                    , selectSize.x - LayoutNode::SplitWidth - 1
                                     , selectSize.y + selectSize.height / 2 );
             else
-                goodParent->pickNode( selectSize.x + selectSize.width + LayoutNode::SplitWidth + 1
+                goodParent->pickNode( _moveAmount
+                                    , selectSize.x + selectSize.width + LayoutNode::SplitWidth + 1
                                     , selectSize.y + selectSize.height / 2 );
 
             // our next window, still in the same screen.
@@ -238,7 +248,8 @@ namespace Actions
             int     pickHeight = selectSize.y + selectSize.height / 2
                                - l[ prevScreen ].getY();
 
-            l[prevScreen].layoutRoot->pickNode( l[prevScreen].getX() + l[prevScreen].getWidth() - 1
+            l[prevScreen].layoutRoot->pickNode( _moveAmount
+                                              , l[prevScreen].getX() + l[prevScreen].getWidth() - 1
                                               , pickHeight );
 
             nextSelection = l[prevScreen].layoutRoot->getSelected();
@@ -257,7 +268,8 @@ namespace Actions
             int     pickHeight = selectSize.y + selectSize.height / 2
                                - l[ nextScreen ].getY();
 
-            l[nextScreen].layoutRoot->pickNode( -1, pickHeight );
+            l[nextScreen].layoutRoot->pickNode( _moveAmount
+                                              , -1, pickHeight );
             nextSelection = l[nextScreen].layoutRoot->getSelected();
         }
 
