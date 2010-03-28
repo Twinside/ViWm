@@ -150,6 +150,23 @@ namespace ViWm
          */
         virtual LayoutLeaf* getSelected() = 0;
 
+        ///////////////////////////////////////////////////////////
+        ///                 Split move validation
+        ///////////////////////////////////////////////////////////
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , size_t              splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const = 0;
+
+        virtual void splitDeltaPropagate( const Screen& s
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , SplitSide           side
+                                        , int           delta
+                                        ) = 0;
+
         virtual bool        checkInvariant() const = 0;
 
         struct SplitCoord
@@ -278,6 +295,20 @@ namespace ViWm
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
         virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , size_t              splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const;
+
+        virtual void splitDeltaPropagate( const Screen& s
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , SplitSide           side
+                                        , int           delta
+                                        );
+
         virtual bool          checkInvariant() const;
 
         virtual void    Establish( const Screen &currentScreen
@@ -326,7 +357,8 @@ namespace ViWm
         {
             SplitWidth = 8,
             HalfSplit = SplitWidth / 2,
-            MinimumViewableSize = SplitWidth * 2
+            MinimumViewableSize = SplitWidth * 2,
+            MaxNodeCount = 0xFFFFFF
         };
 
     protected:
@@ -338,15 +370,11 @@ namespace ViWm
 
     private:
         CompStatus  pack( CompStatus what, size_t &index );
+        bool isAtBound( IterationDirection dir
+                      , size_t splitIndex ) const;
         void        insert( LayoutTree  *toSearch
                           , LayoutTree  *toAdd
                           , int plusMinus );
-
-        bool        splitDeltaPropagate( const Screen &s
-                                       , size_t splitIndex
-                                       , IterationDirection dir
-                                       , int delta
-                                       );
 
         SplitSide   lastDirection;
         Collection  nodes;
@@ -373,6 +401,20 @@ namespace ViWm
 
         TilledWindow&   getWindow() { return window; }
         const TilledWindow&   getWindow() const { return window; }
+
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , size_t              splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const;
+
+        virtual void splitDeltaPropagate( const Screen&
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , SplitSide           side
+                                        , int           delta
+                                        );
 
     protected:
         virtual void        displayLayoutStructure

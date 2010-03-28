@@ -733,215 +733,261 @@ namespace ViWm
         prevDim.x = 0;
         prevDim.y = 0;
 
+        // it's ugly, but I can't put them inside the if
+        // due to reference initialisation :]
+        int&    previousDim =  (lastDirection == SplitVertical)
+                            ? prevDim.width
+                            : prevDim.height;
+
+        int&    dimensionWriting = (lastDirection == SplitVertical)
+                                 ? previous.width
+                                 : previous.height;
+
+        int&    prevPoint = (lastDirection == SplitVertical)
+                          ? prevDim.x
+                          : prevDim.y;
+
+        int&    nextSize = (lastDirection == SplitVertical)
+                         ? nodes[splitIndex + 1].width
+                         : nodes[splitIndex + 1].height;
+
+        // redirection variables, used to avoid two version
+        // (one for vertical & horizontal split)
+        int     currPoint;
+        int     lastPoint;
+        int     lastSize;
+
         if ( lastDirection == SplitVertical )
         {
-            // if we are out of our bounds, we can't resize
-            if ( x < prevDim.x || x >= prevDim.x + prevDim.width )
-                return false;   // TODO : fix this, doesn't work when root
-                                // is the screen :(
+            currPoint = x;
+            lastPoint = previous.lastLogicalDimension.x;
+            lastSize = previous.lastLogicalDimension.width;
+        }
+        else
+        {
+            currPoint = y;
+            lastPoint = previous.lastLogicalDimension.y;
+            lastSize = previous.lastLogicalDimension.height;
+        }
 
-            int desiredWidth = x - previous.lastLogicalDimension.x;
+        // if we are out of our bounds, we can't resize
+        if ( currPoint < prevPoint || currPoint >= prevPoint + previousDim )
+            return false;   // TODO : fix this, doesn't work when root
+                            // is the screen :(
 
-            // the size doesn't change, so we don't care
-            if ( desiredWidth == previous.lastLogicalDimension.width )
-                return false;
+        int desiredSize = currPoint - lastPoint;
 
-            // *ugh* we're asked to be very small, yet we can't be smaller
-            // than "MinimumViewableSize"
-            if ( desiredWidth < 0 )
+        // the size doesn't change, so we don't care
+        if ( desiredSize == lastSize )
+            return false;
+
+        // *ugh* we're asked to be very small, yet we can't be smaller
+        // than "MinimumViewableSize"
+        if ( desiredSize < 0 )
+        {
+            // at the beginning of the box, we can't shrink
+            // more.
+            if ( splitIndex == 0 ) return false;
+
+            if ( canPropagateSplit( current, splitIndex - 1
+                                  , Backward, lastDirection
+                                  , desiredSize ) )
             {
-                // at the beginning of the box, we can't shrink
-                // more.
-                if ( splitIndex == 0 ) return false;
+                splitDeltaPropagate( current, splitIndex - 1
+                                   , Backward, lastDirection
+                                   , desiredSize );
 
-                if ( splitDeltaPropagate( current, splitIndex - 1
-                                        , Backward, desiredWidth ) )
-                {
-                    nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
-                                                 - MinimumViewableSize
-                                                 - desiredWidth;
-                    previous.width = MinimumViewableSize;
-                    return true;
-                }
-            }
-            // if we already are at the minimum size, we can't be even
-            // smaller. Or we can try to "push" previous windows.
-            if ( desiredWidth < MinimumViewableSize )
-            {
-                if ( splitIndex == 0 ) return false;
-
-                int diff = desiredWidth - MinimumViewableSize;
-
-                if ( splitDeltaPropagate( current, splitIndex - 1
-                                        , Backward, diff ) )
-                {
-                    nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
-                                                 - desiredWidth;
-                    previous.width = MinimumViewableSize;
-                    return true;
-                }
-            }
-            // we are shrinking ourselves but we are in normal
-            // operating range
-            else if ( previous.lastLogicalDimension.width > desiredWidth )
-            {
-                nodes[splitIndex + 1].width += previous.lastLogicalDimension.width
-                                             - desiredWidth;
-                previous.width = desiredWidth;
-                return true;
-            }
-            // Allright, we are expending ourselves, we just have
-            // to make sure that there is enough place to expand
-            // without violating the minimum size constraint.
-            else if ( splitDeltaPropagate( current, splitIndex + 1
-                                         , Forward, previous.width - desiredWidth ) )
-            {
-                // everything ok, commit the size change
-                previous.width= desiredWidth;
+                int sizeModification = lastSize - MinimumViewableSize - desiredSize;
+                nextSize += sizeModification;
+                dimensionWriting = MinimumViewableSize;
                 return true;
             }
         }
-        else // SplitHorizontal
+        // if we already are at the minimum size, we can't be even
+        // smaller. Or we can try to "push" previous windows.
+        if ( desiredSize < MinimumViewableSize )
         {
-            // if we are out of our bounds, we can't resize
-            if ( y < prevDim.y || y >= prevDim.y + prevDim.height )
-                return false;
+            if ( splitIndex == 0 ) return false;
 
-            int desiredHeight = y - previous.lastLogicalDimension.y;
+            int diff = desiredSize - MinimumViewableSize;
 
-            // the size doesn't change, so we don't care
-            if ( desiredHeight == previous.lastLogicalDimension.height )
-                return false;
-
-            // *ugh* we're asked to be very small, yet we can't be smaller
-            // than "MinimumViewableSize"
-            if ( desiredHeight < 0 )
+            if ( canPropagateSplit( current, splitIndex - 1
+                                  , Backward, lastDirection, diff ) )
             {
-                // at the beginning of the box, we can't shrink
-                // more.
-                if ( splitIndex == 0 ) return false;
+                splitDeltaPropagate( current, splitIndex - 1, Backward, lastDirection, diff );
 
-                if ( splitDeltaPropagate( current, splitIndex - 1
-                                        , Backward, desiredHeight ) )
-                {
-                    nodes[splitIndex + 1].height += previous.lastLogicalDimension.height
-                                                  - MinimumViewableSize
-                                                  - desiredHeight;
-                    previous.height = MinimumViewableSize;
-                    return true;
-                }
-            }
-            // if we already are at the minimum size, we can't be even
-            // smaller. Or we can try to "push" previous windows.
-            if ( desiredHeight < MinimumViewableSize )
-            {
-                if ( splitIndex == 0 ) return false;
-
-                int diff = desiredHeight - MinimumViewableSize;
-
-                if ( splitDeltaPropagate( current, splitIndex - 1
-                                        , Backward, diff ) )
-                {
-                    nodes[splitIndex + 1].height += previous.lastLogicalDimension.height
-                                                 - desiredHeight;
-                    previous.height = MinimumViewableSize;
-                    return true;
-                }
-            }
-            // we are shrinking ourselves but we are in normal
-            // operating range
-            else if ( previous.lastLogicalDimension.height > desiredHeight )
-            {
-                nodes[splitIndex + 1].height += previous.lastLogicalDimension.height
-                                              - desiredHeight;
-                previous.height = desiredHeight;
+                nextSize += lastSize - desiredSize;
+                dimensionWriting = MinimumViewableSize;
                 return true;
             }
-            // Allright, we are expending ourselves, we just have
-            // to make sure that there is enough place to expand
-            // without violating the minimum size constraint.
-            else if ( splitDeltaPropagate( current, splitIndex + 1
-                                         , Forward, previous.height - desiredHeight ) )
-            {
-                // everything ok, commit the size change
-                previous.height = desiredHeight;
-                return true;
-            }
+        }
+        // we are shrinking ourselves but we are in normal
+        // operating range
+        else if ( lastSize > desiredSize )
+        {
+            nextSize += lastSize - desiredSize;
+            dimensionWriting = desiredSize;
+            return true;
+        }
+        // Allright, we are expending ourselves, we just have
+        // to make sure that there is enough place to expand
+        // without violating the minimum size constraint.
+        else if ( canPropagateSplit( current, splitIndex + 1
+                                  , Forward, lastDirection
+                                  , dimensionWriting - desiredSize ) )
+        {
+            splitDeltaPropagate( current
+                               , splitIndex + 1
+                               , Forward
+                               , lastDirection
+                               , dimensionWriting - desiredSize );
+
+            // everything ok, commit the size change
+            dimensionWriting = desiredSize;
+            return true;
         }
 
         return false;
     }
 
-    bool LayoutNode::splitDeltaPropagate( const Screen &s
-                                        , size_t splitIndex
-                                        , IterationDirection dir
-                                        , int           delta
-                                        )
+    bool LayoutNode::isAtBound( IterationDirection dir, size_t splitIndex ) const
+    {
+        return (int(dir) > 0 && splitIndex == nodes.size() - 1)
+            || (int(dir) < 0 && splitIndex == 0);
+    }
+
+    bool LayoutLeaf::canPropagateSplit( const Screen&      /*s*/
+                                      , size_t             /*splitIndex*/
+                                      , IterationDirection /*dir*/
+                                      , SplitSide          /*side*/
+                                      , int                /*delta*/ ) const
+        { return true; }
+
+    bool LayoutNode::canPropagateSplit( const Screen&       s
+                                      , size_t              splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const
     {
         const int minSize = MinimumViewableSize;
-        SizePair    &previous = nodes[splitIndex];
+        const SizePair    &previous = nodes[splitIndex];
+        size_t  subId = (dir == Forward) ? 0 : MaxNodeCount;
 
         if ( delta == 0 ) return true;
 
-        if ( lastDirection == SplitVertical )
+        if ( splitIndex > nodes.size() )
+            splitIndex = nodes.size();
+
+        // We're here only to propagate As this split doesn't
+        // move the same way our caller do
+        if ( side != lastDirection )
         {
-            // we cannot satisfy the constraint.
-            if ( previous.width + delta < minSize )
+            for (size_t i = 0; i < nodes.size(); i++)
             {
-                // if we are at the end of the box, we
-                // cannot do anything
-                if ( (int(dir) > 0 && splitIndex == nodes.size() - 1)
-                    || (int(dir) < 0 && splitIndex == 0) )
+                if ( nodes[i].subTree
+                 && !nodes[i].subTree->canPropagateSplit(s, subId, dir, side, delta) )
                     return false;
-
-                // we can safely assume that delta is negative. If it was positive
-                // we couldn't be smaller than the minSize.
-                int newProp = delta + (previous.lastLogicalDimension.width - minSize);
-
-                // we can try to take the maximum of delta and forward the rest
-                // to others.
-                if ( splitDeltaPropagate( s, splitIndex + int(dir), dir, newProp ))
-                {
-                    previous.width= minSize;
-                    return true;
-                }
-                else return false;
             }
-            else
-            {
-                previous.width += delta;
-                return true;
-            }
+            return true;
         }
-        else // SplitHorizontal
+
+        int         dim = (lastDirection == SplitVertical)
+                        ? previous.width
+                        : previous.height;
+
+        // we cannot satisfy the constraint.
+        if ( dim + delta < minSize )
         {
-            // we cannot satisfy the constraint.
-            if ( previous.height + delta < minSize )
+            // we can safely assume that delta is negative. If it was positive
+            // we couldn't be smaller than the minSize.
+            int newProp = delta - minSize;
+            
+            if ( lastDirection == SplitVertical )
+                newProp += previous.lastLogicalDimension.width;
+            else // SplitHorizontal
+                newProp += previous.lastLogicalDimension.height;
+
+            // we can try to take the maximum of delta and forward the rest
+            // to others.
+            return !isAtBound( dir, splitIndex )
+                && canPropagateSplit( s, splitIndex + int(dir), dir, side, newProp );
+        }
+        else if (nodes[splitIndex].subTree)
+        {
+            return nodes[splitIndex].subTree->canPropagateSplit( s, subId, dir, side, delta )
+                // if the sub cannot propagate, we continue propagation
+                || (!isAtBound( dir, splitIndex )
+                    && canPropagateSplit( s, splitIndex + int(dir), dir, side, delta ));
+        }
+        // subTree is null
+        else return true;
+    }
+
+    void LayoutLeaf::splitDeltaPropagate( const Screen&, size_t, IterationDirection, SplitSide, int) {}
+    void LayoutNode::splitDeltaPropagate( const Screen &s
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , SplitSide           side
+                                        , int           delta
+                                        )
+    {
+        SizePair    &previous = nodes[splitIndex];
+        int         dim = (lastDirection == SplitVertical)
+                        ? previous.width
+                        : previous.height;
+        size_t      subId = dir == Forward ? 0 : MaxNodeCount;
+
+        if ( side != lastDirection )
+        {
+            for (size_t i = 0; i < nodes.size(); i++)
             {
-                // if we are at the end of the box, we
-                // cannot do anything
-                if ( (int(dir) > 0 && splitIndex == nodes.size() - 1)
-                    || (int(dir) < 0 && splitIndex == 0) )
-                    return false;
+                if ( nodes[i].subTree )
+                    nodes[i].subTree->splitDeltaPropagate(s, subId, dir, side, delta);
+            }
+            return;
+        }
 
-                // we can safely assume that delta is negative. If it was positive
-                // we couldn't be smaller than the minSize.
-                int newProp = delta + (previous.lastLogicalDimension.height - minSize);
-
-                // we can try to take the maximum of delta and forward the rest
-                // to others.
-                if ( splitDeltaPropagate( s, splitIndex + int(dir), dir, newProp ))
-                {
-                    previous.height = minSize;
-                    return true;
-                }
-                else return false;
+        if ( dim + delta < MinimumViewableSize)
+        {
+            int newProp = delta - MinimumViewableSize;
+            
+            if ( lastDirection == SplitVertical )
+            {
+                newProp += previous.lastLogicalDimension.width;
+                previous.width = MinimumViewableSize;
             }
             else
             {
-                previous.height += delta;
-                return true;
+                newProp += previous.lastLogicalDimension.height;
+                previous.height = MinimumViewableSize;
             }
+
+            // subPropagate
+            if ( nodes[ splitIndex ].subTree )
+                nodes[ splitIndex ].subTree->splitDeltaPropagate( s, subId, dir, side, delta );
+
+            splitDeltaPropagate( s, splitIndex + int(dir), dir, side, newProp );
+        }
+        // we can absorb, but maybe not the subnodes
+        else if (nodes[splitIndex].subTree
+              && !nodes[splitIndex].subTree->canPropagateSplit( s, subId, dir
+                                                              , lastDirection, delta ))
+        {
+            // we propagate
+            splitDeltaPropagate( s, splitIndex + int(dir), dir, side, delta );
+        }
+        // otherwise, we update
+        else
+        {
+            // propagateSub
+            if ( lastDirection == SplitVertical )
+                previous.width += delta;
+            else
+                previous.height += delta;
+
+            if ( nodes[splitIndex].subTree )
+                nodes[splitIndex].subTree->splitDeltaPropagate( s, subId, dir, side, delta );
         }
     }
 
