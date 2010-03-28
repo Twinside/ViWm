@@ -785,6 +785,11 @@ namespace ViWm
             // more.
             if ( splitIndex == 0 ) return false;
 
+            if ( nodes[ splitIndex ].subTree
+              && !nodes[ splitIndex ].subTree->canPropagateSplit
+                        ( current, MaxNodeCount, Backward
+                        , lastDirection, MinimumViewableSize ) ) return false;
+
             if ( canPropagateSplit( current, splitIndex - 1
                                   , Backward, lastDirection
                                   , desiredSize ) )
@@ -798,6 +803,12 @@ namespace ViWm
                                    , Forward, lastDirection
                                    , lastSize - MinimumViewableSize - desiredSize );
 
+                if ( nodes[ splitIndex ].subTree )
+                {
+                    nodes[ splitIndex ].subTree->splitDeltaPropagate
+                                ( current, MaxNodeCount, Backward
+                                , lastDirection, MinimumViewableSize );
+                }
                 dimensionWriting = MinimumViewableSize;
                 return true;
             }
@@ -818,11 +829,7 @@ namespace ViWm
                 splitDeltaPropagate( current, splitIndex + 1, Forward, lastDirection
                                    , lastSize - desiredSize );
 
-                /*
-                if ( nodes[splitIndex].subTree )
-                    nodes[splitIndex].subTree->splitDeltaPropagate( current
-                                                                  ,
-                                                                  //*/
+                // our children are already small enough
                 dimensionWriting = MinimumViewableSize;
                 return true;
             }
@@ -831,8 +838,17 @@ namespace ViWm
         // operating range
         else if ( lastSize > desiredSize )
         {
+            // TODO : CHECK our children HERE !!
             splitDeltaPropagate( current, splitIndex + 1, Forward, lastDirection
                                , lastSize - desiredSize );
+
+            if ( nodes[ splitIndex ].subTree )
+            {
+                nodes[ splitIndex ].subTree->splitDeltaPropagate
+                            ( current, MaxNodeCount, Backward
+                            , lastDirection, desiredSize );
+            }
+
             dimensionWriting = desiredSize;
             return true;
         }
