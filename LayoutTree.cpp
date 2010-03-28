@@ -747,10 +747,6 @@ namespace ViWm
                           ? prevDim.x
                           : prevDim.y;
 
-        int&    nextSize = (lastDirection == SplitVertical)
-                         ? nodes[splitIndex + 1].width
-                         : nodes[splitIndex + 1].height;
-
         // redirection variables, used to avoid two version
         // (one for vertical & horizontal split)
         int     currPoint;
@@ -797,8 +793,11 @@ namespace ViWm
                                    , Backward, lastDirection
                                    , desiredSize );
 
-                int sizeModification = lastSize - MinimumViewableSize - desiredSize;
-                nextSize += sizeModification;
+                splitDeltaPropagate( current
+                                   , splitIndex + 1
+                                   , Forward, lastDirection
+                                   , lastSize - MinimumViewableSize - desiredSize );
+
                 dimensionWriting = MinimumViewableSize;
                 return true;
             }
@@ -814,9 +813,16 @@ namespace ViWm
             if ( canPropagateSplit( current, splitIndex - 1
                                   , Backward, lastDirection, diff ) )
             {
-                splitDeltaPropagate( current, splitIndex - 1, Backward, lastDirection, diff );
+                splitDeltaPropagate( current, splitIndex - 1, Backward, lastDirection
+                                   , diff );
+                splitDeltaPropagate( current, splitIndex + 1, Forward, lastDirection
+                                   , lastSize - desiredSize );
 
-                nextSize += lastSize - desiredSize;
+                /*
+                if ( nodes[splitIndex].subTree )
+                    nodes[splitIndex].subTree->splitDeltaPropagate( current
+                                                                  ,
+                                                                  //*/
                 dimensionWriting = MinimumViewableSize;
                 return true;
             }
@@ -825,7 +831,8 @@ namespace ViWm
         // operating range
         else if ( lastSize > desiredSize )
         {
-            nextSize += lastSize - desiredSize;
+            splitDeltaPropagate( current, splitIndex + 1, Forward, lastDirection
+                               , lastSize - desiredSize );
             dimensionWriting = desiredSize;
             return true;
         }
@@ -833,8 +840,8 @@ namespace ViWm
         // to make sure that there is enough place to expand
         // without violating the minimum size constraint.
         else if ( canPropagateSplit( current, splitIndex + 1
-                                  , Forward, lastDirection
-                                  , dimensionWriting - desiredSize ) )
+                                   , Forward, lastDirection
+                                   , dimensionWriting - desiredSize ) )
         {
             splitDeltaPropagate( current
                                , splitIndex + 1
