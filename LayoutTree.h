@@ -25,6 +25,14 @@ namespace ViWm
         int width, height;
     };
 
+    struct Dimension
+    {
+        Dimension() : width( 0 ), height( 0 ) {}
+        Dimension(int w, int h) : width( w ), height( h ) {}
+
+        int width, height;
+    };
+
     enum IterationDirection
     {
         Forward = 1,
@@ -153,19 +161,7 @@ namespace ViWm
         ///////////////////////////////////////////////////////////
         ///                 Split move validation
         ///////////////////////////////////////////////////////////
-        virtual bool canPropagateSplit( const Screen&       s
-                                      , size_t              splitIndex
-                                      , IterationDirection  dir
-                                      , SplitSide           side
-                                      , int                 delta
-                                      ) const = 0;
-
-        virtual void splitDeltaPropagate( const Screen& s
-                                        , size_t splitIndex
-                                        , IterationDirection dir
-                                        , SplitSide           side
-                                        , int           delta
-                                        ) = 0;
+        virtual Dimension computMinimumSize() const = 0;
 
         virtual bool        checkInvariant() const = 0;
 
@@ -210,6 +206,12 @@ namespace ViWm
                             ( Renderer::RenderWindow &r
                             , Renderer::Brush defaultBrush ) const = 0;
 
+        virtual void splitDeltaPropagate( const Screen& s
+                                        , size_t splitIndex
+                                        , IterationDirection dir
+                                        , SplitSide           side
+                                        , int           delta
+                                        ) = 0;
     protected:
         friend class LayoutNode;
         friend class Layout::EmptyFinder;
@@ -237,6 +239,13 @@ namespace ViWm
             Unconstrained = -1
         };
 
+        enum Propagation
+        {
+            Propagate,
+            PartialPropagation,
+            UpdateInPlace
+        };
+
         struct SizePair
         {
             SizePair( LayoutTree *t )
@@ -253,6 +262,7 @@ namespace ViWm
             int         width;
             int         height; /**< Same thing as width */
 
+            Propagation resizeAction;
             /**
              * Store the width atributed to the subtree
              * during the last establishment
@@ -295,19 +305,14 @@ namespace ViWm
         virtual LayoutLeaf*   getSelected();
         virtual SplitCoord    FindPointedSplit( int x, int y );
         virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
-        virtual bool canPropagateSplit( const Screen&       s
-                                      , size_t              splitIndex
-                                      , IterationDirection  dir
-                                      , SplitSide           side
-                                      , int                 delta
-                                      ) const;
-
         virtual void splitDeltaPropagate( const Screen& s
                                         , size_t splitIndex
                                         , IterationDirection dir
                                         , SplitSide           side
                                         , int           delta
                                         );
+
+        virtual Dimension computMinimumSize() const;
 
         virtual bool          checkInvariant() const;
 
@@ -372,6 +377,14 @@ namespace ViWm
         CompStatus  pack( CompStatus what, size_t &index );
         bool isAtBound( IterationDirection dir
                       , size_t splitIndex ) const;
+
+        bool canPropagateSplit( const Screen&       s
+                              , size_t              splitIndex
+                              , IterationDirection  dir
+                              , SplitSide           side
+                              , int                 delta
+                              ) const;
+
         void        insert( LayoutTree  *toSearch
                           , LayoutTree  *toAdd
                           , int plusMinus );
@@ -379,6 +392,7 @@ namespace ViWm
         SplitSide   lastDirection;
         Collection  nodes;
         size_t      selectedRoute;
+        mutable Dimension minimumSize;
     };
 
     class LayoutLeaf : public LayoutTree
@@ -402,12 +416,7 @@ namespace ViWm
         TilledWindow&   getWindow() { return window; }
         const TilledWindow&   getWindow() const { return window; }
 
-        virtual bool canPropagateSplit( const Screen&       s
-                                      , size_t              splitIndex
-                                      , IterationDirection  dir
-                                      , SplitSide           side
-                                      , int                 delta
-                                      ) const;
+        virtual Dimension computMinimumSize() const;
 
         virtual void splitDeltaPropagate( const Screen&
                                         , size_t splitIndex
