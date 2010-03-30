@@ -985,9 +985,15 @@ namespace ViWm
                 }
             }
             else if ( lastDirection == SplitVertical )
+            {
                 rez.width += MinimumViewableSize;
+                nodes[i].nodeIncompresibleSize = MinimumViewableSize;
+            }
             else
+            {
                 rez.height += MinimumViewableSize;
+                nodes[i].nodeIncompresibleSize = MinimumViewableSize;
+            }
         }
         return rez;
     }
@@ -1008,7 +1014,7 @@ namespace ViWm
         for (size_t i = 0; i < p->nodes.size(); i++)
         {
             if ( p->nodes[i].subTree == this )
-                return p->nodes[i].lastLogicalDimension;
+                return p->nodes[i].lastScreenDim;
         }
 
         // if we reach this code path, we clearly have a problem
