@@ -734,9 +734,6 @@ namespace ViWm
         SizePair    &previous = nodes[splitIndex];
         Rect        prevDim = getMyPreviousDimension( current );
 
-        prevDim.x = 0;
-        prevDim.y = 0;
-
         // calculate all the subsize splits :]
         computMinimumSize();
 
