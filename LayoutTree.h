@@ -207,11 +207,18 @@ namespace ViWm
                             , Renderer::Brush defaultBrush ) const = 0;
 
         virtual void splitDeltaPropagate( const Screen& s
-                                        , size_t splitIndex
+                                        , int    splitIndex
                                         , IterationDirection dir
                                         , SplitSide           side
                                         , int           delta
                                         ) = 0;
+
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , int                 splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const = 0;
     protected:
         friend class LayoutNode;
         friend class Layout::EmptyFinder;
@@ -307,11 +314,18 @@ namespace ViWm
         virtual SplitCoord    FindPointedSplit( int x, int y );
         virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
         virtual void splitDeltaPropagate( const Screen& s
-                                        , size_t splitIndex
+                                        , int    splitIndex
                                         , IterationDirection dir
                                         , SplitSide           side
                                         , int           delta
                                         );
+
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , int                 splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const;
 
         virtual Dimension computMinimumSize() const;
 
@@ -379,12 +393,11 @@ namespace ViWm
         bool isAtBound( IterationDirection dir
                       , size_t splitIndex ) const;
 
-        bool canPropagateSplit( const Screen&       s
-                              , size_t              splitIndex
-                              , IterationDirection  dir
-                              , SplitSide           side
-                              , int                 delta
-                              ) const;
+        void canPropagateSplitScatter( const Screen &s
+                                     , IterationDirection dir
+                                     , SplitSide side
+                                     , int delta ) const;
+
 
         void        insert( LayoutTree  *toSearch
                           , LayoutTree  *toAdd
@@ -410,6 +423,7 @@ namespace ViWm
         virtual LayoutTree*   pickNode( IterationDirection dir, int xHope, int yHope );
         virtual bool          checkInvariant() const;
 
+
         virtual void    Establish( const Screen &currentScreen
                                  , const Rect &dim
                                  , SplitSide side );
@@ -418,9 +432,15 @@ namespace ViWm
         const TilledWindow&   getWindow() const { return window; }
 
         virtual Dimension computMinimumSize() const;
+        virtual bool canPropagateSplit( const Screen&       s
+                                      , int                 splitIndex
+                                      , IterationDirection  dir
+                                      , SplitSide           side
+                                      , int                 delta
+                                      ) const;
 
         virtual void splitDeltaPropagate( const Screen&
-                                        , size_t splitIndex
+                                        , int   splitIndex
                                         , IterationDirection dir
                                         , SplitSide           side
                                         , int           delta

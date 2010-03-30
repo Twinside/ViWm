@@ -737,6 +737,9 @@ namespace ViWm
         prevDim.x = 0;
         prevDim.y = 0;
 
+        // calculate all the subsize splits :]
+        computMinimumSize();
+
         // it's ugly, but I can't put them inside the if
         // due to reference initialisation :]
         int&    previousDim =  (lastDirection == SplitVertical)
@@ -775,7 +778,7 @@ namespace ViWm
         int sizeDelta = desiredSize - lastSize;
 
         // the size doesn't change, so we don't care
-        if ( desiredSize == lastSize )
+        if ( sizeDelta == 0 )
             return false;
 
         bool    canMoveBackward =
@@ -805,30 +808,46 @@ namespace ViWm
         return canMoveForward;
     }
 
-    bool LayoutNode::isAtBound( IterationDirection dir, size_t splitIndex ) const
+    void LayoutNode::canPropagateSplitScatter( const Screen &s
+                                             , IterationDirection dir
+                                             , SplitSide side
+                                             , int delta ) const
     {
-        return (int(dir) > 0 && splitIndex == nodes.size() - 1)
-            || (int(dir) < 0 && splitIndex == 0);
+        size_t subId = ( dir == Forward ) ? 0 : MaxNodeCount;
+
+        for ( size_t i = 0; i < nodes.size(); i++ )
+        {
+            if (nodes[i].subTree)
+            {
+                nodes[i].subTree->canPropagateSplit( s, subId, dir, side, delta );
+            }
+        }
     }
 
+    bool LayoutLeaf::canPropagateSplit( const Screen&, int, IterationDirection
+                                      , SplitSide, int ) const
+        { return true; }
+
     bool LayoutNode::canPropagateSplit( const Screen&       s
-                                      , size_t              splitIndex
+                                      , int                 splitIndex
                                       , IterationDirection  dir
                                       , SplitSide           side
                                       , int                 delta
                                       ) const
     {
-        if ( delta == 0 ) return true;
+        if ( splitIndex == MaxNodeCount )
+            splitIndex = nodes.size() - 1;
 
+        if ( splitIndex < 0 || splitIndex >= int(nodes.size()) )
+            return false;
+
+        if ( side != lastDirection )
+        {
+            canPropagateSplitScatter(s, dir, side, delta);
+            return true;
+        }
         const SizePair    &previous = nodes[splitIndex];
-        Dimension minimumSize( MinimumViewableSize, MinimumViewableSize );
-        if ( previous.subTree )
-            minimumSize = previous.subTree->computMinimumSize();
-
-        if (lastDirection == SplitVertical)
-            previous.nodeIncompresibleSize = minimumSize.width;
-        else
-            previous.nodeIncompresibleSize = minimumSize.height;
+        
 
         int         dim;
         
@@ -837,45 +856,55 @@ namespace ViWm
         else
             dim = previous.height;
 
+        size_t subId = ( dir == Forward ) ? 0 : MaxNodeCount;
+
         // we cannot satisfy the constraint.
-        if ( dim + delta < previous.nodeIncompresibleSize )
+        if ( dim == previous.nodeIncompresibleSize && delta < 0 )
+        {
+            previous.resizeAction = Propagate;
+            return canPropagateSplit( s, splitIndex + int(dir), dir, side, delta );
+        }
+        else if ( dim + delta < previous.nodeIncompresibleSize )
         {
             // we can safely assume that delta is negative. If it was positive
             // we couldn't be smaller than the minimumSize.
-            int newProp = delta - previous.nodeIncompresibleSize;
-            
-            if ( lastDirection == SplitVertical )
-                newProp += previous.lastLogicalDimension.width;
-            else // SplitHorizontal
-                newProp += previous.lastLogicalDimension.height;
+            int newProp = previous.nodeIncompresibleSize - dim;
+            previous.resizeAction = PartialPropagation;
 
-            if ( dim == previous.nodeIncompresibleSize )
-                previous.resizeAction = Propagate;
-            else
-                previous.resizeAction = PartialPropagation;
+            bool possibleMove = canPropagateSplit( s, splitIndex + int(dir)
+                                                 , dir, side, newProp );
+            // call our children
+            if ( possibleMove && previous.subTree )
+                previous.subTree->canPropagateSplit( s, subId, dir, side, newProp );
 
             // we can try to take the maximum of delta and forward the rest
             // to others.
-            return !isAtBound( dir, splitIndex )
-                && canPropagateSplit( s, splitIndex + int(dir), dir, side, newProp );
+            return possibleMove;
         }
         else
         {
             previous.resizeAction = UpdateInPlace;
+            // recurse to know what to do on next pass
+            if ( previous.subTree )
+                previous.subTree->canPropagateSplit( s, subId, dir, side, delta );
+
             return true;
         }
     }
 
-    void LayoutLeaf::splitDeltaPropagate( const Screen&, size_t, IterationDirection, SplitSide, int) {}
+    void LayoutLeaf::splitDeltaPropagate( const Screen&, int, IterationDirection, SplitSide, int) {}
     void LayoutNode::splitDeltaPropagate( const Screen &s
-                                        , size_t splitIndex
+                                        , int splitIndex
                                         , IterationDirection dir
                                         , SplitSide           side
                                         , int           delta
                                         )
     {
-        if ( splitIndex >= nodes.size() )
+        if ( splitIndex == MaxNodeCount )
             splitIndex = nodes.size() - 1;
+
+        if ( splitIndex < 0 || splitIndex >= int(nodes.size()) )
+            return;
 
         SizePair    &previous = nodes[splitIndex];
 
@@ -942,11 +971,13 @@ namespace ViWm
                 {
                     rez.width += sub.width;
                     rez.height = std::max( rez.height, sub.height );
+                    nodes[i].nodeIncompresibleSize = sub.width;
                 }
                 else
                 {
                     rez.height += sub.height;
                     rez.width = std::max( rez.width, sub.width );
+                    nodes[i].nodeIncompresibleSize = sub.height;
                 }
             }
             else if ( lastDirection == SplitVertical )
