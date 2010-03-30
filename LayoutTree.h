@@ -406,7 +406,6 @@ namespace ViWm
         SplitSide   lastDirection;
         Collection  nodes;
         size_t      selectedRoute;
-        mutable Dimension minimumSize;
     };
 
     class LayoutLeaf : public LayoutTree

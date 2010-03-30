@@ -868,7 +868,7 @@ namespace ViWm
         {
             // we can safely assume that delta is negative. If it was positive
             // we couldn't be smaller than the minimumSize.
-            int newProp = previous.nodeIncompresibleSize - dim;
+            int newProp = delta + (dim - previous.nodeIncompresibleSize);
             previous.resizeAction = PartialPropagation;
 
             bool possibleMove = canPropagateSplit( s, splitIndex + int(dir)
@@ -924,17 +924,21 @@ namespace ViWm
             splitDeltaPropagate( s, splitIndex + int(dir), dir, side, delta );
         else if ( previous.resizeAction == PartialPropagation )
         {
-            int newProp = delta - previous.nodeIncompresibleSize;
+            int newProp;
             
             if ( lastDirection == SplitVertical )
             {
-                newProp += previous.lastLogicalDimension.width;
-                previous.width = minimumSize.width;
+                newProp = delta
+                        + ( previous.lastLogicalDimension.width
+                          - previous.nodeIncompresibleSize);
+                previous.width = previous.nodeIncompresibleSize;
             }
             else
             {
-                newProp += previous.lastLogicalDimension.height;
-                previous.height = minimumSize.height;
+                newProp = delta
+                        + ( previous.lastLogicalDimension.height
+                          - previous.nodeIncompresibleSize);
+                previous.height = previous.nodeIncompresibleSize;
             }
 
             // subPropagate
@@ -1004,7 +1008,7 @@ namespace ViWm
         for (size_t i = 0; i < p->nodes.size(); i++)
         {
             if ( p->nodes[i].subTree == this )
-                return p->nodes[i].lastScreenDim;
+                return p->nodes[i].lastLogicalDimension;
         }
 
         // if we reach this code path, we clearly have a problem
