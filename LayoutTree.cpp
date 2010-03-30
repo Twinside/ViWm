@@ -743,10 +743,6 @@ namespace ViWm
                             ? prevDim.width
                             : prevDim.height;
 
-        int&    dimensionWriting = (lastDirection == SplitVertical)
-                                 ? previous.width
-                                 : previous.height;
-
         int&    prevPoint = (lastDirection == SplitVertical)
                           ? prevDim.x
                           : prevDim.y;
@@ -783,12 +779,12 @@ namespace ViWm
             return false;
 
         bool    canMoveBackward =
-             canPropagateSplit( current, splitIndex - 1
+             canPropagateSplit( current, splitIndex
                               , Backward, lastDirection
                               , sizeDelta );
 
         bool    canMoveForward = canMoveBackward &&
-             canPropagateSplit( current, splitIndex
+             canPropagateSplit( current, splitIndex + 1
                               , Forward, lastDirection
                               , - sizeDelta );
 
@@ -796,14 +792,14 @@ namespace ViWm
         // than "MinimumViewableSize"
         if ( canMoveForward )
         {
-            splitDeltaPropagate( current, splitIndex - 1
+            splitDeltaPropagate( current, splitIndex
                                , Backward, lastDirection
-                               , desiredSize );
+                               , sizeDelta );
 
             splitDeltaPropagate( current
-                               , splitIndex
+                               , splitIndex + 1
                                , Forward, lastDirection
-                               , lastSize - MinimumViewableSize - desiredSize );
+                               , - sizeDelta );
         }
 
         return canMoveForward;
@@ -829,27 +825,31 @@ namespace ViWm
         if ( previous.subTree )
             minimumSize = previous.subTree->computMinimumSize();
 
-        const int minSize = (lastDirection == SplitVertical)
-                          ? minimumSize.width
-                          : minimumSize.height;
+        if (lastDirection == SplitVertical)
+            previous.nodeIncompresibleSize = minimumSize.width;
+        else
+            previous.nodeIncompresibleSize = minimumSize.height;
 
-        int         dim = (lastDirection == SplitVertical)
-                        ? previous.width
-                        : previous.height;
+        int         dim;
+        
+        if (lastDirection == SplitVertical)
+            dim = previous.width;
+        else
+            dim = previous.height;
 
         // we cannot satisfy the constraint.
-        if ( dim + delta < minSize )
+        if ( dim + delta < previous.nodeIncompresibleSize )
         {
             // we can safely assume that delta is negative. If it was positive
             // we couldn't be smaller than the minimumSize.
-            int newProp = delta - minSize;
+            int newProp = delta - previous.nodeIncompresibleSize;
             
             if ( lastDirection == SplitVertical )
                 newProp += previous.lastLogicalDimension.width;
             else // SplitHorizontal
                 newProp += previous.lastLogicalDimension.height;
 
-            if ( dim == minSize )
+            if ( dim == previous.nodeIncompresibleSize )
                 previous.resizeAction = Propagate;
             else
                 previous.resizeAction = PartialPropagation;
@@ -861,7 +861,7 @@ namespace ViWm
         }
         else
         {
-            preious.resizeAction = UpdateInPlace;
+            previous.resizeAction = UpdateInPlace;
             return true;
         }
     }
@@ -877,13 +877,9 @@ namespace ViWm
         if ( splitIndex >= nodes.size() )
             splitIndex = nodes.size() - 1;
 
-        const int minSize = (lastDirection == SplitVertical)
-                          ? minimumSize.width
-                          : minimumSize.height;
+        SizePair    &previous = nodes[splitIndex];
 
-        int         dim = (lastDirection == SplitVertical)
-                        ? previous.width
-                        : previous.height;
+        size_t      subId = dir == Forward ? 0 : MaxNodeCount;
 
         if ( side != lastDirection )
         {
@@ -895,14 +891,11 @@ namespace ViWm
             return;
         }
 
-        SizePair    &previous = nodes[splitIndex];
-        size_t      subId = dir == Forward ? 0 : MaxNodeCount;
-
         if ( previous.resizeAction == Propagate )
-            splitDeltaPropagate( s, splitIndex + int(dir), dir, side, newProp );
+            splitDeltaPropagate( s, splitIndex + int(dir), dir, side, delta );
         else if ( previous.resizeAction == PartialPropagation )
         {
-            int newProp = delta - minSize;
+            int newProp = delta - previous.nodeIncompresibleSize;
             
             if ( lastDirection == SplitVertical )
             {

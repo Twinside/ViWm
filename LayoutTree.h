@@ -262,7 +262,8 @@ namespace ViWm
             int         width;
             int         height; /**< Same thing as width */
 
-            Propagation resizeAction;
+            mutable Propagation resizeAction;
+            mutable int         nodeIncompresibleSize;
             /**
              * Store the width atributed to the subtree
              * during the last establishment
