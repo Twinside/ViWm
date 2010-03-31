@@ -9,6 +9,7 @@
 #include "Actions/MultiScreen.h"
 #include "Actions/System.h"
 #include "Actions/Debug.h"
+#include "Actions/WindowCapture.h"
 #include "resource.h"
 
 using namespace ViWm;
@@ -54,6 +55,9 @@ int WINAPI WinMain( HINSTANCE hInstance
     defs.push_back( HotKey( 'R', new Actions::NodeRotate( IDS_ACTION_ROTATE, NoStringId ,1 ) ));
     defs.push_back( HotKey( 'I', new Actions::InverseScreenLayout( IDS_ACTION_INVERSELAYOUT, NoStringId )));
     defs.push_back( HotKey( 'U', new Actions::Relayout( IDS_ACTION_RELAYOUT, NoStringId )));
+
+    defs.push_back( HotKey( 'C', new Actions::WindowCapture( IDS_ACTION_CAPTURE, NoStringId )));
+    defs.push_back( HotKey( 'F', new Actions::WindowRelease( IDS_ACTION_FREEWINDOW, NoStringId )));
 
     defs.push_back( HotKey( 'H', new Actions::HorizontalMove( IDS_ACTION_MOVELEFT, NoStringId, Backward )));
     defs.push_back( HotKey( 'J', new Actions::VerticalMove( IDS_ACTION_MOVEDOWN, NoStringId, Forward )));

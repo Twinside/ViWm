@@ -79,6 +79,8 @@ BEGIN
     IDS_ACTION_MOVERIGHT    "Move Right"
     IDS_ACTION_MOVEUP       "Move Up"
     IDS_ACTION_MOVEDOWN     "Move Down"
+    IDS_ACTION_CAPTURE      "Capture window"
+    IDS_ACTION_FREEWINDOW   "Free window"
 END
 
 #endif    // French (France) resources

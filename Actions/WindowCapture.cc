@@ -8,10 +8,21 @@ namespace Actions
         : Action( display, descr )
     {}
 
-    Action::ReturnInfo   WindowCapture::operator() ( DesktopLayout&    /*l*/
-                                                   , WindowMakerState& /*state*/ )
+    Action::ReturnInfo   WindowCapture::operator() ( DesktopLayout&    layout
+                                                   , WindowMakerState& state )
     {
-        return Nothing;
+        HWND focused = GetForegroundWindow();
+
+        if ( focused == NULL )
+            return Nothing;
+
+        TilledWindow    *newWindow = new TilledWindow( focused );
+        state.addWindow( *newWindow );
+
+        state.getCurrentLayouter().addNewWindowToLayout
+                ( *newWindow, state, layout );
+
+        return NeedRelayout;
     }
 
     WindowRelease::WindowRelease( StringId display
@@ -19,10 +30,22 @@ namespace Actions
         : Action( display, descr )
     {}
 
-    Action::ReturnInfo   WindowRelease::operator() ( DesktopLayout&    /*l*/
-                                                   , WindowMakerState& /*state*/ )
+    Action::ReturnInfo   WindowRelease::operator() ( DesktopLayout&    layout
+                                                   , WindowMakerState& state )
     {
-        return Nothing;
+        HWND focused = GetForegroundWindow();
+
+        TilledWindow *found = state.FindNode(focused);
+
+        if ( !found )
+            return Nothing;
+
+        for (size_t i = 0; i < layout.size(); ++i)
+            LayoutTree::removeClean( layout[i].layoutRoot, focused );
+
+        state.RemoveNode(focused);
+
+        return NeedRelayout;
     }
 }}
 

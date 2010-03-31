@@ -16,6 +16,8 @@
 #define IDS_ACTION_MOVERIGHT            112
 #define IDS_ACTION_MOVEUP               113
 #define IDS_ACTION_MOVEDOWN             114
+#define IDS_ACTION_CAPTURE              115
+#define IDS_ACTION_FREEWINDOW           116
 
 // Next default values for new objects
 // 
