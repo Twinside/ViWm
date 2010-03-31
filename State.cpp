@@ -42,7 +42,7 @@ namespace ViWm
         return 0;
     }
 
-    void WindowMakerState::RemoveNode( HWND hwnd )
+    void WindowMakerState::RemoveNode( HWND hwnd, bool isRelease )
     {
         std::vector<Bucket>::iterator it;
         std::list<TilledWindow*>::iterator     found;
@@ -81,7 +81,11 @@ namespace ViWm
 
         if ( hasFound )
         {
-            firstFound->Discard();
+            // We need to perform de-initialization
+            // if we want to release it
+            if ( !isRelease )
+                firstFound->Discard();
+
             delete firstFound;
         }
     }

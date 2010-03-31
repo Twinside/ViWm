@@ -43,7 +43,7 @@ namespace Actions
         for (size_t i = 0; i < layout.size(); ++i)
             LayoutTree::removeClean( layout[i].layoutRoot, focused );
 
-        state.RemoveNode(focused);
+        state.RemoveNode(focused, true);
 
         return NeedRelayout;
     }

@@ -32,7 +32,12 @@ namespace ViWm
         };
 
         TilledWindow*   FindNode( HWND hwnd );
-        void            RemoveNode( HWND hwnd );
+
+        /**
+         * @param isRelease Tell if we need to give back window
+         *                  borders & all.
+         */
+        void            RemoveNode( HWND hwnd, bool isRelease );
 
         TillingMode getTillingMode() const { return tilingMode; }
         Layouter&   getCurrentLayouter()

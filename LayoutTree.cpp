@@ -226,116 +226,85 @@ namespace ViWm
         // +-----------------------------+
         //
         //
+        int constrainedDim;
+        int dimSize;
+
+        int &sizeWriter = ( side == SplitHorizontal )
+                        ? subSize.height : subSize.width;
+
+        int &logicalSizeWriter = ( side == SplitHorizontal )
+                               ? logicalSubsize.height : subSize.width;
+
+        int &startWriter = ( side == SplitHorizontal )
+                         ? subSize.y : subSize.x;
+
+        int &startLogicalWriter = ( side == SplitHorizontal )
+                                ? logicalSubsize.y : logicalSubsize.x;
+
         if ( side == SplitHorizontal )
         {
-            int unconstrainedSize;
-
-            if (constrainedHeightCount > 0 && constrainedHeightCount < nodes.size())
-            {
-                unconstrainedSize = unconstrainedHeight
-                                  / (int(nodes.size()) - int(constrainedHeightCount));
-            }
-            else
-            {
-                unconstrainedSize = dim.height
-                                  / static_cast<int>( nodes.size() );
-            }
-
-            size_t i = 0;
-            for (it = nodes.begin(); it != nodes.end(); ++it, i++)
-            {
-                int sizeSub = SplitWidth;
-                int topShift = HalfSplit;
-
-                if (i == 0)
-                {
-                    sizeSub = HalfSplit;
-                    topShift = 0;
-                } 
-                else if (i == nodes.size() - 1)
-                {
-                    sizeSub = HalfSplit;
-                }
-
-                if ( it->height )
-                {
-                    subSize.height = it->height - sizeSub;
-                    logicalSubsize.height = it->height;
-                }
-                else
-                {
-                    subSize.height = unconstrainedSize - sizeSub;
-                    logicalSubsize.height = unconstrainedSize;
-                }
-
-                subSize.y += topShift;
-                if ( it->subTree )
-                {
-                    it->subTree->Establish( currentScreen
-                                          , subSize
-                                          , SplitVertical );
-                }
-                it->lastScreenDim = subSize;
-                it->lastLogicalDimension = logicalSubsize;
-
-                subSize.y += subSize.height + HalfSplit;
-                logicalSubsize.y += logicalSubsize.height;
-            }
+            constrainedDim = constrainedHeightCount;
+            dimSize = dim.height;
         }
-        else // SplitVertical
+        else
         {
-            int unconstrainedSize;
-            
-            if ( constrainedWidthCount > 0 && constrainedWidthCount < nodes.size())
+            constrainedDim = constrainedWidthCount;
+            dimSize = dim.width;
+        }
+
+        int unconstrainedSize;
+
+        if (constrainedDim > 0 && constrainedDim < int(nodes.size()))
+        {
+            unconstrainedSize = unconstrainedHeight
+                              / (int(nodes.size()) - constrainedDim);
+        }
+        else
+        {
+            unconstrainedSize = dimSize
+                              / static_cast<int>( nodes.size() );
+        }
+
+        size_t i = 0;
+        for (it = nodes.begin(); it != nodes.end(); ++it, i++)
+        {
+            int sizeSub = SplitWidth;
+            int topShift = HalfSplit;
+
+            if (i == 0)
             {
-                unconstrainedSize = unconstrainedWidth 
-                                  / (int(nodes.size()) - int(constrainedWidthCount));
+                sizeSub = HalfSplit;
+                topShift = 0;
+            } 
+            else if (i == nodes.size() - 1)
+            {
+                sizeSub = HalfSplit;
+            }
+
+            if ( it->height )
+            {
+                /// AAAAAAAAAAAAAAAARGH
+                sizeWriter = it->height - sizeSub;
+                logicalSizeWriter = it->height;
             }
             else
             {
-                unconstrainedSize = dim.width
-                                  / static_cast<int>( nodes.size() );
+                sizeWriter = unconstrainedSize - sizeSub;
+                logicalSizeWriter = unconstrainedSize;
             }
 
-            size_t i = 0;
-
-            for (it = nodes.begin(); it != nodes.end(); ++it, i++)
+            startWriter += topShift;
+            if ( it->subTree )
             {
-                int sizeSub = SplitWidth;
-                int leftShift = HalfSplit;
-
-                if (i == 0)
-                {
-                    sizeSub = HalfSplit;
-                    leftShift = 0;
-                }
-                else if (i != nodes.size() - 1)
-                    sizeSub = HalfSplit;
-
-                if ( it->width )
-                {
-                    subSize.width = it->width - sizeSub;
-                    logicalSubsize.width = it->width;
-                }
-                else
-                {
-                    subSize.width = unconstrainedSize - sizeSub;
-                    logicalSubsize.width = unconstrainedSize;
-                }
-
-                subSize.x += leftShift;
-                if ( it->subTree )
-                {
-                    it->subTree->Establish( currentScreen
-                                          , subSize
-                                          , SplitHorizontal );
-                }
-                it->lastScreenDim = subSize;
-                it->lastLogicalDimension = logicalSubsize;
-
-                subSize.x += subSize.width + HalfSplit;
-                logicalSubsize.x += logicalSubsize.width;
+                it->subTree->Establish( currentScreen
+                                      , subSize
+                                      , SplitVertical );
             }
+            it->lastScreenDim = subSize;
+            it->lastLogicalDimension = logicalSubsize;
+
+            startWriter += sizeWriter + HalfSplit;
+            startLogicalWriter += logicalSizeWriter;
         }
         INV_CHECK;
     }

@@ -132,7 +132,7 @@ namespace ViWm
                 for (size_t i = 0; i < currentLayout.size(); ++i)
                     LayoutTree::removeClean( currentLayout[i].layoutRoot, (HWND) lParam );
 
-                currentState.RemoveNode((HWND)lParam);
+                currentState.RemoveNode((HWND)lParam, false);
 
                 ArrangeWindows();
                 FocusCurrent();
