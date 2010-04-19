@@ -8,7 +8,7 @@
 
 
 #ifdef _DEBUG
-#   define INV_CHECK assert(checkInvariant())
+#   define INV_CHECK checkInvariant()
 #else /* DEBUG */
 #   define INV_CHECK
 #endif /* DEBUG */
@@ -1108,18 +1108,15 @@ namespace ViWm
     bool LayoutNode::checkInvariant() const
     {
         // the selection must be in range.
-        if ( selectedRoute >= nodes.size() && nodes.size() > 1 )
-            return false;
+        assert( selectedRoute < nodes.size() || nodes.size() <= 1 );
 
         // we should
         if ( nodes.size() > 1 )
         {
-            if ( nodes[selectedRoute].subTree == NULL )
-                return false;
-            return nodes[selectedRoute].subTree->checkInvariant();
+            assert(nodes[selectedRoute].subTree != NULL);
+            nodes[selectedRoute].subTree->checkInvariant();
         }
-        else // we should be deleted soon. SO don't care
-            return true;
+        return true;
     }
 
     void LayoutNode::rotate( int about )
