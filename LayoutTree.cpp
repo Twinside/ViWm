@@ -270,6 +270,8 @@ namespace ViWm
         {
             int sizeSub = SplitWidth;
             int topShift = HalfSplit;
+            int thisDim = (side == SplitHorizontal)
+                        ? it->height : it->width;
 
             if (i == 0)
             {
@@ -281,11 +283,11 @@ namespace ViWm
                 sizeSub = HalfSplit;
             }
 
-            if ( it->height )
+            if ( thisDim )
             {
                 /// AAAAAAAAAAAAAAAARGH
-                sizeWriter = it->height - sizeSub;
-                logicalSizeWriter = it->height;
+                sizeWriter = thisDim - sizeSub;
+                logicalSizeWriter = thisDim;
             }
             else
             {
@@ -703,6 +705,10 @@ namespace ViWm
         SizePair    &previous = nodes[splitIndex];
         Rect        prevDim = getMyPreviousDimension( current );
 
+        /* TODO : re-remove this shit
+        prevDim.x = 0;
+        prevDim.y = 0;//*/
+
         // calculate all the subsize splits :]
         computMinimumSize();
 
@@ -967,7 +973,7 @@ namespace ViWm
     Dimension LayoutLeaf::computMinimumSize() const
     {
         return Dimension( LayoutNode::MinimumViewableSize
-                        , LayoutNode::MinimumViewableSize );
+            , LayoutNode::MinimumViewableSize );
     }
 
     Rect LayoutNode::getMyPreviousDimension( const Screen &current ) const
