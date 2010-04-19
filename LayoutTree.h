@@ -390,6 +390,7 @@ namespace ViWm
 
     private:
         CompStatus  pack( CompStatus what, size_t &index );
+        void updateSelectedRoute( size_t removedIndex );
         bool isAtBound( IterationDirection dir
                       , size_t splitIndex ) const;
 

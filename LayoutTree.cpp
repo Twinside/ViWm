@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <algorithm>
+#include <numeric>
 #include <xutility>
 #include <iostream>
 #include "LayoutTree.h"
@@ -388,8 +389,7 @@ namespace ViWm
 
         // update the selected route into valid range
         // to avoid problems.
-        if ( selectedRoute >= nodes.size() )
-            selectedRoute = nodes.size() - 1;
+        updateSelectedRoute( i );
 
         INV_CHECK;
         if ( nodes.size() == 0 ) return Todo;
@@ -400,6 +400,58 @@ namespace ViWm
     // Depth First Search + same idea of backtracking as in node adding.
     LayoutTree::CompStatus LayoutLeaf::removeNode( WindowKey toRemove )
     { return window == toRemove ? Todo : Searching; }
+
+    {
+        bool   operator() ( bool acc, LayoutNode::SizePair &p )
+            { return p.subTree == NULL && acc; }
+    };
+
+    void    LayoutNode::updateSelectedRoute( size_t removedIndex )
+    {
+        IsNullFold  accumPred;
+        if ( std::accumulate( nodes.begin(), nodes.end()
+                            , true, accumPred )) 
+            return Todo;
+
+        if ( selectedRoute >= nodes.size() )
+        { 
+            int32_t nextSlection = nodes.size() - 1;
+
+            // find the previous valid selection in case of presence
+            // of other splits.
+            while ( nodes[ nextSlection ].subTree == 0
+                 && selectedRoute >= 0)
+            {
+                nextSlection--;
+            }
+
+            if ( nextSlection >= 0 )
+            {
+                selectedRoute = size_t(nextSlection);
+                return Done;
+            }
+        }
+        else if ( nodes[ selectedRoute ].subTree == 0 )
+        {
+            // try find next
+            size_t nextSlection = selectedRoute + 1;
+
+            // find the previous valid selection in case of presence
+            // of other splits.
+            while ( nodes[ nextSlection ].subTree == 0
+                 && selectedRoute >= nodes.size())
+            {
+                nextSlection++;
+            }
+
+            if ( nextSlection < nodes.size() )
+            {
+                return Node;
+            }
+        }
+
+        return Done;
+    }
 
     LayoutTree::CompStatus LayoutNode::removeNode( WindowKey toRemove )
     {
