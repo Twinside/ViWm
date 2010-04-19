@@ -233,7 +233,7 @@ namespace ViWm
                         ? subSize.height : subSize.width;
 
         int &logicalSizeWriter = ( side == SplitHorizontal )
-                               ? logicalSubsize.height : subSize.width;
+                               ? logicalSubsize.height : logicalSubsize.width;
 
         int &startWriter = ( side == SplitHorizontal )
                          ? subSize.y : subSize.x;
@@ -264,6 +264,7 @@ namespace ViWm
             unconstrainedSize = dimSize
                               / static_cast<int>( nodes.size() );
         }
+        logicalSizeWriter = 0;
 
         size_t i = 0;
         for (it = nodes.begin(); it != nodes.end(); ++it, i++)
