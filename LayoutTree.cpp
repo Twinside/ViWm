@@ -179,6 +179,10 @@ namespace ViWm
 
         lastDirection = side;
 
+        SplitSide nextDirection = (side == SplitHorizontal)
+                                ? SplitVertical 
+                                : SplitHorizontal;
+
         // first we need do collect some size constraints.
         int unconstrainedWidth = dim.width;
         int unconstrainedHeight = dim.height;
@@ -301,7 +305,7 @@ namespace ViWm
             {
                 it->subTree->Establish( currentScreen
                                       , subSize
-                                      , SplitVertical );
+                                      , nextDirection );
             }
             it->lastScreenDim = subSize;
             it->lastLogicalDimension = logicalSubsize;
