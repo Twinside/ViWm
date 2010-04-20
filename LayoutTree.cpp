@@ -387,12 +387,8 @@ namespace ViWm
             if ( nodes[i].subTree )
                 pack( nodes[i].subTree->removeNode( toRemove ), i );
 
-        // update the selected route into valid range
-        // to avoid problems.
-        updateSelectedRoute( i );
-
         INV_CHECK;
-        if ( nodes.size() == 0 ) return Todo;
+        if ( nodes.size() == 0 || areSubnodesNull() ) return Todo;
         if ( nodes.size() == 1 ) return Compact;
         return Done;
     }
@@ -401,52 +397,40 @@ namespace ViWm
     LayoutTree::CompStatus LayoutLeaf::removeNode( WindowKey toRemove )
     { return window == toRemove ? Todo : Searching; }
 
+    struct IsNullFold
     {
-        bool   operator() ( bool acc, LayoutNode::SizePair &p )
+        bool   operator() ( bool acc, const LayoutNode::SizePair &p )
             { return p.subTree == NULL && acc; }
     };
 
-    void    LayoutNode::updateSelectedRoute( size_t removedIndex )
+    bool LayoutNode::areSubnodesNull() const
     {
         IsNullFold  accumPred;
-        if ( std::accumulate( nodes.begin(), nodes.end()
-                            , true, accumPred )) 
+        return std::accumulate( nodes.begin(), nodes.end()
+                              , true, accumPred );
+    }
+
+    LayoutTree::CompStatus    LayoutNode::updateSelectedRoute( size_t removedIndex )
+    {
+        if ( areSubnodesNull() ) 
             return Todo;
 
-        if ( selectedRoute >= nodes.size() )
-        { 
-            int32_t nextSlection = nodes.size() - 1;
+        if ( nodes[ removedIndex ].subTree )
+            return Done;
 
-            // find the previous valid selection in case of presence
-            // of other splits.
-            while ( nodes[ nextSlection ].subTree == 0
-                 && selectedRoute >= 0)
-            {
-                nextSlection--;
-            }
-
-            if ( nextSlection >= 0 )
-            {
-                selectedRoute = size_t(nextSlection);
-                return Done;
-            }
-        }
-        else if ( nodes[ selectedRoute ].subTree == 0 )
+        // from the removed index, pick the first
+        // around
+        for (size_t i = 1; i < nodes.size(); i++)
         {
-            // try find next
-            size_t nextSlection = selectedRoute + 1;
-
-            // find the previous valid selection in case of presence
-            // of other splits.
-            while ( nodes[ nextSlection ].subTree == 0
-                 && selectedRoute >= nodes.size())
+            if ( removedIndex + i < nodes.size() 
+               && nodes[ removedIndex + i ].subTree )
             {
-                nextSlection++;
+                selectedRoute = removedIndex + i;
             }
-
-            if ( nextSlection < nodes.size() )
+            else if ( int(removedIndex) - i > 0 
+                && nodes[ removedIndex - i ].subTree )
             {
-                return Node;
+                selectedRoute = removedIndex - i;
             }
         }
 
@@ -465,7 +449,6 @@ namespace ViWm
                 lastOperation = pack( nodes[i].subTree->removeNode( toRemove ), i );
                 if ( lastOperation != Searching  )
                 {
-                    INV_CHECK;
                     return lastOperation;
                 }
             }
@@ -490,8 +473,7 @@ namespace ViWm
             else if ( nodes.size() == 1 )
                 return Compact;
 
-            i--;
-            break;
+            return updateSelectedRoute( i );
 
         case Compact:
             child = static_cast<LayoutNode*>(nodes[i].subTree);
@@ -503,17 +485,17 @@ namespace ViWm
 
             child->releaseChildren();
             delete child;
-            break;
+            return Done;
 
-        case Searching: 
-            return Searching;
+        case Searching: return Searching;
         
-        case Done: break;
+        case Done:
+            // no invariant check because it's often called
+            // by internal functions, thus not finished sabilizing
+            // the internal state
+            return Done;
         }
 
-        // no invariant check because it's often called
-        // by internal functions, thus not finished sabilizing
-        // the internal state
         return Done;
     }
 
